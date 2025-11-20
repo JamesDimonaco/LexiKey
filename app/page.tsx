@@ -1,166 +1,101 @@
 "use client";
 
-import {
-  Authenticated,
-  Unauthenticated,
-  useMutation,
-  useQuery,
-} from "convex/react";
-import { api } from "../convex/_generated/api";
 import Link from "next/link";
-import { SignUpButton } from "@clerk/nextjs";
-import { SignInButton } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
   return (
     <>
-      <header className="sticky top-0 z-10 bg-background p-4 border-b-2 border-slate-200 dark:border-slate-800 flex flex-row justify-between items-center">
-        Convex + Next.js + Clerk
-        <UserButton />
+      <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
+        <h1 className="text-xl font-bold text-black dark:text-white">LexiKey</h1>
+        <div className="flex items-center gap-4">
+          <ModeToggle />
+          <UserButton />
+        </div>
       </header>
-      <main className="p-8 flex flex-col gap-8">
-        <h1 className="text-4xl font-bold text-center">
-          Convex + Next.js + Clerk
-        </h1>
-        <Authenticated>
+      <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col gap-8">
+        <div className="max-w-4xl mx-auto w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-5xl font-bold mb-4 text-black dark:text-white">LexiKey</h1>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              Kinesthetic Literacy & Typing for Dyslexic Students
+            </p>
+          </div>
           <Content />
-        </Authenticated>
-        <Unauthenticated>
-          <SignInForm />
-        </Unauthenticated>
+        </div>
       </main>
     </>
   );
 }
 
-function SignInForm() {
-  return (
-    <div className="flex flex-col gap-8 w-96 mx-auto">
-      <p>Log in to see the numbers</p>
-      <SignInButton mode="modal">
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">
-          Sign in
-        </button>
-      </SignInButton>
-      <SignUpButton mode="modal">
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">
-          Sign up
-        </button>
-      </SignUpButton>
-    </div>
-  );
-}
-
 function Content() {
-  const { viewer, numbers } =
-    useQuery(api.myFunctions.listNumbers, {
-      count: 10,
-    }) ?? {};
-  const addNumber = useMutation(api.myFunctions.addNumber);
-
-  if (viewer === undefined || numbers === undefined) {
-    return (
-      <div className="mx-auto">
-        <p>loading... (consider a loading skeleton)</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-8 max-w-lg mx-auto">
-      <p>Welcome {viewer ?? "Anonymous"}!</p>
-      <p>
-        Click the button below and open this page in another window - this data
-        is persisted in the Convex cloud database!
-      </p>
-      <p>
-        <button
-          className="bg-foreground text-background text-sm px-4 py-2 rounded-md"
-          onClick={() => {
-            void addNumber({ value: Math.floor(Math.random() * 10) });
-          }}
-        >
-          Add a random number
-        </button>
-      </p>
-      <p>
-        Numbers:{" "}
-        {numbers?.length === 0
-          ? "Click the button!"
-          : (numbers?.join(", ") ?? "...")}
-      </p>
-      <p>
-        Edit{" "}
-        <code className="text-sm font-bold font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded-md">
-          convex/myFunctions.ts
-        </code>{" "}
-        to change your backend
-      </p>
-      <p>
-        Edit{" "}
-        <code className="text-sm font-bold font-mono bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded-md">
-          app/page.tsx
-        </code>{" "}
-        to change your frontend
-      </p>
-      <p>
-        See the{" "}
-        <Link href="/server" className="underline hover:no-underline">
-          /server route
-        </Link>{" "}
-        for an example of loading data in a server component
-      </p>
-      <div className="flex flex-col">
-        <p className="text-lg font-bold">Useful resources:</p>
-        <div className="flex gap-2">
-          <div className="flex flex-col gap-2 w-1/2">
-            <ResourceCard
-              title="Convex docs"
-              description="Read comprehensive documentation for all Convex features."
-              href="https://docs.convex.dev/home"
+    <div className="flex flex-col gap-8">
+      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+        <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">Welcome to LexiKey!</h2>
+        <p className="text-gray-700 dark:text-gray-400 mb-6">
+          A literacy intervention tool that uses touch-typing muscle memory to
+          reinforce phonics and spelling. Combining the Orton-Gillingham
+          approach with adaptive typing practice.
+        </p>
+
+        <div className="space-y-4">
+          <Link
+            href="/practice"
+            className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Start Practice →
+          </Link>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+            <FeatureCard
+              icon="👁️"
+              title="Accessibility First"
+              description="High contrast, adjustable fonts, customizable cursor - designed for dyslexic students"
             />
-            <ResourceCard
-              title="Stack articles"
-              description="Learn about best practices, use cases, and more from a growing
-            collection of articles, videos, and walkthroughs."
-              href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html"
+            <FeatureCard
+              icon="🔊"
+              title="Multi-Sensory"
+              description="See + Hear + Type with Web Speech API for reinforced learning"
             />
-          </div>
-          <div className="flex flex-col gap-2 w-1/2">
-            <ResourceCard
-              title="Templates"
-              description="Browse our collection of templates to get started quickly."
-              href="https://www.convex.dev/templates"
-            />
-            <ResourceCard
-              title="Discord"
-              description="Join our developer community to ask questions, trade tips & tricks,
-            and show off your projects."
-              href="https://www.convex.dev/community"
+            <FeatureCard
+              icon="📚"
+              title="Phonics-Based"
+              description="Words organized by Orton-Gillingham phonics patterns, not just frequency"
             />
           </div>
         </div>
       </div>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800">
+        <h3 className="font-bold mb-2 text-black dark:text-white">Key Features:</h3>
+        <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+          <li>✓ Zero-latency local-first typing validation</li>
+          <li>✓ Automatic &ldquo;bucket system&rdquo; for struggling words</li>
+          <li>✓ No timer pressure option</li>
+          <li>✓ Blind mode for muscle memory practice</li>
+          <li>✓ Tracks hesitations and patterns for review</li>
+        </ul>
+      </div>
     </div>
   );
 }
 
-function ResourceCard({
+function FeatureCard({
+  icon,
   title,
   description,
-  href,
 }: {
+  icon: string;
   title: string;
   description: string;
-  href: string;
 }) {
   return (
-    <div className="flex flex-col gap-2 bg-slate-200 dark:bg-slate-800 p-4 rounded-md h-28 overflow-auto">
-      <a href={href} className="text-sm underline hover:no-underline">
-        {title}
-      </a>
-      <p className="text-xs">{description}</p>
+    <div className="flex flex-col gap-2 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border-2 border-gray-300 dark:border-gray-700">
+      <div className="text-3xl">{icon}</div>
+      <h3 className="font-bold text-black dark:text-white">{title}</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
     </div>
   );
 }
