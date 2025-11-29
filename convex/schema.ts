@@ -55,6 +55,11 @@ export default defineSchema({
       lastPracticeDate: v.optional(v.string()), // ISO date
       totalMinutesPracticed: v.number(),
       averageAccuracy: v.number(), // 0-100
+
+      // Adaptive learning
+      currentLevel: v.number(), // 1-10 difficulty rating
+      hasCompletedPlacementTest: v.boolean(),
+      struggleGroups: v.array(v.string()), // Phonics groups user struggles with
     }),
 
     // Subscription info (B2B/Premium)

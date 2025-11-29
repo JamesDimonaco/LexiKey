@@ -1,257 +1,334 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { TypingEngine } from "@/components/TypingEngine";
-import { AccessibilitySettings } from "@/components/AccessibilitySettings";
-import { TypingWord, WordResult } from "@/lib/types";
+import { useState, useEffect } from "react";
+import { UserButton, SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Word, UserProgress, PhonicsGroup } from "@/lib/types";
+import { AdaptiveSessionGenerator, calculateNewUserLevel } from "@/lib/AdaptiveEngine";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
 import Link from "next/link";
 import wordsData from "./words.json";
 
-// Load words from JSON file
-const SAMPLE_WORDS: TypingWord[] = wordsData;
+// Load words from JSON and transform to Word[] format
+const WORD_POOL: Word[] = wordsData.map((w: any) => ({
+  id: w.id,
+  text: w.word,
+  difficulty: w.difficultyLevel,
+  phonicsGroup: w.phonicsGroup as PhonicsGroup,
+  sentenceContext: w.sentenceContext,
+}));
 
-interface SavedProgress {
-  currentWordIndex: number;
-  sessionResults: WordResult[];
-  words: TypingWord[];
-}
-
-const STORAGE_KEY = "lexikey-practice-progress";
+type WordResult = {
+  wordId: string;
+  word: string;
+  difficulty: number;
+  phonicsGroup: string;
+  correct: boolean;
+  timeSpent: number;
+  backspaceCount: number;
+  hesitationDetected: boolean;
+};
 
 export default function PracticePage() {
-  const [showSettings, setShowSettings] = useState(false);
-  const [sessionActive, setSessionActive] = useState(false);
-  const [sessionResults, setSessionResults] = useState<WordResult[]>([]);
-  const [savedProgress, setSavedProgress] = useState<SavedProgress | null>(
-    null,
-  );
-  const [wordsToPractice, setWordsToPractice] =
-    useState<TypingWord[]>(SAMPLE_WORDS);
-
-  const handleWordComplete = useCallback((result: WordResult) => {
-    console.log("Word completed:", result);
-    // In production, this would send result summary to Convex
-    // NOT individual keystrokes - only the aggregate result
-  }, []);
-
-  const handleSessionComplete = useCallback((results: WordResult[]) => {
-    setSessionResults(results);
-    setSessionActive(false);
-    setSavedProgress(null);
-    localStorage.removeItem(STORAGE_KEY);
-
-    // In production, this would create a PracticeSession in Convex
-    const accuracy =
-      (results.filter((r) => r.isCorrect).length / results.length) * 100;
-    const totalDuration = results.reduce((sum, r) => sum + r.timeSpent, 0);
-    const struggleWords = results
-      .filter((r) => r.hesitated || r.backspaceCount > 3 || !r.isCorrect)
-      .map((r) => r.wordId);
-
-    console.log("Session Summary:", {
-      wordsAttempted: results.length,
-      accuracy,
-      durationSeconds: totalDuration,
-      struggleWords,
-    });
-  }, []);
-
-  // Load saved progress on mount
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const progress: SavedProgress = JSON.parse(saved);
-        // Verify the saved words match current words structure
-        if (progress.words && progress.words.length > 0) {
-          setSavedProgress(progress);
-          setWordsToPractice(progress.words);
-        }
-      } catch (e) {
-        console.error("Failed to load saved progress:", e);
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-  }, []);
-
-  const startNewSession = () => {
-    setSessionResults([]);
-    setSavedProgress(null);
-    setWordsToPractice(SAMPLE_WORDS);
-    localStorage.removeItem(STORAGE_KEY);
-    setSessionActive(true);
-  };
-
-  const continueSession = () => {
-    if (savedProgress) {
-      setSessionResults(savedProgress.sessionResults);
-      setWordsToPractice(savedProgress.words);
-      setSessionActive(true);
-    }
-  };
-
-  const handleQuit = useCallback((progress: SavedProgress) => {
-    // Save progress to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    setSavedProgress(progress);
-    setSessionActive(false);
-  }, []);
-
-  const clearSavedProgress = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setSavedProgress(null);
-  };
-
-  if (showSettings) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-black p-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6 flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-black dark:text-white">
-              Settings
-            </h1>
-            <button
-              onClick={() => setShowSettings(false)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Back to Practice
-            </button>
-          </div>
-          <AccessibilitySettings />
-        </div>
-      </div>
-    );
-  }
-
-  if (sessionActive) {
-    return (
-      <TypingEngine
-        words={wordsToPractice}
-        onWordComplete={handleWordComplete}
-        onSessionComplete={handleSessionComplete}
-        onQuit={handleQuit}
-        initialWordIndex={savedProgress?.currentWordIndex ?? 0}
-        initialResults={savedProgress?.sessionResults ?? []}
-      />
-    );
-  }
+  // Sync any placement test data from localStorage when user signs in
+  useSyncPlacementData();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-black dark:text-white">
-            LexiKey Practice
+    <>
+      <SignedOut>
+        <AuthWall />
+      </SignedOut>
+      <SignedIn>
+        <PracticeSession />
+      </SignedIn>
+    </>
+  );
+}
+
+function AuthWall() {
+  return (
+    <>
+      <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
+        <Link href="/" className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          LexiKey
+        </Link>
+        <div className="flex items-center gap-4">
+          <ModeToggle />
+        </div>
+      </header>
+      <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
+        <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 text-center">
+          <div className="text-6xl mb-6">🔒</div>
+          <h1 className="text-3xl font-bold mb-4 text-black dark:text-white">
+            Sign In Required
           </h1>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setShowSettings(true)}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            You need to be signed in to practice and save your progress.
+          </p>
+          <div className="space-y-4">
+            <SignInButton mode="modal">
+              <button className="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors">
+                Sign In to Practice
+              </button>
+            </SignInButton>
+            <Link
+              href="/placement-test"
+              className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
-              ⚙️ Settings
-            </button>
+              Take Placement Test (No Sign In Required)
+            </Link>
             <Link
               href="/"
-              className="px-4 py-2 bg-gray-300 dark:bg-gray-800 text-black dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700"
+              className="block text-blue-600 dark:text-blue-400 hover:underline"
             >
-              Home
+              ← Back to Home
             </Link>
           </div>
         </div>
+      </main>
+    </>
+  );
+}
 
-        {sessionResults.length > 0 ? (
-          <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md mb-6 border border-gray-200 dark:border-gray-800">
-            <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
-              Last Session Results
-            </h2>
+function PracticeSession() {
+  const { user } = useUser();
+  const currentUser = useQuery(api.users.getCurrentUser, user?.id ? { clerkId: user.id } : "skip");
+  const updateUserStats = useMutation(api.users.updateUserStats);
 
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
-                  {sessionResults.length}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Words Practiced
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-green-600 dark:text-green-400">
-                  {Math.round(
-                    (sessionResults.filter((r) => r.isCorrect).length /
-                      sessionResults.length) *
-                      100,
-                  )}
-                  %
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Accuracy
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-purple-600 dark:text-purple-400">
-                  {Math.round(
-                    sessionResults.reduce((sum, r) => sum + r.timeSpent, 0),
-                  )}
-                  s
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Total Time
-                </div>
-              </div>
-            </div>
+  const [sessionWords, setSessionWords] = useState<Word[]>([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [userInput, setUserInput] = useState("");
+  const [results, setResults] = useState<WordResult[]>([]);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [backspaceCount, setBackspaceCount] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+  const [levelProgress, setLevelProgress] = useState(0); // 0-100 representing progress to next level
+  const [showFeedback, setShowFeedback] = useState<{
+    type: 'correct' | 'incorrect';
+    speed: 'fast' | 'slow' | 'normal';
+  } | null>(null);
 
-            <div className="space-y-2">
-              <h3 className="font-semibold mb-2 text-black dark:text-white">
-                Word Details:
-              </h3>
-              {sessionResults.map((result) => (
-                <div
-                  key={result.wordId}
-                  className={`p-3 rounded-lg ${
-                    result.isCorrect
-                      ? "bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800"
-                      : "bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800"
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono font-bold text-black dark:text-white">
-                      {result.word}
-                    </span>
-                    <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span>{result.timeSpent.toFixed(1)}s</span>
-                      <span>{result.keystrokeCount} keys</span>
-                      {result.backspaceCount > 0 && (
-                        <span>{result.backspaceCount} backspaces</span>
-                      )}
-                      {result.hesitated && (
-                        <span className="text-orange-600 dark:text-orange-400">
-                          ⚠️ Hesitated
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+  const currentWord = sessionWords[currentWordIndex];
 
-            {sessionResults.filter(
-              (r) => r.hesitated || r.backspaceCount > 3 || !r.isCorrect,
-            ).length > 0 && (
-              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <h3 className="font-semibold mb-2 text-black dark:text-white">
-                  Words to Review:
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  These words will be added to your review bucket for extra
-                  practice.
+  // Generate adaptive session when user data loads
+  useEffect(() => {
+    if (!currentUser || sessionWords.length > 0) return;
+
+    // Build UserProgress from Convex data
+    const userProgress: UserProgress = {
+      userId: currentUser._id,
+      currentLevel: currentUser.stats.currentLevel,
+      hasCompletedPlacementTest: currentUser.stats.hasCompletedPlacementTest,
+      struggleGroups: currentUser.stats.struggleGroups as any[], // Type assertion for now
+      wordHistory: {}, // TODO: fetch from Convex practiceSessions
+    };
+
+    const generator = new AdaptiveSessionGenerator(WORD_POOL);
+    const generatedWords = generator.generateSession(userProgress);
+    setSessionWords(generatedWords);
+  }, [currentUser, sessionWords.length]);
+
+  useEffect(() => {
+    setStartTime(Date.now());
+    setBackspaceCount(0);
+    setShowFeedback(null);
+  }, [currentWordIndex]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      setBackspaceCount(prev => prev + 1);
+    }
+
+    // Advance on Enter or Space (if user has typed something)
+    if ((e.key === "Enter" || e.key === " ") && userInput.length > 0) {
+      e.preventDefault(); // Prevent space from being added to input
+      handleSubmitWord();
+    }
+  };
+
+  const handleSubmitWord = () => {
+    if (!currentWord) return;
+
+    const timeSpentMs = Date.now() - startTime;
+    const timeSpent = timeSpentMs / 1000; // Convert to seconds
+    const correct = userInput.trim().toLowerCase() === currentWord.text.toLowerCase();
+
+    // Determine speed feedback
+    let speed: 'fast' | 'slow' | 'normal' = 'normal';
+    if (timeSpent < 2) {
+      speed = 'fast';
+    } else if (timeSpent > 4) {
+      speed = 'slow';
+    }
+
+    // Show feedback briefly
+    setShowFeedback({
+      type: correct ? 'correct' : 'incorrect',
+      speed,
+    });
+
+    // Record result
+    const wordResult: WordResult = {
+      wordId: currentWord.id,
+      word: currentWord.text,
+      difficulty: currentWord.difficulty,
+      phonicsGroup: currentWord.phonicsGroup,
+      correct,
+      timeSpent,
+      backspaceCount,
+      hesitationDetected: timeSpent > 1.5,
+    };
+
+    setResults(prev => [...prev, wordResult]);
+
+    // Move to next word after brief delay (to show feedback)
+    setTimeout(() => {
+      if (currentWordIndex < sessionWords.length - 1) {
+        setCurrentWordIndex(prev => prev + 1);
+        setUserInput("");
+      } else {
+        // Session complete
+        finishSession([...results, wordResult]);
+      }
+    }, 800);
+  };
+
+  const finishSession = async (allResults: WordResult[]) => {
+    setIsComplete(true);
+
+    if (!currentUser) return;
+
+    // Calculate session stats
+    const accuracy = allResults.filter(r => r.correct).length / allResults.length;
+    const avgTimePerWord = allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length * 1000; // ms
+
+    // Calculate new user level
+    const newLevel = calculateNewUserLevel(
+      currentUser.stats.currentLevel,
+      accuracy,
+      avgTimePerWord
+    );
+
+    // Update user stats in Convex
+    await updateUserStats({
+      userId: currentUser._id,
+      stats: {
+        currentLevel: newLevel,
+      },
+    });
+
+    console.log("Session completed. New level:", newLevel);
+  };
+
+  const restartSession = () => {
+    setSessionWords([]);
+    setCurrentWordIndex(0);
+    setUserInput("");
+    setResults([]);
+    setIsComplete(false);
+    setStartTime(Date.now());
+    setBackspaceCount(0);
+    setShowFeedback(null);
+  };
+
+  // Loading state
+  if (!currentUser || sessionWords.length === 0) {
+    return (
+      <>
+        <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
+          <Link href="/" className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            LexiKey
+          </Link>
+          <div className="flex items-center gap-4">
+            <ModeToggle />
+            <UserButton />
+          </div>
+        </header>
+        <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
+          <div className="text-center">
+            <div className="text-6xl mb-4">⏳</div>
+            <p className="text-xl text-gray-600 dark:text-gray-400">Loading your personalized session...</p>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  if (isComplete) {
+    const accuracy = Math.round((results.filter(r => r.correct).length / results.length) * 100);
+    const totalTime = Math.round(results.reduce((sum, r) => sum + r.timeSpent, 0));
+    const struggleWords = results.filter(r => r.hesitationDetected || r.backspaceCount > 3 || !r.correct);
+    const fastWords = results.filter(r => r.correct && r.timeSpent < 2).length;
+    const newLevel = currentUser?.stats.currentLevel ?? 1;
+
+    return (
+      <>
+        <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
+          <Link href="/" className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            LexiKey
+          </Link>
+          <div className="flex items-center gap-4">
+            <ModeToggle />
+            <UserButton />
+          </div>
+        </header>
+        <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
+          <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+            <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
+              Session Complete! 🎉
+            </h1>
+
+            <div className="space-y-6">
+              {/* Level Display */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-6 rounded-lg border-2 border-purple-300 dark:border-purple-700">
+                <div className="text-center mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Current Level</p>
+                  <p className="text-5xl font-bold text-purple-600 dark:text-purple-400">
+                    {newLevel.toFixed(1)}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                    {accuracy >= 85 ? "Great job! 🚀" : accuracy >= 70 ? "Keep practicing! 💪" : "Take your time! 🌱"}
+                  </p>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-500"
+                    style={{ width: `${((newLevel % 1) * 100)}%` }}
+                  />
+                </div>
+                <p className="text-center text-xs text-gray-500 dark:text-gray-500 mt-2">
+                  Progress to Level {Math.ceil(newLevel)}
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {sessionResults
-                    .filter(
-                      (r) =>
-                        r.hesitated || r.backspaceCount > 3 || !r.isCorrect,
-                    )
-                    .map((r) => (
+              </div>
+
+              <div className="grid grid-cols-4 gap-3">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 text-center">
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{results.length}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Words</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800 text-center">
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{accuracy}%</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Accuracy</p>
+                </div>
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800 text-center">
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{totalTime}s</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Time</p>
+                </div>
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 text-center">
+                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">⚡{fastWords}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Fast</p>
+                </div>
+              </div>
+
+              {struggleWords.length > 0 && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <h2 className="text-xl font-bold mb-3 text-black dark:text-white">
+                    Words to Review
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {struggleWords.map(r => (
                       <span
                         key={r.wordId}
                         className="px-3 py-1 bg-yellow-200 dark:bg-yellow-600/30 border border-yellow-300 dark:border-yellow-700 rounded-full text-sm font-mono text-yellow-900 dark:text-yellow-200"
@@ -259,87 +336,144 @@ export default function PracticePage() {
                         {r.word}
                       </span>
                     ))}
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+                    These words will be added to your review bucket for extra practice
+                  </p>
                 </div>
-              </div>
-            )}
-          </div>
-        ) : null}
+              )}
 
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
-          <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
-            Ready to Practice?
-          </h2>
-          <p className="text-gray-700 dark:text-gray-400 mb-6">
-            This practice session includes {SAMPLE_WORDS.length} words focusing
-            on:
-          </p>
-          <ul className="list-disc list-inside mb-6 text-gray-700 dark:text-gray-400 space-y-1">
-            <li>CVC words (short vowels: a, e, i, o, u)</li>
-            <li>Silent E patterns</li>
-            <li>Digraphs (sh, ch, th, ck, wh, ph)</li>
-            <li>Common reversals (b/d, p/q, was/saw)</li>
-            <li>Blends (st, fl, fr, cr, dr, sp, sw, tr, gl, pl, cl)</li>
-            <li>End blends (mp, nd, nt, st, lk)</li>
-            <li>Glued sounds (ng, nk)</li>
-            <li>Vowel teams (ai, ay, oa, ee, ea, oo, ou, ow, oy)</li>
-            <li>R-controlled vowels (ar, or, er, ir, ur)</li>
-          </ul>
-
-          {savedProgress && (
-            <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-              <h3 className="font-semibold mb-2 text-black dark:text-white">
-                📌 Saved Progress
-              </h3>
-              <p className="text-sm text-gray-700 dark:text-gray-400 mb-3">
-                You have {savedProgress.currentWordIndex} of{" "}
-                {savedProgress.words.length} words completed. Continue where you
-                left off?
-              </p>
-              <div className="flex gap-2">
+              <div className="flex gap-4">
                 <button
-                  onClick={continueSession}
-                  className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold"
+                  onClick={restartSession}
+                  className="flex-1 py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Continue Practice
+                  Practice Again
                 </button>
-                <button
-                  onClick={clearSavedProgress}
-                  className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-black dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
+                <Link
+                  href="/"
+                  className="flex-1 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
-                  Clear
-                </button>
+                  Home
+                </Link>
               </div>
             </div>
-          )}
+          </div>
+        </main>
+      </>
+    );
+  }
 
-          <button
-            onClick={startNewSession}
-            className="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            {sessionResults.length > 0
-              ? "Practice Again"
-              : "Start New Practice"}
-          </button>
+  return (
+    <>
+      <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
+        <h1 className="text-xl font-bold text-black dark:text-white">LexiKey</h1>
+        <div className="flex items-center gap-4">
+          <ModeToggle />
+          <UserButton />
+        </div>
+      </header>
+      <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
+        <div className="max-w-2xl w-full">
+          {/* Level and Progress */}
+          <div className="mb-8 space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-semibold">Level {currentUser.stats.currentLevel.toFixed(1)}</span>
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Word {currentWordIndex + 1} of {sessionWords.length}
+              </div>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(currentWordIndex / sessionWords.length) * 100}%` }}
+              />
+            </div>
+          </div>
 
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <h3 className="font-semibold mb-2 text-black dark:text-white">
-              💡 Tips:
-            </h3>
-            <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-              <li>• Listen to the word being spoken</li>
-              <li>• Type carefully - accuracy is more important than speed</li>
-              <li>
-                • Use the &ldquo;Repeat Word&rdquo; button if you need to hear
-                it again
-              </li>
-              <li>
-                • Take your time - there&apos;s no rush unless you enable timer
-                mode
-              </li>
-            </ul>
+          {/* Main Card */}
+          <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold mb-2 text-black dark:text-white">
+                Practice Session
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Type the word you see below
+              </p>
+            </div>
+
+            {/* Word Display */}
+            <div className="mb-8 p-8 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700 relative">
+              <div className="text-6xl font-bold text-center text-black dark:text-white tracking-wider">
+                {currentWord.text}
+              </div>
+              {currentWord.sentenceContext && (
+                <p className="text-center text-gray-600 dark:text-gray-400 mt-4 text-lg">
+                  &ldquo;{currentWord.sentenceContext}&rdquo;
+                </p>
+              )}
+
+              {/* Visual Feedback */}
+              {showFeedback && (
+                <div className="absolute top-4 right-4 flex gap-2">
+                  {/* Correct/Incorrect Icon */}
+                  {showFeedback.type === 'correct' ? (
+                    <div className="bg-green-500 text-white rounded-full p-3 shadow-lg animate-bounce">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="bg-red-500 text-white rounded-full p-3 shadow-lg animate-bounce">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* Speed Icon */}
+                  {showFeedback.speed === 'fast' && (
+                    <div className="bg-yellow-500 text-white rounded-full p-3 shadow-lg">
+                      <span className="text-2xl">⚡</span>
+                    </div>
+                  )}
+                  {showFeedback.speed === 'slow' && (
+                    <div className="bg-blue-500 text-white rounded-full p-3 shadow-lg">
+                      <span className="text-2xl">🐌</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="mb-6">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type the word here..."
+                autoFocus
+                className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-center text-sm text-gray-500 dark:text-gray-500 mt-2">
+                Press Space or Enter to continue
+              </p>
+            </div>
+
+            <button
+              onClick={handleSubmitWord}
+              disabled={userInput.length === 0}
+              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              Next Word
+            </button>
           </div>
         </div>
-      </div>
-    </div>
+      </main>
+    </>
   );
 }

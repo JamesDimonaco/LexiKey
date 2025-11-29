@@ -291,6 +291,7 @@ export const createPracticeSession = mutation({
 
       await ctx.db.patch(args.userId, {
         stats: {
+          ...user.stats, // Keep all existing stats fields
           totalWords: newTotalWords,
           totalSessions: newTotalSessions,
           currentStreak,

@@ -1,7 +1,7 @@
 // Accessibility Settings Types
 export interface AccessibilitySettings {
   // Font settings
-  font: 'helvetica' | 'arial' | 'opendyslexic';
+  font: "helvetica" | "arial" | "opendyslexic";
   fontSize: number; // in px
   letterSpacing: number; // in px
 
@@ -52,11 +52,62 @@ export interface WordResult {
 
 export interface PracticeSession {
   userId: string;
-  mode: 'lesson' | 'practice' | 'assignment';
+  mode: "lesson" | "practice" | "assignment";
   phonicsGroupFocus?: string;
   wordsAttempted: number;
   accuracy: number; // percentage
   durationSeconds: number;
   struggleWords: string[]; // word IDs
   completedAt: number;
+}
+
+// Adaptive Learning Types
+export type PhonicsGroup =
+  | "cvc"
+  | "silent-e"
+  | "digraphs"
+  | "blends"
+  | "vowel-teams"
+  | "r-controlled"
+  | "diphthongs"
+  | "reversals"
+  | "multi-syllable";
+
+export interface Word {
+  id: string;
+  text: string;
+  difficulty: number; // 1 (Easy) to 10 (Hard)
+  phonicsGroup: PhonicsGroup;
+  sentenceContext?: string;
+}
+
+export interface WordStats {
+  timesSeen: number;
+  timesCorrect: number;
+  lastSeenAt: number; // Timestamp
+  consecutiveCorrect: number; // For "mastery" tracking
+  avgTimeSpent: number; // Average milliseconds per attempt
+  totalBackspaces: number;
+}
+
+export interface UserProgress {
+  userId: string;
+  currentLevel: number; // 1-10, can be decimal like 3.5
+  hasCompletedPlacementTest: boolean;
+  struggleGroups: PhonicsGroup[];
+  wordHistory: Record<string, WordStats>; // Map of WordID -> Stats
+}
+
+export interface PlacementTestResult {
+  determinedLevel: number;
+  identifiedStruggleGroups: PhonicsGroup[];
+  wordResults: Array<{
+    wordId: string;
+    word: string;
+    phonicsGroup: PhonicsGroup;
+    difficulty: number;
+    correct: boolean;
+    timeSpent: number;
+    backspaceCount: number;
+  }>;
 }

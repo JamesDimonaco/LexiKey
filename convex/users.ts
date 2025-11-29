@@ -151,6 +151,9 @@ export const createUser = mutation({
         lastPracticeDate: undefined,
         totalMinutesPracticed: 0,
         averageAccuracy: 0,
+        currentLevel: 1,
+        hasCompletedPlacementTest: false,
+        struggleGroups: [],
       },
       subscription: {
         tier: "free",
@@ -225,6 +228,9 @@ export const updateUserStats = mutation({
       lastPracticeDate: v.optional(v.string()),
       totalMinutesPracticed: v.optional(v.number()),
       averageAccuracy: v.optional(v.number()),
+      currentLevel: v.optional(v.number()),
+      hasCompletedPlacementTest: v.optional(v.boolean()),
+      struggleGroups: v.optional(v.array(v.string())),
     }),
   },
   handler: async (ctx, { userId, stats }) => {

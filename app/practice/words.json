@@ -838,5 +838,2105 @@
     "phonicsGroup": "r-controlled-ar",
     "difficultyLevel": 4,
     "sentenceContext": "We play at the park."
+  },
+  {
+    "id": "121",
+    "word": "sad",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "Do not be sad."
+  },
+  {
+    "id": "122",
+    "word": "mad",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "He was mad at the dog."
+  },
+  {
+    "id": "123",
+    "word": "bag",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "Put the book in the bag."
+  },
+  {
+    "id": "124",
+    "word": "tag",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "Check the price tag."
+  },
+  {
+    "id": "125",
+    "word": "rag",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "Use a rag to clean up."
+  },
+  {
+    "id": "126",
+    "word": "van",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "We drove in a big van."
+  },
+  {
+    "id": "127",
+    "word": "pan",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "Cook the egg in a pan."
+  },
+  {
+    "id": "128",
+    "word": "man",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "The man walked fast."
+  },
+  {
+    "id": "129",
+    "word": "can",
+    "phonicsGroup": "cvc-short-a",
+    "difficultyLevel": 1,
+    "sentenceContext": "I can run fast."
+  },
+  {
+    "id": "130",
+    "word": "ten",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "I have ten fingers."
+  },
+  {
+    "id": "131",
+    "word": "pen",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "Write with a blue pen."
+  },
+  {
+    "id": "132",
+    "word": "den",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "The bear sleeps in a den."
+  },
+  {
+    "id": "133",
+    "word": "men",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "Two men lifted the box."
+  },
+  {
+    "id": "134",
+    "word": "jet",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "The jet flew high."
+  },
+  {
+    "id": "135",
+    "word": "net",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "Catch the fish in the net."
+  },
+  {
+    "id": "136",
+    "word": "pet",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "Can I pet your dog?"
+  },
+  {
+    "id": "137",
+    "word": "set",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "Set the table for dinner."
+  },
+  {
+    "id": "138",
+    "word": "vet",
+    "phonicsGroup": "cvc-short-e",
+    "difficultyLevel": 1,
+    "sentenceContext": "Take the cat to the vet."
+  },
+  {
+    "id": "139",
+    "word": "kid",
+    "phonicsGroup": "cvc-short-i",
+    "difficultyLevel": 1,
+    "sentenceContext": "The kid played ball."
+  },
+  {
+    "id": "140",
+    "word": "lid",
+    "phonicsGroup": "cvc-short-i",
+    "difficultyLevel": 1,
+    "sentenceContext": "Put the lid on the jar."
+  },
+  {
+    "id": "141",
+    "word": "hid",
+    "phonicsGroup": "cvc-short-i",
+    "difficultyLevel": 1,
+    "sentenceContext": "He hid behind the tree."
+  },
+  {
+    "id": "142",
+    "word": "bib",
+    "phonicsGroup": "cvc-short-i",
+    "difficultyLevel": 1,
+    "sentenceContext": "The baby wore a bib."
+  },
+  {
+    "id": "143",
+    "word": "rib",
+    "phonicsGroup": "cvc-short-i",
+    "difficultyLevel": 1,
+    "sentenceContext": "I hurt my rib."
+  },
+  {
+    "id": "144",
+    "word": "pot",
+    "phonicsGroup": "cvc-short-o",
+    "difficultyLevel": 1,
+    "sentenceContext": "Boil water in the pot."
+  },
+  {
+    "id": "145",
+    "word": "dot",
+    "phonicsGroup": "cvc-short-o",
+    "difficultyLevel": 1,
+    "sentenceContext": "Put a dot on the paper."
+  },
+  {
+    "id": "146",
+    "word": "cot",
+    "phonicsGroup": "cvc-short-o",
+    "difficultyLevel": 1,
+    "sentenceContext": "Sleep on the small cot."
+  },
+  {
+    "id": "147",
+    "word": "lot",
+    "phonicsGroup": "cvc-short-o",
+    "difficultyLevel": 1,
+    "sentenceContext": "I have a lot of toys."
+  },
+  {
+    "id": "148",
+    "word": "got",
+    "phonicsGroup": "cvc-short-o",
+    "difficultyLevel": 1,
+    "sentenceContext": "I got a new bike."
+  },
+  {
+    "id": "149",
+    "word": "rot",
+    "phonicsGroup": "cvc-short-o",
+    "difficultyLevel": 1,
+    "sentenceContext": "Do not let the apple rot."
+  },
+  {
+    "id": "150",
+    "word": "cut",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "Cut the paper with scissors."
+  },
+  {
+    "id": "151",
+    "word": "nut",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "The squirrel ate a nut."
+  },
+  {
+    "id": "152",
+    "word": "hut",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "They built a small hut."
+  },
+  {
+    "id": "153",
+    "word": "tub",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "Take a bath in the tub."
+  },
+  {
+    "id": "154",
+    "word": "rub",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "Rub the stain out."
+  },
+  {
+    "id": "155",
+    "word": "sub",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "The sub went underwater."
+  },
+  {
+    "id": "156",
+    "word": "mud",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "My boots are covered in mud."
+  },
+  {
+    "id": "157",
+    "word": "bud",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "Look at the flower bud."
+  },
+  {
+    "id": "158",
+    "word": "scan",
+    "phonicsGroup": "blends-sc",
+    "difficultyLevel": 3,
+    "sentenceContext": "Scan the code here."
+  },
+  {
+    "id": "159",
+    "word": "skip",
+    "phonicsGroup": "blends-sk",
+    "difficultyLevel": 3,
+    "sentenceContext": "I like to skip rope."
+  },
+  {
+    "id": "160",
+    "word": "skin",
+    "phonicsGroup": "blends-sk",
+    "difficultyLevel": 3,
+    "sentenceContext": "The sun warms my skin."
+  },
+  {
+    "id": "161",
+    "word": "smell",
+    "phonicsGroup": "blends-sm",
+    "difficultyLevel": 3,
+    "sentenceContext": "I smell cookies baking."
+  },
+  {
+    "id": "162",
+    "word": "small",
+    "phonicsGroup": "blends-sm",
+    "difficultyLevel": 3,
+    "sentenceContext": "The ant is very small."
+  },
+  {
+    "id": "163",
+    "word": "snap",
+    "phonicsGroup": "blends-sn",
+    "difficultyLevel": 3,
+    "sentenceContext": "Can you snap your fingers?"
+  },
+  {
+    "id": "164",
+    "word": "snug",
+    "phonicsGroup": "blends-sn",
+    "difficultyLevel": 3,
+    "sentenceContext": "The baby is snug in bed."
+  },
+  {
+    "id": "165",
+    "word": "spun",
+    "phonicsGroup": "blends-sp",
+    "difficultyLevel": 3,
+    "sentenceContext": "The wheel spun around."
+  },
+  {
+    "id": "166",
+    "word": "step",
+    "phonicsGroup": "blends-st",
+    "difficultyLevel": 3,
+    "sentenceContext": "Watch your step."
+  },
+  {
+    "id": "167",
+    "word": "twig",
+    "phonicsGroup": "blends-tw",
+    "difficultyLevel": 3,
+    "sentenceContext": "The bird sat on a twig."
+  },
+  {
+    "id": "168",
+    "word": "twin",
+    "phonicsGroup": "blends-tw",
+    "difficultyLevel": 3,
+    "sentenceContext": "He has a twin brother."
+  },
+  {
+    "id": "169",
+    "word": "last",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "This is the last cookie."
+  },
+  {
+    "id": "170",
+    "word": "past",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "It is half past two."
+  },
+  {
+    "id": "171",
+    "word": "mast",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "The ship has a tall mast."
+  },
+  {
+    "id": "172",
+    "word": "cast",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "He wore a cast on his arm."
+  },
+  {
+    "id": "173",
+    "word": "rest",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "Get some rest tonight."
+  },
+  {
+    "id": "174",
+    "word": "test",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "I passed the math test."
+  },
+  {
+    "id": "175",
+    "word": "west",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "The sun sets in the west."
+  },
+  {
+    "id": "176",
+    "word": "pest",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "The fly is a pest."
+  },
+  {
+    "id": "177",
+    "word": "list",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "Make a shopping list."
+  },
+  {
+    "id": "178",
+    "word": "fist",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "He closed his hand into a fist."
+  },
+  {
+    "id": "179",
+    "word": "mist",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "There was mist over the lake."
+  },
+  {
+    "id": "180",
+    "word": "dust",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "Wipe the dust off the shelf."
+  },
+  {
+    "id": "181",
+    "word": "rust",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "The old car has rust."
+  },
+  {
+    "id": "182",
+    "word": "must",
+    "phonicsGroup": "end-blends-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "You must finish your work."
+  },
+  {
+    "id": "183",
+    "word": "belt",
+    "phonicsGroup": "end-blends-lt",
+    "difficultyLevel": 2,
+    "sentenceContext": "Wear your seat belt."
+  },
+  {
+    "id": "184",
+    "word": "felt",
+    "phonicsGroup": "end-blends-lt",
+    "difficultyLevel": 2,
+    "sentenceContext": "I felt happy today."
+  },
+  {
+    "id": "185",
+    "word": "melt",
+    "phonicsGroup": "end-blends-lt",
+    "difficultyLevel": 2,
+    "sentenceContext": "The ice cream will melt."
+  },
+  {
+    "id": "186",
+    "word": "help",
+    "phonicsGroup": "end-blends-lp",
+    "difficultyLevel": 2,
+    "sentenceContext": "Can you help me?"
+  },
+  {
+    "id": "187",
+    "word": "yelp",
+    "phonicsGroup": "end-blends-lp",
+    "difficultyLevel": 2,
+    "sentenceContext": "The dog gave a yelp."
+  },
+  {
+    "id": "188",
+    "word": "silk",
+    "phonicsGroup": "end-blends-lk",
+    "difficultyLevel": 2,
+    "sentenceContext": "The dress is made of silk."
+  },
+  {
+    "id": "189",
+    "word": "camp",
+    "phonicsGroup": "end-blends-mp",
+    "difficultyLevel": 2,
+    "sentenceContext": "We will camp in the woods."
+  },
+  {
+    "id": "190",
+    "word": "damp",
+    "phonicsGroup": "end-blends-mp",
+    "difficultyLevel": 2,
+    "sentenceContext": "The towel is still damp."
+  },
+  {
+    "id": "191",
+    "word": "sand",
+    "phonicsGroup": "end-blends-nd",
+    "difficultyLevel": 2,
+    "sentenceContext": "Play in the sand."
+  },
+  {
+    "id": "192",
+    "word": "band",
+    "phonicsGroup": "end-blends-nd",
+    "difficultyLevel": 2,
+    "sentenceContext": "The band played loud music."
+  },
+  {
+    "id": "193",
+    "word": "land",
+    "phonicsGroup": "end-blends-nd",
+    "difficultyLevel": 2,
+    "sentenceContext": "The plane will land soon."
+  },
+  {
+    "id": "194",
+    "word": "tank",
+    "phonicsGroup": "glued-nk",
+    "difficultyLevel": 3,
+    "sentenceContext": "Fish swim in the tank."
+  },
+  {
+    "id": "195",
+    "word": "sank",
+    "phonicsGroup": "glued-nk",
+    "difficultyLevel": 3,
+    "sentenceContext": "The boat sank deep."
+  },
+  {
+    "id": "196",
+    "word": "bang",
+    "phonicsGroup": "glued-ng",
+    "difficultyLevel": 3,
+    "sentenceContext": "The drum goes bang."
+  },
+  {
+    "id": "197",
+    "word": "hang",
+    "phonicsGroup": "glued-ng",
+    "difficultyLevel": 3,
+    "sentenceContext": "Hang your coat here."
+  },
+  {
+    "id": "198",
+    "word": "rang",
+    "phonicsGroup": "glued-ng",
+    "difficultyLevel": 3,
+    "sentenceContext": "The phone rang loudly."
+  },
+  {
+    "id": "199",
+    "word": "sang",
+    "phonicsGroup": "glued-ng",
+    "difficultyLevel": 3,
+    "sentenceContext": "She sang a sweet song."
+  },
+  {
+    "id": "200",
+    "word": "shell",
+    "phonicsGroup": "digraph-sh",
+    "difficultyLevel": 2,
+    "sentenceContext": "I found a seashell."
+  },
+  {
+    "id": "201",
+    "word": "shed",
+    "phonicsGroup": "digraph-sh",
+    "difficultyLevel": 2,
+    "sentenceContext": "The tools are in the shed."
+  },
+  {
+    "id": "202",
+    "word": "shut",
+    "phonicsGroup": "digraph-sh",
+    "difficultyLevel": 2,
+    "sentenceContext": "Please shut the door."
+  },
+  {
+    "id": "203",
+    "word": "shot",
+    "phonicsGroup": "digraph-sh",
+    "difficultyLevel": 2,
+    "sentenceContext": "He made a good shot."
+  },
+  {
+    "id": "204",
+    "word": "chin",
+    "phonicsGroup": "digraph-ch",
+    "difficultyLevel": 2,
+    "sentenceContext": "Milk dripped on his chin."
+  },
+  {
+    "id": "205",
+    "word": "chat",
+    "phonicsGroup": "digraph-ch",
+    "difficultyLevel": 2,
+    "sentenceContext": "We like to chat."
+  },
+  {
+    "id": "206",
+    "word": "chess",
+    "phonicsGroup": "digraph-ch",
+    "difficultyLevel": 2,
+    "sentenceContext": "Let's play chess."
+  },
+  {
+    "id": "207",
+    "word": "such",
+    "phonicsGroup": "digraph-ch",
+    "difficultyLevel": 2,
+    "sentenceContext": "You are such a good friend."
+  },
+  {
+    "id": "208",
+    "word": "much",
+    "phonicsGroup": "digraph-ch",
+    "difficultyLevel": 2,
+    "sentenceContext": "Thank you very much."
+  },
+  {
+    "id": "209",
+    "word": "thin",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 2,
+    "sentenceContext": "The paper is very thin."
+  },
+  {
+    "id": "210",
+    "word": "thick",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 2,
+    "sentenceContext": "The fog was thick."
+  },
+  {
+    "id": "211",
+    "word": "path",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 2,
+    "sentenceContext": "Walk on the path."
+  },
+  {
+    "id": "212",
+    "word": "bath",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 2,
+    "sentenceContext": "Take a warm bath."
+  },
+  {
+    "id": "213",
+    "word": "math",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 2,
+    "sentenceContext": "I like math class."
+  },
+  {
+    "id": "214",
+    "word": "whiz",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 3,
+    "sentenceContext": "The cars whiz by."
+  },
+  {
+    "id": "215",
+    "word": "whom",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 3,
+    "sentenceContext": "To whom am I speaking?"
+  },
+  {
+    "id": "216",
+    "word": "luck",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Good luck on the test."
+  },
+  {
+    "id": "217",
+    "word": "buck",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "The male deer is a buck."
+  },
+  {
+    "id": "218",
+    "word": "suck",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Drink with a straw to suck."
+  },
+  {
+    "id": "219",
+    "word": "tuck",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Tuck your shirt in."
+  },
+  {
+    "id": "220",
+    "word": "lock",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Lock the front door."
+  },
+  {
+    "id": "221",
+    "word": "sock",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "I lost my other sock."
+  },
+  {
+    "id": "222",
+    "word": "dock",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "The boat is at the dock."
+  },
+  {
+    "id": "223",
+    "word": "neck",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "The giraffe has a long neck."
+  },
+  {
+    "id": "224",
+    "word": "deck",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Sit out on the deck."
+  },
+  {
+    "id": "225",
+    "word": "peck",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Birds peck at seeds."
+  },
+  {
+    "id": "226",
+    "word": "sick",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "I feel sick today."
+  },
+  {
+    "id": "227",
+    "word": "pick",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Pick a red apple."
+  },
+  {
+    "id": "228",
+    "word": "kick",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Kick the ball hard."
+  },
+  {
+    "id": "229",
+    "word": "lick",
+    "phonicsGroup": "digraph-ck",
+    "difficultyLevel": 2,
+    "sentenceContext": "Lick the lollipop."
+  },
+  {
+    "id": "230",
+    "word": "safe",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Keep your money safe."
+  },
+  {
+    "id": "231",
+    "word": "late",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Do not be late."
+  },
+  {
+    "id": "232",
+    "word": "date",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "What is the date today?"
+  },
+  {
+    "id": "233",
+    "word": "gate",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Close the garden gate."
+  },
+  {
+    "id": "234",
+    "word": "hate",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "I hate broccoli."
+  },
+  {
+    "id": "235",
+    "word": "mate",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "He is my best mate."
+  },
+  {
+    "id": "236",
+    "word": "rate",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "The car went at a high rate."
+  },
+  {
+    "id": "237",
+    "word": "fine",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "I am feeling fine."
+  },
+  {
+    "id": "238",
+    "word": "line",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Stand in a line."
+  },
+  {
+    "id": "239",
+    "word": "mine",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "That toy is mine."
+  },
+  {
+    "id": "240",
+    "word": "nine",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "The number after eight is nine."
+  },
+  {
+    "id": "241",
+    "word": "pine",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "A pine tree stays green."
+  },
+  {
+    "id": "242",
+    "word": "vine",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Grapes grow on a vine."
+  },
+  {
+    "id": "243",
+    "word": "bone",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "The dog chewed a bone."
+  },
+  {
+    "id": "244",
+    "word": "cone",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "I want an ice cream cone."
+  },
+  {
+    "id": "245",
+    "word": "zone",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "This is a quiet zone."
+  },
+  {
+    "id": "246",
+    "word": "tone",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Speak in a soft tone."
+  },
+  {
+    "id": "247",
+    "word": "lone",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "A lone wolf howled."
+  },
+  {
+    "id": "248",
+    "word": "tube",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Squeeze the tube of toothpaste."
+  },
+  {
+    "id": "249",
+    "word": "cube",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "An ice cube is cold."
+  },
+  {
+    "id": "250",
+    "word": "rude",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "It is rude to stare."
+  },
+  {
+    "id": "251",
+    "word": "here",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Come over here."
+  },
+  {
+    "id": "252",
+    "word": "these",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "These are my shoes."
+  },
+  {
+    "id": "253",
+    "word": "tail",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 4,
+    "sentenceContext": "The dog wagged its tail."
+  },
+  {
+    "id": "254",
+    "word": "mail",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 4,
+    "sentenceContext": "Check the mailbox for mail."
+  },
+  {
+    "id": "255",
+    "word": "sail",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 4,
+    "sentenceContext": "Boats sail on water."
+  },
+  {
+    "id": "256",
+    "word": "pail",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 4,
+    "sentenceContext": "Fill the pail with sand."
+  },
+  {
+    "id": "257",
+    "word": "nail",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 4,
+    "sentenceContext": "Hammer the nail in."
+  },
+  {
+    "id": "258",
+    "word": "rail",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 4,
+    "sentenceContext": "Hold the hand rail."
+  },
+  {
+    "id": "259",
+    "word": "day",
+    "phonicsGroup": "vowel-team-ay",
+    "difficultyLevel": 4,
+    "sentenceContext": "Have a nice day."
+  },
+  {
+    "id": "260",
+    "word": "say",
+    "phonicsGroup": "vowel-team-ay",
+    "difficultyLevel": 4,
+    "sentenceContext": "What did you say?"
+  },
+  {
+    "id": "261",
+    "word": "hay",
+    "phonicsGroup": "vowel-team-ay",
+    "difficultyLevel": 4,
+    "sentenceContext": "Horses eat hay."
+  },
+  {
+    "id": "262",
+    "word": "pay",
+    "phonicsGroup": "vowel-team-ay",
+    "difficultyLevel": 4,
+    "sentenceContext": "You must pay for food."
+  },
+  {
+    "id": "263",
+    "word": "way",
+    "phonicsGroup": "vowel-team-ay",
+    "difficultyLevel": 4,
+    "sentenceContext": "Which way is home?"
+  },
+  {
+    "id": "264",
+    "word": "feet",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "Stomp your feet."
+  },
+  {
+    "id": "265",
+    "word": "meet",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "Nice to meet you."
+  },
+  {
+    "id": "266",
+    "word": "seed",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "Plant a seed."
+  },
+  {
+    "id": "267",
+    "word": "need",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "I need some water."
+  },
+  {
+    "id": "268",
+    "word": "feed",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "Don't forget to feed the cat."
+  },
+  {
+    "id": "269",
+    "word": "weed",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "Pull the weed out."
+  },
+  {
+    "id": "270",
+    "word": "sea",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 4,
+    "sentenceContext": "The sea is deep blue."
+  },
+  {
+    "id": "271",
+    "word": "tea",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 4,
+    "sentenceContext": "I drink hot tea."
+  },
+  {
+    "id": "272",
+    "word": "beak",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 4,
+    "sentenceContext": "The bird has a sharp beak."
+  },
+  {
+    "id": "273",
+    "word": "peak",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 4,
+    "sentenceContext": "We climbed to the peak."
+  },
+  {
+    "id": "274",
+    "word": "goat",
+    "phonicsGroup": "vowel-team-oa",
+    "difficultyLevel": 4,
+    "sentenceContext": "The goat ate the can."
+  },
+  {
+    "id": "275",
+    "word": "coat",
+    "phonicsGroup": "vowel-team-oa",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wear your warm coat."
+  },
+  {
+    "id": "276",
+    "word": "soap",
+    "phonicsGroup": "vowel-team-oa",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wash with soap and water."
+  },
+  {
+    "id": "277",
+    "word": "toe",
+    "phonicsGroup": "vowel-team-oe",
+    "difficultyLevel": 4,
+    "sentenceContext": "I stubbed my toe."
+  },
+  {
+    "id": "278",
+    "word": "pie",
+    "phonicsGroup": "vowel-team-ie",
+    "difficultyLevel": 4,
+    "sentenceContext": "I love apple pie."
+  },
+  {
+    "id": "279",
+    "word": "tie",
+    "phonicsGroup": "vowel-team-ie",
+    "difficultyLevel": 4,
+    "sentenceContext": "Can you tie your shoe?"
+  },
+  {
+    "id": "280",
+    "word": "lie",
+    "phonicsGroup": "vowel-team-ie",
+    "difficultyLevel": 4,
+    "sentenceContext": "Do not tell a lie."
+  },
+  {
+    "id": "281",
+    "word": "blue",
+    "phonicsGroup": "vowel-team-ue",
+    "difficultyLevel": 4,
+    "sentenceContext": "The sky is blue."
+  },
+  {
+    "id": "282",
+    "word": "glue",
+    "phonicsGroup": "vowel-team-ue",
+    "difficultyLevel": 4,
+    "sentenceContext": "Use glue to stick it."
+  },
+  {
+    "id": "283",
+    "word": "true",
+    "phonicsGroup": "vowel-team-ue",
+    "difficultyLevel": 4,
+    "sentenceContext": "Is that story true?"
+  },
+  {
+    "id": "284",
+    "word": "farm",
+    "phonicsGroup": "r-controlled-ar",
+    "difficultyLevel": 4,
+    "sentenceContext": "Cows live on a farm."
+  },
+  {
+    "id": "285",
+    "word": "harm",
+    "phonicsGroup": "r-controlled-ar",
+    "difficultyLevel": 4,
+    "sentenceContext": "Do no harm."
+  },
+  {
+    "id": "286",
+    "word": "part",
+    "phonicsGroup": "r-controlled-ar",
+    "difficultyLevel": 4,
+    "sentenceContext": "This is part of the game."
+  },
+  {
+    "id": "287",
+    "word": "cart",
+    "phonicsGroup": "r-controlled-ar",
+    "difficultyLevel": 4,
+    "sentenceContext": "Push the shopping cart."
+  },
+  {
+    "id": "288",
+    "word": "dark",
+    "phonicsGroup": "r-controlled-ar",
+    "difficultyLevel": 4,
+    "sentenceContext": "It is dark at night."
+  },
+  {
+    "id": "289",
+    "word": "mark",
+    "phonicsGroup": "r-controlled-ar",
+    "difficultyLevel": 4,
+    "sentenceContext": "Make a mark here."
+  },
+  {
+    "id": "290",
+    "word": "shark",
+    "phonicsGroup": "r-controlled-ar",
+    "difficultyLevel": 4,
+    "sentenceContext": "The shark has teeth."
+  },
+  {
+    "id": "291",
+    "word": "born",
+    "phonicsGroup": "r-controlled-or",
+    "difficultyLevel": 4,
+    "sentenceContext": "The baby was born today."
+  },
+  {
+    "id": "292",
+    "word": "torn",
+    "phonicsGroup": "r-controlled-or",
+    "difficultyLevel": 4,
+    "sentenceContext": "My shirt is torn."
+  },
+  {
+    "id": "293",
+    "word": "horn",
+    "phonicsGroup": "r-controlled-or",
+    "difficultyLevel": 4,
+    "sentenceContext": "Beep the car horn."
+  },
+  {
+    "id": "294",
+    "word": "short",
+    "phonicsGroup": "r-controlled-or",
+    "difficultyLevel": 4,
+    "sentenceContext": "The pencil is short."
+  },
+  {
+    "id": "295",
+    "word": "fern",
+    "phonicsGroup": "r-controlled-er",
+    "difficultyLevel": 4,
+    "sentenceContext": "A fern is a green plant."
+  },
+  {
+    "id": "296",
+    "word": "term",
+    "phonicsGroup": "r-controlled-er",
+    "difficultyLevel": 4,
+    "sentenceContext": "School term starts soon."
+  },
+  {
+    "id": "297",
+    "word": "germ",
+    "phonicsGroup": "r-controlled-er",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wash off every germ."
+  },
+  {
+    "id": "298",
+    "word": "girl",
+    "phonicsGroup": "r-controlled-ir",
+    "difficultyLevel": 4,
+    "sentenceContext": "The girl ran fast."
+  },
+  {
+    "id": "299",
+    "word": "dirt",
+    "phonicsGroup": "r-controlled-ir",
+    "difficultyLevel": 4,
+    "sentenceContext": "Dig in the dirt."
+  },
+  {
+    "id": "300",
+    "word": "shirt",
+    "phonicsGroup": "r-controlled-ir",
+    "difficultyLevel": 4,
+    "sentenceContext": "Put on a clean shirt."
+  },
+  {
+    "id": "301",
+    "word": "skirt",
+    "phonicsGroup": "r-controlled-ir",
+    "difficultyLevel": 4,
+    "sentenceContext": "She wore a blue skirt."
+  },
+  {
+    "id": "302",
+    "word": "turn",
+    "phonicsGroup": "r-controlled-ur",
+    "difficultyLevel": 4,
+    "sentenceContext": "It is your turn."
+  },
+  {
+    "id": "303",
+    "word": "hurt",
+    "phonicsGroup": "r-controlled-ur",
+    "difficultyLevel": 4,
+    "sentenceContext": "Did you get hurt?"
+  },
+  {
+    "id": "304",
+    "word": "curl",
+    "phonicsGroup": "r-controlled-ur",
+    "difficultyLevel": 4,
+    "sentenceContext": "Her hair has a curl."
+  },
+  {
+    "id": "305",
+    "word": "surf",
+    "phonicsGroup": "r-controlled-ur",
+    "difficultyLevel": 4,
+    "sentenceContext": "Watch them surf the waves."
+  },
+  {
+    "id": "306",
+    "word": "oil",
+    "phonicsGroup": "diphthong-oi",
+    "difficultyLevel": 5,
+    "sentenceContext": "Pour olive oil."
+  },
+  {
+    "id": "307",
+    "word": "boil",
+    "phonicsGroup": "diphthong-oi",
+    "difficultyLevel": 5,
+    "sentenceContext": "Boil the water."
+  },
+  {
+    "id": "308",
+    "word": "coil",
+    "phonicsGroup": "diphthong-oi",
+    "difficultyLevel": 5,
+    "sentenceContext": "A coil of rope."
+  },
+  {
+    "id": "309",
+    "word": "soil",
+    "phonicsGroup": "diphthong-oi",
+    "difficultyLevel": 5,
+    "sentenceContext": "Plant seeds in soil."
+  },
+  {
+    "id": "310",
+    "word": "foil",
+    "phonicsGroup": "diphthong-oi",
+    "difficultyLevel": 5,
+    "sentenceContext": "Wrap food in foil."
+  },
+  {
+    "id": "311",
+    "word": "joy",
+    "phonicsGroup": "diphthong-oy",
+    "difficultyLevel": 4,
+    "sentenceContext": "Jump for joy."
+  },
+  {
+    "id": "312",
+    "word": "cloud",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 5,
+    "sentenceContext": "A fluffy white cloud."
+  },
+  {
+    "id": "313",
+    "word": "loud",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 5,
+    "sentenceContext": "The music is too loud."
+  },
+  {
+    "id": "314",
+    "word": "round",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 5,
+    "sentenceContext": "The ball is round."
+  },
+  {
+    "id": "315",
+    "word": "sound",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 5,
+    "sentenceContext": "Did you hear that sound?"
+  },
+  {
+    "id": "316",
+    "word": "found",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 5,
+    "sentenceContext": "I found a dollar."
+  },
+  {
+    "id": "317",
+    "word": "ground",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 5,
+    "sentenceContext": "Sit on the ground."
+  },
+  {
+    "id": "318",
+    "word": "how",
+    "phonicsGroup": "diphthong-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "How are you?"
+  },
+  {
+    "id": "319",
+    "word": "down",
+    "phonicsGroup": "diphthong-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "Sit down please."
+  },
+  {
+    "id": "320",
+    "word": "town",
+    "phonicsGroup": "diphthong-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "We went to town."
+  },
+  {
+    "id": "321",
+    "word": "clown",
+    "phonicsGroup": "diphthong-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "The funny clown laughed."
+  },
+  {
+    "id": "322",
+    "word": "brown",
+    "phonicsGroup": "diphthong-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "A brown bear."
+  },
+  {
+    "id": "323",
+    "word": "law",
+    "phonicsGroup": "diphthong-aw",
+    "difficultyLevel": 5,
+    "sentenceContext": "Obey the law."
+  },
+  {
+    "id": "324",
+    "word": "raw",
+    "phonicsGroup": "diphthong-aw",
+    "difficultyLevel": 5,
+    "sentenceContext": "The meat is raw."
+  },
+  {
+    "id": "325",
+    "word": "paw",
+    "phonicsGroup": "diphthong-aw",
+    "difficultyLevel": 5,
+    "sentenceContext": "The dog hurt its paw."
+  },
+  {
+    "id": "326",
+    "word": "jaw",
+    "phonicsGroup": "diphthong-aw",
+    "difficultyLevel": 5,
+    "sentenceContext": "He moved his jaw."
+  },
+  {
+    "id": "327",
+    "word": "rabbit",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "The rabbit hops."
+  },
+  {
+    "id": "328",
+    "word": "tennis",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Play a game of tennis."
+  },
+  {
+    "id": "329",
+    "word": "picnic",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "We had a picnic."
+  },
+  {
+    "id": "330",
+    "word": "basket",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Put apples in the basket."
+  },
+  {
+    "id": "331",
+    "word": "velvet",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Soft red velvet."
+  },
+  {
+    "id": "332",
+    "word": "jumping",
+    "phonicsGroup": "suffix-ing",
+    "difficultyLevel": 6,
+    "sentenceContext": "He is jumping up."
+  },
+  {
+    "id": "333",
+    "word": "singing",
+    "phonicsGroup": "suffix-ing",
+    "difficultyLevel": 6,
+    "sentenceContext": "She is singing loud."
+  },
+  {
+    "id": "334",
+    "word": "eating",
+    "phonicsGroup": "suffix-ing",
+    "difficultyLevel": 6,
+    "sentenceContext": "I am eating lunch."
+  },
+  {
+    "id": "335",
+    "word": "happy",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "I am very happy."
+  },
+  {
+    "id": "336",
+    "word": "funny",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "That joke was funny."
+  },
+  {
+    "id": "337",
+    "word": "puppy",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "The puppy barked."
+  },
+  {
+    "id": "338",
+    "word": "kitty",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "Here kitty kitty."
+  },
+  {
+    "id": "339",
+    "word": "baby",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "The baby is sleeping."
+  },
+  {
+    "id": "340",
+    "word": "party",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "Let's go to the party."
+  },
+  {
+    "id": "341",
+    "word": "candy",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "Sweet candy tastes good."
+  },
+  {
+    "id": "342",
+    "word": "sunny",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "It is a sunny day."
+  },
+  {
+    "id": "343",
+    "word": "windy",
+    "phonicsGroup": "ending-y",
+    "difficultyLevel": 5,
+    "sentenceContext": "Hold your hat, it is windy."
+  },
+  {
+    "id": "344",
+    "word": "snow",
+    "phonicsGroup": "vowel-team-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "White snow falls."
+  },
+  {
+    "id": "345",
+    "word": "grow",
+    "phonicsGroup": "vowel-team-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "Flowers grow in spring."
+  },
+  {
+    "id": "346",
+    "word": "show",
+    "phonicsGroup": "vowel-team-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "Show me your work."
+  },
+  {
+    "id": "347",
+    "word": "blow",
+    "phonicsGroup": "vowel-team-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "Blow out the candle."
+  },
+  {
+    "id": "348",
+    "word": "flow",
+    "phonicsGroup": "vowel-team-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "Rivers flow to the sea."
+  },
+  {
+    "id": "349",
+    "word": "slow",
+    "phonicsGroup": "vowel-team-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "Turtles are slow."
+  },
+  {
+    "id": "350",
+    "word": "crow",
+    "phonicsGroup": "vowel-team-ow",
+    "difficultyLevel": 5,
+    "sentenceContext": "The black crow flew."
+  },
+  {
+    "id": "351",
+    "word": "know",
+    "phonicsGroup": "silent-kn",
+    "difficultyLevel": 6,
+    "sentenceContext": "I know the answer."
+  },
+  {
+    "id": "352",
+    "word": "knee",
+    "phonicsGroup": "silent-kn",
+    "difficultyLevel": 6,
+    "sentenceContext": "I scraped my knee."
+  },
+  {
+    "id": "353",
+    "word": "knit",
+    "phonicsGroup": "silent-kn",
+    "difficultyLevel": 6,
+    "sentenceContext": "Grandma can knit."
+  },
+  {
+    "id": "354",
+    "word": "knot",
+    "phonicsGroup": "silent-kn",
+    "difficultyLevel": 6,
+    "sentenceContext": "Tie a tight knot."
+  },
+  {
+    "id": "355",
+    "word": "wrap",
+    "phonicsGroup": "silent-wr",
+    "difficultyLevel": 6,
+    "sentenceContext": "Wrap the gift up."
+  },
+  {
+    "id": "356",
+    "word": "write",
+    "phonicsGroup": "silent-wr",
+    "difficultyLevel": 6,
+    "sentenceContext": "Write a letter to me."
+  },
+  {
+    "id": "357",
+    "word": "wrong",
+    "phonicsGroup": "silent-wr",
+    "difficultyLevel": 6,
+    "sentenceContext": "That is the wrong way."
+  },
+  {
+    "id": "358",
+    "word": "wrist",
+    "phonicsGroup": "silent-wr",
+    "difficultyLevel": 6,
+    "sentenceContext": "A watch goes on your wrist."
+  },
+  {
+    "id": "359",
+    "word": "high",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "Jump up high."
+  },
+  {
+    "id": "360",
+    "word": "sigh",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "He let out a sigh."
+  },
+  {
+    "id": "361",
+    "word": "thigh",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "My thigh muscle hurts."
+  },
+  {
+    "id": "362",
+    "word": "night",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "Sleep well at night."
+  },
+  {
+    "id": "363",
+    "word": "light",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "Turn on the light."
+  },
+  {
+    "id": "364",
+    "word": "right",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "Turn right here."
+  },
+  {
+    "id": "365",
+    "word": "sight",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "What a beautiful sight."
+  },
+  {
+    "id": "366",
+    "word": "tight",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "The shoes are too tight."
+  },
+  {
+    "id": "367",
+    "word": "flight",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "Have a safe flight."
+  },
+  {
+    "id": "368",
+    "word": "bright",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "The sun is bright."
+  },
+  {
+    "id": "369",
+    "word": "fight",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not fight."
+  },
+  {
+    "id": "370",
+    "word": "might",
+    "phonicsGroup": "silent-gh",
+    "difficultyLevel": 5,
+    "sentenceContext": "I might go swimming."
+  },
+  {
+    "id": "371",
+    "word": "catch",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "Catch the ball."
+  },
+  {
+    "id": "372",
+    "word": "match",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "Light a match."
+  },
+  {
+    "id": "373",
+    "word": "patch",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "Sew a patch on."
+  },
+  {
+    "id": "374",
+    "word": "watch",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "Watch the movie."
+  },
+  {
+    "id": "375",
+    "word": "pitch",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "Pitch the tent."
+  },
+  {
+    "id": "376",
+    "word": "ditch",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "Dig a ditch."
+  },
+  {
+    "id": "377",
+    "word": "fetch",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "Dogs fetch sticks."
+  },
+  {
+    "id": "378",
+    "word": "witch",
+    "phonicsGroup": "trigraph-tch",
+    "difficultyLevel": 5,
+    "sentenceContext": "The witch wore a hat."
+  },
+  {
+    "id": "379",
+    "word": "edge",
+    "phonicsGroup": "trigraph-dge",
+    "difficultyLevel": 6,
+    "sentenceContext": "Stand near the edge."
+  },
+  {
+    "id": "380",
+    "word": "hedge",
+    "phonicsGroup": "trigraph-dge",
+    "difficultyLevel": 6,
+    "sentenceContext": "Trim the green hedge."
+  },
+  {
+    "id": "381",
+    "word": "badge",
+    "phonicsGroup": "trigraph-dge",
+    "difficultyLevel": 6,
+    "sentenceContext": "He wore a shiny badge."
+  },
+  {
+    "id": "382",
+    "word": "fudge",
+    "phonicsGroup": "trigraph-dge",
+    "difficultyLevel": 6,
+    "sentenceContext": "Chocolate fudge is sweet."
+  },
+  {
+    "id": "383",
+    "word": "judge",
+    "phonicsGroup": "trigraph-dge",
+    "difficultyLevel": 6,
+    "sentenceContext": "The judge hit the gavel."
+  },
+  {
+    "id": "384",
+    "word": "bridge",
+    "phonicsGroup": "trigraph-dge",
+    "difficultyLevel": 6,
+    "sentenceContext": "Cross the bridge."
+  },
+  {
+    "id": "385",
+    "word": "old",
+    "phonicsGroup": "welded-old",
+    "difficultyLevel": 4,
+    "sentenceContext": "The car is old."
+  },
+  {
+    "id": "386",
+    "word": "cold",
+    "phonicsGroup": "welded-old",
+    "difficultyLevel": 4,
+    "sentenceContext": "Ice is very cold."
+  },
+  {
+    "id": "387",
+    "word": "hold",
+    "phonicsGroup": "welded-old",
+    "difficultyLevel": 4,
+    "sentenceContext": "Hold my hand."
+  },
+  {
+    "id": "388",
+    "word": "gold",
+    "phonicsGroup": "welded-old",
+    "difficultyLevel": 4,
+    "sentenceContext": "A ring made of gold."
+  },
+  {
+    "id": "389",
+    "word": "told",
+    "phonicsGroup": "welded-old",
+    "difficultyLevel": 4,
+    "sentenceContext": "She told a story."
+  },
+  {
+    "id": "390",
+    "word": "sold",
+    "phonicsGroup": "welded-old",
+    "difficultyLevel": 4,
+    "sentenceContext": "They sold the house."
+  },
+  {
+    "id": "391",
+    "word": "kind",
+    "phonicsGroup": "welded-ind",
+    "difficultyLevel": 4,
+    "sentenceContext": "Be kind to others."
+  },
+  {
+    "id": "392",
+    "word": "find",
+    "phonicsGroup": "welded-ind",
+    "difficultyLevel": 4,
+    "sentenceContext": "Did you find it?"
+  },
+  {
+    "id": "393",
+    "word": "mind",
+    "phonicsGroup": "welded-ind",
+    "difficultyLevel": 4,
+    "sentenceContext": "Make up your mind."
+  },
+  {
+    "id": "394",
+    "word": "wind",
+    "phonicsGroup": "welded-ind",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wind up the toy."
+  },
+  {
+    "id": "395",
+    "word": "blind",
+    "phonicsGroup": "welded-ind",
+    "difficultyLevel": 4,
+    "sentenceContext": "Guide dogs help the blind."
+  },
+  {
+    "id": "396",
+    "word": "grind",
+    "phonicsGroup": "welded-ind",
+    "difficultyLevel": 4,
+    "sentenceContext": "Grind the coffee beans."
+  },
+  {
+    "id": "397",
+    "word": "most",
+    "phonicsGroup": "welded-ost",
+    "difficultyLevel": 4,
+    "sentenceContext": "I like cake the most."
+  },
+  {
+    "id": "398",
+    "word": "post",
+    "phonicsGroup": "welded-ost",
+    "difficultyLevel": 4,
+    "sentenceContext": "Lean on the fence post."
+  },
+  {
+    "id": "399",
+    "word": "host",
+    "phonicsGroup": "welded-ost",
+    "difficultyLevel": 4,
+    "sentenceContext": "He is the party host."
+  },
+  {
+    "id": "400",
+    "word": "ghost",
+    "phonicsGroup": "welded-ost",
+    "difficultyLevel": 4,
+    "sentenceContext": "A scary ghost."
+  },
+  {
+    "id": "401",
+    "word": "wild",
+    "phonicsGroup": "welded-ild",
+    "difficultyLevel": 4,
+    "sentenceContext": "A wild animal."
+  },
+  {
+    "id": "402",
+    "word": "child",
+    "phonicsGroup": "welded-ild",
+    "difficultyLevel": 4,
+    "sentenceContext": "The child played."
+  },
+  {
+    "id": "403",
+    "word": "mild",
+    "phonicsGroup": "welded-ild",
+    "difficultyLevel": 4,
+    "sentenceContext": "The sauce is mild."
+  },
+  {
+    "id": "404",
+    "word": "city",
+    "phonicsGroup": "soft-c",
+    "difficultyLevel": 6,
+    "sentenceContext": "New York is a big city."
+  },
+  {
+    "id": "405",
+    "word": "cent",
+    "phonicsGroup": "soft-c",
+    "difficultyLevel": 6,
+    "sentenceContext": "One penny is a cent."
+  },
+  {
+    "id": "406",
+    "word": "face",
+    "phonicsGroup": "soft-c",
+    "difficultyLevel": 6,
+    "sentenceContext": "Wash your face."
+  },
+  {
+    "id": "407",
+    "word": "ice",
+    "phonicsGroup": "soft-c",
+    "difficultyLevel": 6,
+    "sentenceContext": "Put ice in the drink."
+  },
+  {
+    "id": "408",
+    "word": "rice",
+    "phonicsGroup": "soft-c",
+    "difficultyLevel": 6,
+    "sentenceContext": "Eat a bowl of rice."
+  },
+  {
+    "id": "409",
+    "word": "mice",
+    "phonicsGroup": "soft-c",
+    "difficultyLevel": 6,
+    "sentenceContext": "Three blind mice."
+  },
+  {
+    "id": "410",
+    "word": "space",
+    "phonicsGroup": "soft-c",
+    "difficultyLevel": 6,
+    "sentenceContext": "Rockets go to space."
+  },
+  {
+    "id": "411",
+    "word": "gem",
+    "phonicsGroup": "soft-g",
+    "difficultyLevel": 6,
+    "sentenceContext": "A shiny red gem."
+  },
+  {
+    "id": "412",
+    "word": "age",
+    "phonicsGroup": "soft-g",
+    "difficultyLevel": 6,
+    "sentenceContext": "What is your age?"
+  },
+  {
+    "id": "413",
+    "word": "cage",
+    "phonicsGroup": "soft-g",
+    "difficultyLevel": 6,
+    "sentenceContext": "The bird is in a cage."
+  },
+  {
+    "id": "414",
+    "word": "page",
+    "phonicsGroup": "soft-g",
+    "difficultyLevel": 6,
+    "sentenceContext": "Turn the page."
+  },
+  {
+    "id": "415",
+    "word": "huge",
+    "phonicsGroup": "soft-g",
+    "difficultyLevel": 6,
+    "sentenceContext": "The elephant is huge."
+  },
+  {
+    "id": "416",
+    "word": "gym",
+    "phonicsGroup": "soft-g",
+    "difficultyLevel": 6,
+    "sentenceContext": "Exercise at the gym."
+  },
+  {
+    "id": "417",
+    "word": "stage",
+    "phonicsGroup": "soft-g",
+    "difficultyLevel": 6,
+    "sentenceContext": "Actors on a stage."
+  },
+  {
+    "id": "418",
+    "word": "phone",
+    "phonicsGroup": "digraph-ph",
+    "difficultyLevel": 5,
+    "sentenceContext": "Talk on the phone."
+  },
+  {
+    "id": "419",
+    "word": "photo",
+    "phonicsGroup": "digraph-ph",
+    "difficultyLevel": 5,
+    "sentenceContext": "Take a photo of me."
+  },
+  {
+    "id": "420",
+    "word": "graph",
+    "phonicsGroup": "digraph-ph",
+    "difficultyLevel": 5,
+    "sentenceContext": "Draw a graph."
   }
 ]

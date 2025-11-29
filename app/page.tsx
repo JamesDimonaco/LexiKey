@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
@@ -42,11 +42,28 @@ function Content() {
 
         <div className="space-y-4">
           <Link
-            href="/practice"
+            href="/placement-test"
             className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Start Practice →
+            Take Placement Test →
           </Link>
+
+          <SignedIn>
+            <Link
+              href="/practice"
+              className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            >
+              Start Practice
+            </Link>
+          </SignedIn>
+
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                Sign In to Practice
+              </button>
+            </SignInButton>
+          </SignedOut>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <FeatureCard
