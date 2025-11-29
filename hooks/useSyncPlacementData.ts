@@ -20,13 +20,21 @@ export function useSyncPlacementData() {
   const { user, isLoaded } = useUser();
   const currentUser = useQuery(
     api.users.getCurrentUser,
-    user?.id ? { clerkId: user.id } : "skip"
+    user?.id ? { clerkId: user.id } : "skip",
   );
   const createUser = useMutation(api.users.createUser);
   const updateUserStats = useMutation(api.users.updateUserStats);
 
   useEffect(() => {
     if (!isLoaded || !user) return;
+
+    // Don't proceed if query hasn't finished loading yet
+    // When query is skipped (user?.id is falsy), currentUser is undefined
+    // When query is loading, currentUser is undefined
+    // When query finishes with no user, currentUser is null (after our fix)
+    // When query finishes with user found, currentUser is the user object
+    if (!user.id) return; // Query is skipped, don't proceed
+    if (currentUser === undefined) return; // Query is still loading, wait
 
     const syncData = async () => {
       // Check for localStorage placement data
@@ -37,7 +45,8 @@ export function useSyncPlacementData() {
         const placementResult = JSON.parse(localData);
 
         // If user doesn't exist in Convex yet, create them first
-        if (!currentUser) {
+        // Now we can safely check for null (query finished, no user found)
+        if (currentUser === null) {
           console.log("👤 Creating user in Convex...");
           try {
             await createUser({
@@ -67,7 +76,9 @@ export function useSyncPlacementData() {
             return;
           }
 
-          console.log("🔄 Syncing placement test from localStorage to Convex...");
+          console.log(
+            "🔄 Syncing placement test from localStorage to Convex...",
+          );
 
           // Sync to Convex
           await updateUserStats({

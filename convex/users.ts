@@ -16,13 +16,16 @@ import { mutation, query } from "./_generated/server";
  */
 export const getCurrentUser = query({
   args: { clerkId: v.string() },
+  returns: v.union(v.object({}), v.null()), // Explicitly allow null return
   handler: async (ctx, { clerkId }) => {
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
       .first();
 
-    return user;
+    // Return null instead of undefined when no user found
+    // This allows distinguishing between loading (undefined) and no user (null)
+    return user ?? null;
   },
 });
 
@@ -45,7 +48,7 @@ export const getUsersByRole = query({
       v.literal("student"),
       v.literal("teacher"),
       v.literal("parent"),
-      v.literal("admin")
+      v.literal("admin"),
     ),
   },
   handler: async (ctx, { role }) => {
@@ -69,8 +72,8 @@ export const searchUsers = query({
         v.literal("student"),
         v.literal("teacher"),
         v.literal("parent"),
-        v.literal("admin")
-      )
+        v.literal("admin"),
+      ),
     ),
   },
   handler: async (ctx, { searchTerm, role }) => {
@@ -86,7 +89,7 @@ export const searchUsers = query({
     users = users.filter(
       (u) =>
         u.name.toLowerCase().includes(searchLower) ||
-        (u.email && u.email.toLowerCase().includes(searchLower))
+        (u.email && u.email.toLowerCase().includes(searchLower)),
     );
 
     return users;
@@ -109,7 +112,7 @@ export const createUser = mutation({
       v.literal("student"),
       v.literal("teacher"),
       v.literal("parent"),
-      v.literal("admin")
+      v.literal("admin"),
     ),
   },
   handler: async (ctx, { clerkId, name, email, role }) => {
@@ -188,8 +191,8 @@ export const updateUserSettings = mutation({
         v.union(
           v.literal("standard"),
           v.literal("large"),
-          v.literal("non-blinking")
-        )
+          v.literal("non-blinking"),
+        ),
       ),
     }),
   },
@@ -250,7 +253,7 @@ export const updateUserStats = mutation({
         const lastDate = new Date(lastPractice);
         const todayDate = new Date(today);
         const diffDays = Math.floor(
-          (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
+          (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24),
         );
 
         if (diffDays === 1) {
@@ -258,7 +261,7 @@ export const updateUserStats = mutation({
           updatedStats.currentStreak = user.stats.currentStreak + 1;
           updatedStats.longestStreak = Math.max(
             updatedStats.currentStreak,
-            user.stats.longestStreak
+            user.stats.longestStreak,
           );
         } else if (diffDays > 1) {
           // Streak broken - reset to 1
@@ -291,7 +294,7 @@ export const updateUserSubscription = mutation({
       tier: v.union(
         v.literal("free"),
         v.literal("premium"),
-        v.literal("school")
+        v.literal("school"),
       ),
       expiresAt: v.optional(v.string()),
       stripeCustomerId: v.optional(v.string()),

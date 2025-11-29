@@ -1,12 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  useUser,
-} from "@clerk/nextjs";
+import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { Word, UserProgress, PhonicsGroup } from "@/lib/types";
 import {
@@ -20,13 +15,21 @@ import Link from "next/link";
 import wordsData from "./words.json";
 
 // Load words from JSON and transform to Word[] format
-const WORD_POOL: Word[] = wordsData.map((w: { id: string; word: string; difficultyLevel: number; phonicsGroup: string; sentenceContext?: string }) => ({
-  id: w.id,
-  text: w.word,
-  difficulty: w.difficultyLevel,
-  phonicsGroup: w.phonicsGroup as PhonicsGroup,
-  sentenceContext: w.sentenceContext,
-}));
+const WORD_POOL: Word[] = wordsData.map(
+  (w: {
+    id: string;
+    word: string;
+    difficultyLevel: number;
+    phonicsGroup: string;
+    sentenceContext?: string;
+  }) => ({
+    id: w.id,
+    text: w.word,
+    difficulty: w.difficultyLevel,
+    phonicsGroup: w.phonicsGroup as PhonicsGroup,
+    sentenceContext: w.sentenceContext,
+  }),
+);
 
 type WordResult = {
   wordId: string;
@@ -118,7 +121,8 @@ function PracticeSession() {
         console.log("✅ User created successfully");
       } catch (error) {
         // Ignore if user already exists
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         if (!errorMessage?.includes("already exists")) {
           console.error("Failed to create user:", error);
         }
@@ -135,7 +139,7 @@ function PracticeSession() {
   const [startTime, setStartTime] = useState(Date.now());
   const [backspaceCount, setBackspaceCount] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
- // 0-100 representing progress to next level
+  // 0-100 representing progress to next level
   const [showFeedback, setShowFeedback] = useState<{
     type: "correct" | "incorrect";
     speed: "fast" | "slow" | "normal";
@@ -152,7 +156,8 @@ function PracticeSession() {
       userId: currentUser._id,
       currentLevel: currentUser.stats.currentLevel,
       hasCompletedPlacementTest: currentUser.stats.hasCompletedPlacementTest,
-      struggleGroups: (currentUser.stats.struggleGroups || []) as PhonicsGroup[],
+      struggleGroups: (currentUser.stats.struggleGroups ||
+        []) as PhonicsGroup[],
       wordHistory: {}, // TODO: fetch from Convex practiceSessions
     };
 
@@ -236,8 +241,7 @@ function PracticeSession() {
     const accuracy =
       allResults.filter((r) => r.correct).length / allResults.length;
     const avgTimePerWord =
-      allResults.reduce((sum, r) => sum + r.timeSpent, 0) /
-      allResults.length; // Already in seconds from timeSpent
+      allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length; // Already in seconds from timeSpent
 
     console.log("📊 Session Stats:", {
       currentLevel: currentUser.stats.currentLevel,
@@ -282,9 +286,6 @@ function PracticeSession() {
     setShowFeedback(null);
   };
 
-  // Loading state
-  console.log("currentUser", currentUser);
-  console.log("sessionWords", sessionWords);
   if (!currentUser || sessionWords.length === 0) {
     return (
       <>
