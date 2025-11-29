@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { UserButton, useUser, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import { ModeToggle } from "@/components/mode-toggle";
+import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { Header } from "@/components/Header";
 import { Word, PhonicsGroup, PlacementTestResult } from "@/lib/types";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
 
 // Adaptive Placement Test Word Pool
 // Multiple words per difficulty level and phonics group
@@ -222,6 +223,9 @@ function selectNextWord(
 const TOTAL_PLACEMENT_WORDS = 20;
 
 export default function PlacementTest() {
+  // Sync placement data from localStorage when user signs in
+  useSyncPlacementData();
+
   const router = useRouter();
   const { user } = useUser();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -315,7 +319,6 @@ export default function PlacementTest() {
     // Calculate determined level
     // Use the average of all attempted difficulties, weighted by correctness
     const correctWords = allResults.filter((r) => r.correct);
-    const incorrectWords = allResults.filter((r) => !r.correct);
 
     // If they got most right, use the average difficulty of correct words
     // If they struggled, use a lower level
@@ -357,7 +360,7 @@ export default function PlacementTest() {
     });
 
     const struggleGroups = Object.entries(groupPerformance)
-      .filter(([_, stats]) => {
+      .filter(([, stats]) => {
         const accuracy = stats.correct / stats.total;
         return accuracy < 1.0; // Any mistakes = potential struggle area
       })
@@ -420,15 +423,7 @@ export default function PlacementTest() {
   if (isComplete && calculatedResult) {
     return (
       <>
-        <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
-          <Link href="/" className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            LexiKey
-          </Link>
-          <div className="flex items-center gap-4">
-            <ModeToggle />
-            <UserButton />
-          </div>
-        </header>
+        <Header />
         <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
           <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
             <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
@@ -444,7 +439,7 @@ export default function PlacementTest() {
                   Level {calculatedResult.determinedLevel}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  We'll start you here and adapt as you progress
+                  We&apos;ll start you here and adapt as you progress
                 </p>
               </div>
 
@@ -465,7 +460,7 @@ export default function PlacementTest() {
                       </div>
                     ))}
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
-                      We'll give you extra practice in these phonics patterns
+                      We&apos;ll give you extra practice in these phonics patterns
                     </p>
                   </div>
                 ) : (
@@ -535,15 +530,7 @@ export default function PlacementTest() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
-        <h1 className="text-xl font-bold text-black dark:text-white">
-          LexiKey
-        </h1>
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          <UserButton />
-        </div>
-      </header>
+      <Header />
       <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
         <div className="max-w-2xl w-full">
           {/* Progress */}

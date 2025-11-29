@@ -1,10 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserButton, SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
-import { ModeToggle } from "@/components/mode-toggle";
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  useUser,
+} from "@clerk/nextjs";
+import { Header } from "@/components/Header";
 import { Word, UserProgress, PhonicsGroup } from "@/lib/types";
-import { AdaptiveSessionGenerator, calculateNewUserLevel } from "@/lib/AdaptiveEngine";
+import {
+  AdaptiveSessionGenerator,
+  calculateNewUserLevel,
+} from "@/lib/AdaptiveEngine";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
@@ -12,7 +20,7 @@ import Link from "next/link";
 import wordsData from "./words.json";
 
 // Load words from JSON and transform to Word[] format
-const WORD_POOL: Word[] = wordsData.map((w: any) => ({
+const WORD_POOL: Word[] = wordsData.map((w: { id: string; word: string; difficultyLevel: number; phonicsGroup: string; sentenceContext?: string }) => ({
   id: w.id,
   text: w.word,
   difficulty: w.difficultyLevel,
@@ -50,14 +58,7 @@ export default function PracticePage() {
 function AuthWall() {
   return (
     <>
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-          LexiKey
-        </Link>
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-        </div>
-      </header>
+      <Header />
       <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
         <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 text-center">
           <div className="text-6xl mb-6">🔒</div>
@@ -94,8 +95,38 @@ function AuthWall() {
 
 function PracticeSession() {
   const { user } = useUser();
-  const currentUser = useQuery(api.users.getCurrentUser, user?.id ? { clerkId: user.id } : "skip");
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    user?.id ? { clerkId: user.id } : "skip",
+  );
+  const createUser = useMutation(api.users.createUser);
   const updateUserStats = useMutation(api.users.updateUserStats);
+
+  // Auto-create user if they don't exist in Convex
+  useEffect(() => {
+    if (!user || currentUser !== null) return;
+
+    const createUserIfNeeded = async () => {
+      try {
+        console.log("👤 Creating user in Convex (from practice page)...");
+        await createUser({
+          clerkId: user.id,
+          name: user.fullName || user.firstName || "User",
+          email: user.primaryEmailAddress?.emailAddress,
+          role: "student",
+        });
+        console.log("✅ User created successfully");
+      } catch (error) {
+        // Ignore if user already exists
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (!errorMessage?.includes("already exists")) {
+          console.error("Failed to create user:", error);
+        }
+      }
+    };
+
+    createUserIfNeeded();
+  }, [user, currentUser, createUser]);
 
   const [sessionWords, setSessionWords] = useState<Word[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -104,10 +135,10 @@ function PracticeSession() {
   const [startTime, setStartTime] = useState(Date.now());
   const [backspaceCount, setBackspaceCount] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [levelProgress, setLevelProgress] = useState(0); // 0-100 representing progress to next level
+ // 0-100 representing progress to next level
   const [showFeedback, setShowFeedback] = useState<{
-    type: 'correct' | 'incorrect';
-    speed: 'fast' | 'slow' | 'normal';
+    type: "correct" | "incorrect";
+    speed: "fast" | "slow" | "normal";
   } | null>(null);
 
   const currentWord = sessionWords[currentWordIndex];
@@ -121,7 +152,7 @@ function PracticeSession() {
       userId: currentUser._id,
       currentLevel: currentUser.stats.currentLevel,
       hasCompletedPlacementTest: currentUser.stats.hasCompletedPlacementTest,
-      struggleGroups: currentUser.stats.struggleGroups as any[], // Type assertion for now
+      struggleGroups: (currentUser.stats.struggleGroups || []) as PhonicsGroup[],
       wordHistory: {}, // TODO: fetch from Convex practiceSessions
     };
 
@@ -138,7 +169,7 @@ function PracticeSession() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace") {
-      setBackspaceCount(prev => prev + 1);
+      setBackspaceCount((prev) => prev + 1);
     }
 
     // Advance on Enter or Space (if user has typed something)
@@ -153,19 +184,20 @@ function PracticeSession() {
 
     const timeSpentMs = Date.now() - startTime;
     const timeSpent = timeSpentMs / 1000; // Convert to seconds
-    const correct = userInput.trim().toLowerCase() === currentWord.text.toLowerCase();
+    const correct =
+      userInput.trim().toLowerCase() === currentWord.text.toLowerCase();
 
     // Determine speed feedback
-    let speed: 'fast' | 'slow' | 'normal' = 'normal';
+    let speed: "fast" | "slow" | "normal" = "normal";
     if (timeSpent < 2) {
-      speed = 'fast';
+      speed = "fast";
     } else if (timeSpent > 4) {
-      speed = 'slow';
+      speed = "slow";
     }
 
     // Show feedback briefly
     setShowFeedback({
-      type: correct ? 'correct' : 'incorrect',
+      type: correct ? "correct" : "incorrect",
       speed,
     });
 
@@ -181,12 +213,12 @@ function PracticeSession() {
       hesitationDetected: timeSpent > 1.5,
     };
 
-    setResults(prev => [...prev, wordResult]);
+    setResults((prev) => [...prev, wordResult]);
 
     // Move to next word after brief delay (to show feedback)
     setTimeout(() => {
       if (currentWordIndex < sessionWords.length - 1) {
-        setCurrentWordIndex(prev => prev + 1);
+        setCurrentWordIndex((prev) => prev + 1);
         setUserInput("");
       } else {
         // Session complete
@@ -201,15 +233,32 @@ function PracticeSession() {
     if (!currentUser) return;
 
     // Calculate session stats
-    const accuracy = allResults.filter(r => r.correct).length / allResults.length;
-    const avgTimePerWord = allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length * 1000; // ms
+    const accuracy =
+      allResults.filter((r) => r.correct).length / allResults.length;
+    const avgTimePerWord =
+      allResults.reduce((sum, r) => sum + r.timeSpent, 0) /
+      allResults.length; // Already in seconds from timeSpent
+
+    console.log("📊 Session Stats:", {
+      currentLevel: currentUser.stats.currentLevel,
+      accuracy,
+      avgTimePerWord,
+      totalWords: allResults.length,
+      correctWords: allResults.filter((r) => r.correct).length,
+    });
 
     // Calculate new user level
     const newLevel = calculateNewUserLevel(
       currentUser.stats.currentLevel,
       accuracy,
-      avgTimePerWord
+      avgTimePerWord,
     );
+
+    console.log("📈 Level Change:", {
+      oldLevel: currentUser.stats.currentLevel,
+      newLevel,
+      difference: newLevel - currentUser.stats.currentLevel,
+    });
 
     // Update user stats in Convex
     await updateUserStats({
@@ -219,7 +268,7 @@ function PracticeSession() {
       },
     });
 
-    console.log("Session completed. New level:", newLevel);
+    console.log("✅ Session completed. New level:", newLevel);
   };
 
   const restartSession = () => {
@@ -234,22 +283,18 @@ function PracticeSession() {
   };
 
   // Loading state
+  console.log("currentUser", currentUser);
+  console.log("sessionWords", sessionWords);
   if (!currentUser || sessionWords.length === 0) {
     return (
       <>
-        <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
-          <Link href="/" className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            LexiKey
-          </Link>
-          <div className="flex items-center gap-4">
-            <ModeToggle />
-            <UserButton />
-          </div>
-        </header>
+        <Header />
         <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
           <div className="text-center">
             <div className="text-6xl mb-4">⏳</div>
-            <p className="text-xl text-gray-600 dark:text-gray-400">Loading your personalized session...</p>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              Loading your personalized session...
+            </p>
           </div>
         </main>
       </>
@@ -257,23 +302,23 @@ function PracticeSession() {
   }
 
   if (isComplete) {
-    const accuracy = Math.round((results.filter(r => r.correct).length / results.length) * 100);
-    const totalTime = Math.round(results.reduce((sum, r) => sum + r.timeSpent, 0));
-    const struggleWords = results.filter(r => r.hesitationDetected || r.backspaceCount > 3 || !r.correct);
-    const fastWords = results.filter(r => r.correct && r.timeSpent < 2).length;
+    const accuracy = Math.round(
+      (results.filter((r) => r.correct).length / results.length) * 100,
+    );
+    const totalTime = Math.round(
+      results.reduce((sum, r) => sum + r.timeSpent, 0),
+    );
+    const struggleWords = results.filter(
+      (r) => r.hesitationDetected || r.backspaceCount > 3 || !r.correct,
+    );
+    const fastWords = results.filter(
+      (r) => r.correct && r.timeSpent < 2,
+    ).length;
     const newLevel = currentUser?.stats.currentLevel ?? 1;
 
     return (
       <>
-        <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
-          <Link href="/" className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            LexiKey
-          </Link>
-          <div className="flex items-center gap-4">
-            <ModeToggle />
-            <UserButton />
-          </div>
-        </header>
+        <Header />
         <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
           <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
             <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
@@ -284,18 +329,24 @@ function PracticeSession() {
               {/* Level Display */}
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-6 rounded-lg border-2 border-purple-300 dark:border-purple-700">
                 <div className="text-center mb-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Current Level</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    Current Level
+                  </p>
                   <p className="text-5xl font-bold text-purple-600 dark:text-purple-400">
                     {newLevel.toFixed(1)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                    {accuracy >= 85 ? "Great job! 🚀" : accuracy >= 70 ? "Keep practicing! 💪" : "Take your time! 🌱"}
+                    {accuracy >= 85
+                      ? "Great job! 🚀"
+                      : accuracy >= 70
+                        ? "Keep practicing! 💪"
+                        : "Take your time! 🌱"}
                   </p>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                   <div
                     className="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${((newLevel % 1) * 100)}%` }}
+                    style={{ width: `${(newLevel % 1) * 100}%` }}
                   />
                 </div>
                 <p className="text-center text-xs text-gray-500 dark:text-gray-500 mt-2">
@@ -305,20 +356,36 @@ function PracticeSession() {
 
               <div className="grid grid-cols-4 gap-3">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 text-center">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{results.length}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Words</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {results.length}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    Words
+                  </p>
                 </div>
                 <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800 text-center">
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{accuracy}%</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Accuracy</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {accuracy}%
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    Accuracy
+                  </p>
                 </div>
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800 text-center">
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{totalTime}s</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Time</p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {totalTime}s
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    Time
+                  </p>
                 </div>
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 text-center">
-                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">⚡{fastWords}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Fast</p>
+                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                    ⚡{fastWords}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    Fast
+                  </p>
                 </div>
               </div>
 
@@ -328,7 +395,7 @@ function PracticeSession() {
                     Words to Review
                   </h2>
                   <div className="flex flex-wrap gap-2">
-                    {struggleWords.map(r => (
+                    {struggleWords.map((r) => (
                       <span
                         key={r.wordId}
                         className="px-3 py-1 bg-yellow-200 dark:bg-yellow-600/30 border border-yellow-300 dark:border-yellow-700 rounded-full text-sm font-mono text-yellow-900 dark:text-yellow-200"
@@ -338,7 +405,8 @@ function PracticeSession() {
                     ))}
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
-                    These words will be added to your review bucket for extra practice
+                    These words will be added to your review bucket for extra
+                    practice
                   </p>
                 </div>
               )}
@@ -366,20 +434,16 @@ function PracticeSession() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
-        <h1 className="text-xl font-bold text-black dark:text-white">LexiKey</h1>
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          <UserButton />
-        </div>
-      </header>
+      <Header />
       <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
         <div className="max-w-2xl w-full">
           {/* Level and Progress */}
           <div className="mb-8 space-y-4">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-semibold">Level {currentUser.stats.currentLevel.toFixed(1)}</span>
+                <span className="font-semibold">
+                  Level {currentUser.stats.currentLevel.toFixed(1)}
+                </span>
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
                 Word {currentWordIndex + 1} of {sessionWords.length}
@@ -388,7 +452,9 @@ function PracticeSession() {
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(currentWordIndex / sessionWords.length) * 100}%` }}
+                style={{
+                  width: `${(currentWordIndex / sessionWords.length) * 100}%`,
+                }}
               />
             </div>
           </div>
@@ -419,27 +485,47 @@ function PracticeSession() {
               {showFeedback && (
                 <div className="absolute top-4 right-4 flex gap-2">
                   {/* Correct/Incorrect Icon */}
-                  {showFeedback.type === 'correct' ? (
+                  {showFeedback.type === "correct" ? (
                     <div className="bg-green-500 text-white rounded-full p-3 shadow-lg animate-bounce">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                   ) : (
                     <div className="bg-red-500 text-white rounded-full p-3 shadow-lg animate-bounce">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </div>
                   )}
 
                   {/* Speed Icon */}
-                  {showFeedback.speed === 'fast' && (
+                  {showFeedback.speed === "fast" && (
                     <div className="bg-yellow-500 text-white rounded-full p-3 shadow-lg">
                       <span className="text-2xl">⚡</span>
                     </div>
                   )}
-                  {showFeedback.speed === 'slow' && (
+                  {showFeedback.speed === "slow" && (
                     <div className="bg-blue-500 text-white rounded-full p-3 shadow-lg">
                       <span className="text-2xl">🐌</span>
                     </div>

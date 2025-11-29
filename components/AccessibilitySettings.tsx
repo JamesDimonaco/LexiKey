@@ -1,18 +1,81 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { AccessibilitySettings as SettingsType } from "@/lib/types";
 
-export function AccessibilitySettings() {
+interface AccessibilitySettingsProps {
+  onClose?: () => void;
+}
+
+export function AccessibilitySettings({ onClose }: AccessibilitySettingsProps) {
   const { settings, updateSettings, resetSettings } = useAccessibility();
+  const [tempSettings, setTempSettings] = useState<SettingsType>(settings);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+  // Update temporary settings for preview
+  const updateTempSettings = (updates: Partial<SettingsType>) => {
+    setTempSettings((prev) => ({ ...prev, ...updates }));
+  };
+
+  const handleSave = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const confirmSave = () => {
+    updateSettings(tempSettings);
+    setShowConfirmDialog(false);
+    onClose?.(); // Close the modal after saving
+  };
+
+  const handleCancel = () => {
+    setTempSettings(settings); // Reset to saved settings
+  };
+
+  const handleReset = () => {
+    resetSettings();
+    setTempSettings({
+      font: "helvetica",
+      fontSize: 24,
+      letterSpacing: 2,
+      largeCursor: false,
+      nonBlinkingCursor: false,
+      highContrast: true,
+      ttsEnabled: true,
+      voiceSpeed: 1.0,
+      showHints: true,
+      noTimerPressure: false,
+      blindMode: false,
+    });
+  };
+
+  // Check if settings have changed
+  const hasChanges = JSON.stringify(tempSettings) !== JSON.stringify(settings);
 
   return (
-    <div className="bg-gray-900 p-6 rounded-lg shadow-md max-w-2xl mx-auto border border-gray-800">
-      <h2 className="text-2xl font-bold mb-6 text-white">Accessibility Settings</h2>
+    <>
+      <div
+        className="bg-gray-900 dark:bg-gray-900 p-6 rounded-lg shadow-md max-w-2xl mx-auto border border-gray-800"
+        style={{
+          fontFamily: tempSettings.font === "opendyslexic" ? "OpenDyslexic, sans-serif" : tempSettings.font,
+          fontSize: `${tempSettings.fontSize}px`,
+          letterSpacing: `${tempSettings.letterSpacing}px`,
+        }}
+      >
+        <h2 className="text-2xl font-bold mb-6 text-white">Accessibility Settings</h2>
 
-      <div className="space-y-6">
-        {/* Font Settings */}
-        <div className="space-y-3">
+        <div className="space-y-6">
+          {/* Font Settings */}
+          <div className="space-y-3">
           <h3 className="text-lg font-semibold text-white">Font Settings</h3>
 
           <div>
@@ -20,9 +83,9 @@ export function AccessibilitySettings() {
               Font Family
             </label>
             <select
-              value={settings.font}
+              value={tempSettings.font}
               onChange={(e) =>
-                updateSettings({
+                updateTempSettings({
                   font: e.target.value as
                     | "helvetica"
                     | "arial"
@@ -35,7 +98,7 @@ export function AccessibilitySettings() {
               <option value="arial">Arial</option>
               <option value="opendyslexic">OpenDyslexic</option>
             </select>
-            {settings.font === "opendyslexic" && (
+            {tempSettings.font === "opendyslexic" && (
               <p className="text-xs text-gray-400 mt-1">
                 Note: Research shows OpenDyslexic provides no statistical
                 benefit over Arial/Helvetica, but some users find it helpful.
@@ -45,15 +108,15 @@ export function AccessibilitySettings() {
 
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-300">
-              Font Size: {settings.fontSize}px
+              Font Size: {tempSettings.fontSize}px
             </label>
             <input
               type="range"
               min="16"
               max="48"
-              value={settings.fontSize}
+              value={tempSettings.fontSize}
               onChange={(e) =>
-                updateSettings({ fontSize: parseInt(e.target.value) })
+                updateTempSettings({ fontSize: parseInt(e.target.value) })
               }
               className="w-full accent-blue-500"
             />
@@ -61,15 +124,15 @@ export function AccessibilitySettings() {
 
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-300">
-              Letter Spacing: {settings.letterSpacing}px
+              Letter Spacing: {tempSettings.letterSpacing}px
             </label>
             <input
               type="range"
               min="0"
               max="8"
-              value={settings.letterSpacing}
+              value={tempSettings.letterSpacing}
               onChange={(e) =>
-                updateSettings({ letterSpacing: parseInt(e.target.value) })
+                updateTempSettings({ letterSpacing: parseInt(e.target.value) })
               }
               className="w-full accent-blue-500"
             />
@@ -83,9 +146,9 @@ export function AccessibilitySettings() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={settings.largeCursor}
+              checked={tempSettings.largeCursor}
               onChange={(e) =>
-                updateSettings({ largeCursor: e.target.checked })
+                updateTempSettings({ largeCursor: e.target.checked })
               }
               className="w-4 h-4 accent-blue-500"
             />
@@ -95,9 +158,9 @@ export function AccessibilitySettings() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={settings.nonBlinkingCursor}
+              checked={tempSettings.nonBlinkingCursor}
               onChange={(e) =>
-                updateSettings({ nonBlinkingCursor: e.target.checked })
+                updateTempSettings({ nonBlinkingCursor: e.target.checked })
               }
               className="w-4 h-4 accent-blue-500"
             />
@@ -112,9 +175,9 @@ export function AccessibilitySettings() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={settings.highContrast}
+              checked={tempSettings.highContrast}
               onChange={(e) =>
-                updateSettings({ highContrast: e.target.checked })
+                updateTempSettings({ highContrast: e.target.checked })
               }
               className="w-4 h-4 accent-blue-500"
             />
@@ -129,26 +192,26 @@ export function AccessibilitySettings() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={settings.ttsEnabled}
-              onChange={(e) => updateSettings({ ttsEnabled: e.target.checked })}
+              checked={tempSettings.ttsEnabled}
+              onChange={(e) => updateTempSettings({ ttsEnabled: e.target.checked })}
               className="w-4 h-4 accent-blue-500"
             />
             <span className="text-sm text-gray-300">Enable Text-to-Speech</span>
           </label>
 
-          {settings.ttsEnabled && (
+          {tempSettings.ttsEnabled && (
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-300">
-                Voice Speed: {settings.voiceSpeed.toFixed(1)}x
+                Voice Speed: {tempSettings.voiceSpeed.toFixed(1)}x
               </label>
               <input
                 type="range"
                 min="0.5"
                 max="2.0"
                 step="0.1"
-                value={settings.voiceSpeed}
+                value={tempSettings.voiceSpeed}
                 onChange={(e) =>
-                  updateSettings({ voiceSpeed: parseFloat(e.target.value) })
+                  updateTempSettings({ voiceSpeed: parseFloat(e.target.value) })
                 }
                 className="w-full accent-blue-500"
               />
@@ -163,8 +226,8 @@ export function AccessibilitySettings() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={settings.showHints}
-              onChange={(e) => updateSettings({ showHints: e.target.checked })}
+              checked={tempSettings.showHints}
+              onChange={(e) => updateTempSettings({ showHints: e.target.checked })}
               className="w-4 h-4 accent-blue-500"
             />
             <span className="text-sm text-gray-300">
@@ -175,9 +238,9 @@ export function AccessibilitySettings() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={settings.noTimerPressure}
+              checked={tempSettings.noTimerPressure}
               onChange={(e) =>
-                updateSettings({ noTimerPressure: e.target.checked })
+                updateTempSettings({ noTimerPressure: e.target.checked })
               }
               className="w-4 h-4 accent-blue-500"
             />
@@ -187,8 +250,8 @@ export function AccessibilitySettings() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={settings.blindMode}
-              onChange={(e) => updateSettings({ blindMode: e.target.checked })}
+              checked={tempSettings.blindMode}
+              onChange={(e) => updateTempSettings({ blindMode: e.target.checked })}
               className="w-4 h-4 accent-blue-500"
             />
             <span className="text-sm text-gray-300">
@@ -197,16 +260,56 @@ export function AccessibilitySettings() {
           </label>
         </div>
 
-        {/* Reset Button */}
-        <div className="pt-4">
-          <button
-            onClick={resetSettings}
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+        {/* Action Buttons */}
+        <div className="pt-4 flex gap-3">
+          <Button
+            onClick={handleReset}
+            variant="outline"
+            className="flex-1"
           >
             Reset to Defaults
-          </button>
+          </Button>
+          <Button
+            onClick={handleCancel}
+            variant="outline"
+            className="flex-1"
+            disabled={!hasChanges}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            className="flex-1"
+            disabled={!hasChanges}
+          >
+            Save Changes
+          </Button>
+        </div>
         </div>
       </div>
-    </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Settings?</DialogTitle>
+            <DialogDescription>
+              Your accessibility settings will be saved to your browser and applied across all pages.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={confirmSave}>
+              Save Settings
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

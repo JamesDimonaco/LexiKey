@@ -4,6 +4,7 @@ import "./globals.css";
 import ConvexClientProvider from "@/components/ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { AccessibilityStyler } from "@/components/AccessibilityStyler";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
@@ -43,6 +44,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <AccessibilityProvider>
+                <AccessibilityStyler />
                 {children}
               </AccessibilityProvider>
             </ThemeProvider>

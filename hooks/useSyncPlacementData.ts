@@ -22,46 +22,71 @@ export function useSyncPlacementData() {
     api.users.getCurrentUser,
     user?.id ? { clerkId: user.id } : "skip"
   );
+  const createUser = useMutation(api.users.createUser);
   const updateUserStats = useMutation(api.users.updateUserStats);
 
   useEffect(() => {
-    if (!isLoaded || !user || !currentUser) return;
+    if (!isLoaded || !user) return;
 
-    // Check if user already has placement test completed
-    if (currentUser.stats.hasCompletedPlacementTest) {
-      // Already synced or completed online
-      localStorage.removeItem("lexikey_placement_result");
-      return;
-    }
+    const syncData = async () => {
+      // Check for localStorage placement data
+      const localData = localStorage.getItem("lexikey_placement_result");
+      if (!localData) return;
 
-    // Check for localStorage placement data
-    const localData = localStorage.getItem("lexikey_placement_result");
-    if (!localData) return;
+      try {
+        const placementResult = JSON.parse(localData);
 
-    try {
-      const placementResult = JSON.parse(localData);
+        // If user doesn't exist in Convex yet, create them first
+        if (!currentUser) {
+          console.log("👤 Creating user in Convex...");
+          try {
+            await createUser({
+              clerkId: user.id,
+              name: user.fullName || user.firstName || "User",
+              email: user.primaryEmailAddress?.emailAddress,
+              role: "student",
+            });
+            console.log("✅ User created");
+            // Don't sync placement data here - it will happen on next render when currentUser exists
+            return;
+          } catch (error: any) {
+            // User might already exist (webhook created it)
+            if (!error.message?.includes("already exists")) {
+              console.error("Failed to create user:", error);
+              return;
+            }
+          }
+        }
 
-      console.log("🔄 Syncing placement test from localStorage to Convex...");
+        // Now sync placement data if user exists
+        if (currentUser) {
+          // Check if user already has placement test completed
+          if (currentUser.stats.hasCompletedPlacementTest) {
+            // Already synced or completed online
+            localStorage.removeItem("lexikey_placement_result");
+            return;
+          }
 
-      // Sync to Convex
-      updateUserStats({
-        userId: currentUser._id,
-        stats: {
-          currentLevel: placementResult.determinedLevel,
-          hasCompletedPlacementTest: true,
-          struggleGroups: placementResult.identifiedStruggleGroups,
-        },
-      })
-        .then(() => {
+          console.log("🔄 Syncing placement test from localStorage to Convex...");
+
+          // Sync to Convex
+          await updateUserStats({
+            userId: currentUser._id,
+            stats: {
+              currentLevel: placementResult.determinedLevel,
+              hasCompletedPlacementTest: true,
+              struggleGroups: placementResult.identifiedStruggleGroups,
+            },
+          });
+
           console.log("✅ Placement test synced successfully!");
           localStorage.removeItem("lexikey_placement_result");
-        })
-        .catch((error) => {
-          console.error("❌ Failed to sync placement test:", error);
-        });
-    } catch (error) {
-      console.error("Failed to parse localStorage placement data:", error);
-      localStorage.removeItem("lexikey_placement_result");
-    }
-  }, [isLoaded, user, currentUser, updateUserStats]);
+        }
+      } catch (error) {
+        console.error("Failed to sync placement data:", error);
+      }
+    };
+
+    syncData();
+  }, [isLoaded, user, currentUser, createUser, updateUserStats]);
 }

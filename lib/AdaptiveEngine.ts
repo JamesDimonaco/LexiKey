@@ -85,7 +85,7 @@ export class AdaptiveSessionGenerator {
   private getStruggleWords(user: UserProgress, count: number): Word[] {
     // Get words with low accuracy (<70%)
     const missedWordIds = Object.entries(user.wordHistory)
-      .filter(([_, stats]) => {
+      .filter(([, stats]) => {
         if (stats.timesSeen === 0) return false;
         const accuracy = stats.timesCorrect / stats.timesSeen;
         return accuracy < 0.7;
@@ -177,25 +177,46 @@ export class AdaptiveSessionGenerator {
 
 /**
  * Calculate new user level based on session performance
+ *
+ * Progressive leveling system:
+ * - Requires multiple successful sessions to level up
+ * - Much slower progression at higher levels
+ * - Gentler adjustments for dyslexic learners
  */
 export function calculateNewUserLevel(
   currentLevel: number,
   sessionAccuracy: number, // 0 to 1 (e.g. 0.85)
-  avgTimePerWord: number // milliseconds
+  avgTimePerWord: number // seconds (e.g., 2.5)
 ): number {
-  let newLevel = currentLevel;
+  let levelAdjustment = 0;
 
-  // Accuracy-based adjustment (gentler for dyslexic users)
-  if (sessionAccuracy >= 0.85 && avgTimePerWord < 3000) {
-    // Good accuracy + reasonable speed = level up
-    newLevel += 0.1;
-  } else if (sessionAccuracy >= 0.85 && avgTimePerWord >= 3000) {
-    // Good accuracy but slow = stay at level (build fluency first)
-    newLevel += 0;
-  } else if (sessionAccuracy < 0.65) {
-    // Struggling = level down
-    newLevel -= 0.15;
+  // Determine base adjustment based on performance
+  if (sessionAccuracy >= 0.95 && avgTimePerWord < 2.5) {
+    // Exceptional performance (95%+ accuracy, fast typing)
+    levelAdjustment = 0.05;
+  } else if (sessionAccuracy >= 0.85 && avgTimePerWord < 3.0) {
+    // Good performance (85%+ accuracy, reasonable speed)
+    levelAdjustment = 0.03;
+  } else if (sessionAccuracy >= 0.75 && avgTimePerWord < 4.0) {
+    // Decent performance - small increase
+    levelAdjustment = 0.01;
+  } else if (sessionAccuracy >= 0.70) {
+    // Acceptable - stay at current level (build fluency)
+    levelAdjustment = 0;
+  } else if (sessionAccuracy >= 0.50) {
+    // Struggling - small decrease
+    levelAdjustment = -0.02;
+  } else {
+    // Significant struggle - larger decrease
+    levelAdjustment = -0.05;
   }
+
+  // Apply speed penalty for slow typing (even if accurate)
+  if (avgTimePerWord > 5.0 && levelAdjustment > 0) {
+    levelAdjustment *= 0.5; // Half the progression if too slow
+  }
+
+  const newLevel = currentLevel + levelAdjustment;
 
   // Clamp between 1 and 10
   return Math.min(Math.max(newLevel, 1), 10);
@@ -246,7 +267,7 @@ export function detectStruggleGroups(
 
   // Return groups with <70% accuracy AND at least 5 attempts
   return Object.entries(groupAccuracy)
-    .filter(([_, stats]) => {
+    .filter(([, stats]) => {
       const accuracy = stats.correct / stats.total;
       return stats.total >= 5 && accuracy < 0.7;
     })

@@ -1,19 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import { ModeToggle } from "@/components/mode-toggle";
+import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { Header } from "@/components/Header";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export default function Home() {
   return (
     <>
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
-        <h1 className="text-xl font-bold text-black dark:text-white">LexiKey</h1>
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          <UserButton />
-        </div>
-      </header>
+      <Header />
       <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col gap-8">
         <div className="max-w-4xl mx-auto w-full">
           <div className="text-center mb-8">
@@ -30,6 +26,14 @@ export default function Home() {
 }
 
 function Content() {
+  const { user } = useUser();
+  const currentUser = useQuery(
+    api.users.getCurrentUser,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
+
+  const hasCompletedPlacementTest = currentUser?.stats.hasCompletedPlacementTest ?? false;
+
   return (
     <div className="flex flex-col gap-8">
       <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
@@ -41,29 +45,53 @@ function Content() {
         </p>
 
         <div className="space-y-4">
-          <Link
-            href="/placement-test"
-            className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Take Placement Test →
-          </Link>
-
-          <SignedIn>
+          {/* Primary CTA - changes based on placement test status */}
+          {!hasCompletedPlacementTest ? (
             <Link
-              href="/practice"
-              className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              href="/placement-test"
+              className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Start Practice
+              Take Placement Test →
             </Link>
-          </SignedIn>
+          ) : (
+            <SignedIn>
+              <Link
+                href="/practice"
+                className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Start Practice →
+              </Link>
+            </SignedIn>
+          )}
 
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                Sign In to Practice
-              </button>
-            </SignInButton>
-          </SignedOut>
+          {/* Secondary CTA */}
+          {hasCompletedPlacementTest ? (
+            <Link
+              href="/placement-test"
+              className="block w-full py-2 text-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              Retake Placement Test
+            </Link>
+          ) : (
+            <>
+              <SignedIn>
+                <Link
+                  href="/practice"
+                  className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Start Practice
+                </Link>
+              </SignedIn>
+
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                    Sign In to Practice
+                  </button>
+                </SignInButton>
+              </SignedOut>
+            </>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <FeatureCard
