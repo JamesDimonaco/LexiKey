@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, action } from "./_generated/server";
+import { api } from "./_generated/api";
 
 /**
  * Struggle Words (Bucket System)
@@ -310,29 +311,6 @@ export const removeFromStruggleBucket = mutation({
 
     await ctx.db.delete(struggleWord._id);
     return { success: true };
-  },
-});
-
-/**
- * Bulk add words to struggle bucket
- * Called after a practice session
- */
-export const bulkAddToStruggleBucket = mutation({
-  args: {
-    userId: v.id("users"),
-    wordIds: v.array(v.id("wordLibrary")),
-  },
-  handler: async (ctx, { userId, wordIds }) => {
-    const results = await Promise.all(
-      wordIds.map((wordId) =>
-        ctx.runMutation(
-          ctx.db.system.getFunctionId("struggleWords:addToStruggleBucket"),
-          { userId, wordId }
-        )
-      )
-    );
-
-    return { count: results.length };
   },
 });
 

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, action } from "./_generated/server";
+import { api } from "./_generated/api";
 
 /**
  * Progress Reports (IEP Generator - B2B Killer Feature)
@@ -266,10 +267,9 @@ export const generateReportPDF = action({
   args: { reportId: v.id("progressReports") },
   handler: async (ctx, { reportId }) => {
     // Fetch report data
-    const report = await ctx.runQuery(
-      ctx.db.system.getFunctionId("progressReports:getReportById"),
-      { reportId }
-    );
+    const report = await ctx.runQuery(api.progressReports.getReportById, {
+      reportId,
+    });
 
     if (!report) {
       throw new Error("Report not found");
@@ -285,67 +285,12 @@ export const generateReportPDF = action({
     const placeholderPdfUrl = `https://placeholder.com/report-${reportId}.pdf`;
 
     // Update report with PDF URL
-    await ctx.runMutation(
-      ctx.db.system.getFunctionId("progressReports:updateReportPdfUrl"),
-      {
-        reportId,
-        pdfUrl: placeholderPdfUrl,
-      }
-    );
+    await ctx.runMutation(api.progressReports.updateReportPdfUrl, {
+      reportId,
+      pdfUrl: placeholderPdfUrl,
+    });
 
     return { pdfUrl: placeholderPdfUrl };
-  },
-});
-
-/**
- * Generate quick weekly report for a student
- * Convenience function for common use case
- */
-export const generateWeeklyReport = mutation({
-  args: {
-    studentId: v.id("users"),
-    teacherId: v.optional(v.id("users")),
-  },
-  handler: async (ctx, { studentId, teacherId }) => {
-    const now = Date.now();
-    const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
-
-    return await ctx.runMutation(
-      ctx.db.system.getFunctionId("progressReports:generateProgressReport"),
-      {
-        studentId,
-        teacherId,
-        reportType: "weekly",
-        startDate: oneWeekAgo,
-        endDate: now,
-      }
-    );
-  },
-});
-
-/**
- * Generate quick monthly report for a student
- * Convenience function for common use case
- */
-export const generateMonthlyReport = mutation({
-  args: {
-    studentId: v.id("users"),
-    teacherId: v.optional(v.id("users")),
-  },
-  handler: async (ctx, { studentId, teacherId }) => {
-    const now = Date.now();
-    const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
-
-    return await ctx.runMutation(
-      ctx.db.system.getFunctionId("progressReports:generateProgressReport"),
-      {
-        studentId,
-        teacherId,
-        reportType: "monthly",
-        startDate: oneMonthAgo,
-        endDate: now,
-      }
-    );
   },
 });
 
