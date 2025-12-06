@@ -233,9 +233,8 @@ export function TypingEngine({
     cursorStyles.borderLeft = "4px solid #FFF";
   }
 
-  if (settings.nonBlinkingCursor) {
-    cursorStyles.animation = "none";
-  }
+  // Cursor never blinks (reduces visual distraction)
+  cursorStyles.animation = "none";
 
   return (
     <div

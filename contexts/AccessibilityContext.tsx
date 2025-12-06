@@ -8,7 +8,6 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   fontSize: 24,
   letterSpacing: 2,
   largeCursor: false,
-  nonBlinkingCursor: false,
   highContrast: true,
   ttsEnabled: true,
   voiceSpeed: 1.0,

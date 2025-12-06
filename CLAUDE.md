@@ -83,7 +83,7 @@ We organize lessons by **Phonics Rules**, not just word difficulty:
 ### Accessibility Features
 - High contrast mode (pure black/white)
 - Large cursor option
-- Non-blinking cursor
+- Non-blinking cursor (always on, not configurable)
 - Adjustable font sizes (16-48px)
 - Letter spacing controls (0-8px)
 - No timer pressure mode

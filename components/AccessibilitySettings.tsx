@@ -48,7 +48,6 @@ export function AccessibilitySettings({ onClose }: AccessibilitySettingsProps) {
       fontSize: 24,
       letterSpacing: 2,
       largeCursor: false,
-      nonBlinkingCursor: false,
       highContrast: true,
       ttsEnabled: true,
       voiceSpeed: 1.0,
@@ -153,18 +152,6 @@ export function AccessibilitySettings({ onClose }: AccessibilitySettingsProps) {
               className="w-4 h-4 accent-blue-500"
             />
             <span className="text-sm text-gray-300">Large Cursor</span>
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={tempSettings.nonBlinkingCursor}
-              onChange={(e) =>
-                updateTempSettings({ nonBlinkingCursor: e.target.checked })
-              }
-              className="w-4 h-4 accent-blue-500"
-            />
-            <span className="text-sm text-gray-300">Non-Blinking Cursor</span>
           </label>
         </div>
 

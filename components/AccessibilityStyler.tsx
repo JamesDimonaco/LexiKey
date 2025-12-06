@@ -34,17 +34,8 @@ export function AccessibilityStyler() {
       document.documentElement.style.setProperty("--cursor-width", "1px");
     }
 
-    if (settings.nonBlinkingCursor) {
-      document.documentElement.style.setProperty(
-        "--cursor-animation",
-        "none"
-      );
-    } else {
-      document.documentElement.style.setProperty(
-        "--cursor-animation",
-        "blink 1s step-end infinite"
-      );
-    }
+    // Cursor never blinks (reduces visual distraction)
+    document.documentElement.style.setProperty("--cursor-animation", "none");
 
     // Apply high contrast mode
     if (settings.highContrast) {

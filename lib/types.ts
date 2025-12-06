@@ -7,7 +7,6 @@ export interface AccessibilitySettings {
 
   // Cursor settings
   largeCursor: boolean;
-  nonBlinkingCursor: boolean;
 
   // Contrast settings
   highContrast: boolean;
