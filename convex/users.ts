@@ -16,7 +16,6 @@ import { mutation, query } from "./_generated/server";
  */
 export const getCurrentUser = query({
   args: { clerkId: v.string() },
-  returns: v.union(v.object({}), v.null()), // Explicitly allow null return
   handler: async (ctx, { clerkId }) => {
     const user = await ctx.db
       .query("users")

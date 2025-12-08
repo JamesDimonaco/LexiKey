@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { Switch } from "@/components/ui/switch";
 import { Header } from "@/components/Header";
 import { Word, UserProgress, PhonicsGroup } from "@/lib/types";
 import {
@@ -11,8 +12,14 @@ import {
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
-import Link from "next/link";
+import { Label } from "@/components/ui/label";
 import wordsData from "./words.json";
+
+import { WordResult, LetterState } from "./types";
+import { AuthWall } from "./AuthWall";
+import { SentenceModeView } from "./SentenceModeView";
+import { SingleWordView } from "./SingleWordView";
+import { SessionComplete } from "./SessionComplete";
 
 // Load words from JSON and transform to Word[] format
 const WORD_POOL: Word[] = wordsData.map(
@@ -31,19 +38,7 @@ const WORD_POOL: Word[] = wordsData.map(
   }),
 );
 
-type WordResult = {
-  wordId: string;
-  word: string;
-  difficulty: number;
-  phonicsGroup: string;
-  correct: boolean;
-  timeSpent: number;
-  backspaceCount: number;
-  hesitationDetected: boolean;
-};
-
 export default function PracticePage() {
-  // Sync any placement test data from localStorage when user signs in
   useSyncPlacementData();
 
   return (
@@ -54,44 +49,6 @@ export default function PracticePage() {
       <SignedIn>
         <PracticeSession />
       </SignedIn>
-    </>
-  );
-}
-
-function AuthWall() {
-  return (
-    <>
-      <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
-        <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 text-center">
-          <div className="text-6xl mb-6">🔒</div>
-          <h1 className="text-3xl font-bold mb-4 text-black dark:text-white">
-            Sign In Required
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            You need to be signed in to practice and save your progress.
-          </p>
-          <div className="space-y-4">
-            <SignInButton mode="modal">
-              <button className="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors">
-                Sign In to Practice
-              </button>
-            </SignInButton>
-            <Link
-              href="/placement-test"
-              className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            >
-              Take Placement Test (No Sign In Required)
-            </Link>
-            <Link
-              href="/"
-              className="block text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              ← Back to Home
-            </Link>
-          </div>
-        </div>
-      </main>
     </>
   );
 }
@@ -111,16 +68,13 @@ function PracticeSession() {
 
     const createUserIfNeeded = async () => {
       try {
-        console.log("👤 Creating user in Convex (from practice page)...");
         await createUser({
           clerkId: user.id,
           name: user.fullName || user.firstName || "User",
           email: user.primaryEmailAddress?.emailAddress,
           role: "student",
         });
-        console.log("✅ User created successfully");
       } catch (error) {
-        // Ignore if user already exists
         const errorMessage =
           error instanceof Error ? error.message : String(error);
         if (!errorMessage?.includes("already exists")) {
@@ -132,33 +86,41 @@ function PracticeSession() {
     createUserIfNeeded();
   }, [user, currentUser, createUser]);
 
+  // Core state
   const [sessionWords, setSessionWords] = useState<Word[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [results, setResults] = useState<WordResult[]>([]);
+  const [isComplete, setIsComplete] = useState(false);
+
+  // Mode state
+  const [sentenceMode, setSentenceMode] = useState(false);
+
+  // Tracking state
   const [startTime, setStartTime] = useState(Date.now());
   const [backspaceCount, setBackspaceCount] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  // 0-100 representing progress to next level
-  const [showFeedback, setShowFeedback] = useState<{
-    type: "correct" | "incorrect";
-    speed: "fast" | "slow" | "normal";
-  } | null>(null);
+  const [correctionsMade, setCorrectionsMade] = useState(0);
+  const [letterStates, setLetterStates] = useState<LetterState[]>([]);
+  const [wasLastKeyBackspace, setWasLastKeyBackspace] = useState(false);
 
+  // Single word mode feedback
+  const [showFeedback, setShowFeedback] = useState<
+    "correct" | "incorrect" | null
+  >(null);
+
+  const inputRef = useRef<HTMLInputElement>(null);
   const currentWord = sessionWords[currentWordIndex];
 
   // Generate adaptive session when user data loads
   useEffect(() => {
     if (!currentUser || sessionWords.length > 0) return;
 
-    // Build UserProgress from Convex data
     const userProgress: UserProgress = {
       userId: currentUser._id,
       currentLevel: currentUser.stats.currentLevel,
       hasCompletedPlacementTest: currentUser.stats.hasCompletedPlacementTest,
-      struggleGroups: (currentUser.stats.struggleGroups ||
-        []) as PhonicsGroup[],
-      wordHistory: {}, // TODO: fetch from Convex practiceSessions
+      struggleGroups: (currentUser.stats.struggleGroups || []) as PhonicsGroup[],
+      wordHistory: {},
     };
 
     const generator = new AdaptiveSessionGenerator(WORD_POOL);
@@ -166,70 +128,193 @@ function PracticeSession() {
     setSessionWords(generatedWords);
   }, [currentUser, sessionWords.length]);
 
+  // Initialize letter states when word changes
   useEffect(() => {
-    setStartTime(Date.now());
-    setBackspaceCount(0);
-    setShowFeedback(null);
-  }, [currentWordIndex]);
+    if (currentWord) {
+      setLetterStates(
+        currentWord.text.split("").map((char) => ({
+          expected: char.toLowerCase(),
+          typed: null,
+          wasCorrectFirstTry: true,
+          wasEverWrong: false,
+        })),
+      );
+      setStartTime(Date.now());
+      setBackspaceCount(0);
+      setCorrectionsMade(0);
+      setShowFeedback(null);
+      setWasLastKeyBackspace(false);
+    }
+  }, [currentWord, currentWordIndex]);
+
+  // Calculate result for current word
+  const calculateWordResult = useCallback((): WordResult => {
+    if (!currentWord) {
+      return {
+        wordId: "",
+        word: "",
+        difficulty: 0,
+        phonicsGroup: "",
+        correct: false,
+        timeSpent: 0,
+        backspaceCount: 0,
+        hesitationDetected: false,
+        correctionsMade: 0,
+        letterAccuracy: 0,
+        finalAccuracy: 0,
+      };
+    }
+
+    const timeSpent = (Date.now() - startTime) / 1000;
+    const isCorrect =
+      userInput.toLowerCase() === currentWord.text.toLowerCase();
+
+    // Calculate letter accuracy (first try accuracy)
+    const correctFirstTry = letterStates.filter(
+      (l) => l.wasCorrectFirstTry && l.typed !== null,
+    ).length;
+    const totalTyped = letterStates.filter((l) => l.typed !== null).length;
+    const letterAccuracy =
+      totalTyped > 0 ? (correctFirstTry / totalTyped) * 100 : 0;
+
+    // Calculate final accuracy
+    const correctLetters = letterStates.filter(
+      (l, i) => l.typed?.toLowerCase() === currentWord.text[i]?.toLowerCase(),
+    ).length;
+    const finalAccuracy = (correctLetters / currentWord.text.length) * 100;
+
+    return {
+      wordId: currentWord.id,
+      word: currentWord.text,
+      difficulty: currentWord.difficulty,
+      phonicsGroup: currentWord.phonicsGroup,
+      correct: isCorrect,
+      timeSpent,
+      backspaceCount,
+      hesitationDetected: timeSpent > 1.5,
+      correctionsMade,
+      letterAccuracy,
+      finalAccuracy,
+    };
+  }, [
+    currentWord,
+    userInput,
+    startTime,
+    backspaceCount,
+    correctionsMade,
+    letterStates,
+  ]);
+
+  // Handle input change with letter tracking
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    const oldLength = userInput.length;
+    const newLength = newValue.length;
+
+    // Detect backspace (correction)
+    if (newLength < oldLength) {
+      if (!wasLastKeyBackspace && oldLength > 0) {
+        // User just started backspacing after typing - this is a correction
+        setCorrectionsMade((prev) => prev + 1);
+      }
+      setWasLastKeyBackspace(true);
+
+      // Update letter states for deleted characters
+      setLetterStates((prev) =>
+        prev.map((state, i) => {
+          if (i >= newLength) {
+            return { ...state, typed: null };
+          }
+          return state;
+        }),
+      );
+    } else {
+      setWasLastKeyBackspace(false);
+
+      // Update letter states for new character
+      const newCharIndex = newLength - 1;
+      const newChar = newValue[newCharIndex];
+
+      if (newCharIndex < letterStates.length) {
+        setLetterStates((prev) =>
+          prev.map((state, i) => {
+            if (i === newCharIndex) {
+              const isCorrect = newChar.toLowerCase() === state.expected;
+              return {
+                ...state,
+                typed: newChar,
+                wasCorrectFirstTry:
+                  state.typed === null ? isCorrect : state.wasCorrectFirstTry,
+                wasEverWrong: state.wasEverWrong || !isCorrect,
+              };
+            }
+            return state;
+          }),
+        );
+      }
+    }
+
+    setUserInput(newValue);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace") {
       setBackspaceCount((prev) => prev + 1);
     }
 
-    // Advance on Enter or Space (if user has typed something)
-    if ((e.key === "Enter" || e.key === " ") && userInput.length > 0) {
-      e.preventDefault(); // Prevent space from being added to input
+    // In single word mode, advance on Enter or Space
+    if (
+      !sentenceMode &&
+      (e.key === "Enter" || e.key === " ") &&
+      userInput.length > 0
+    ) {
+      e.preventDefault();
       handleSubmitWord();
+    }
+
+    // In sentence mode, space advances to next word (even if not fully correct)
+    if (sentenceMode && e.key === " " && userInput.length > 0) {
+      e.preventDefault();
+      advanceToNextWord(
+        userInput.toLowerCase() === currentWord?.text.toLowerCase(),
+      );
+    }
+  };
+
+  const advanceToNextWord = (wasCorrect: boolean) => {
+    const result = calculateWordResult();
+    result.correct = wasCorrect;
+    setResults((prev) => [...prev, result]);
+
+    if (currentWordIndex < sessionWords.length - 1) {
+      setCurrentWordIndex((prev) => prev + 1);
+      setUserInput("");
+    } else {
+      finishSession([...results, result]);
     }
   };
 
   const handleSubmitWord = () => {
     if (!currentWord) return;
 
-    const timeSpentMs = Date.now() - startTime;
-    const timeSpent = timeSpentMs / 1000; // Convert to seconds
-    const correct =
-      userInput.trim().toLowerCase() === currentWord.text.toLowerCase();
+    const result = calculateWordResult();
+    const isCorrect =
+      userInput.toLowerCase() === currentWord.text.toLowerCase();
 
-    // Determine speed feedback
-    let speed: "fast" | "slow" | "normal" = "normal";
-    if (timeSpent < 2) {
-      speed = "fast";
-    } else if (timeSpent > 4) {
-      speed = "slow";
-    }
+    // Show brief feedback in single word mode
+    setShowFeedback(isCorrect ? "correct" : "incorrect");
 
-    // Show feedback briefly
-    setShowFeedback({
-      type: correct ? "correct" : "incorrect",
-      speed,
-    });
+    setResults((prev) => [...prev, result]);
 
-    // Record result
-    const wordResult: WordResult = {
-      wordId: currentWord.id,
-      word: currentWord.text,
-      difficulty: currentWord.difficulty,
-      phonicsGroup: currentWord.phonicsGroup,
-      correct,
-      timeSpent,
-      backspaceCount,
-      hesitationDetected: timeSpent > 1.5,
-    };
-
-    setResults((prev) => [...prev, wordResult]);
-
-    // Move to next word after brief delay (to show feedback)
+    // Brief delay for feedback, then advance
     setTimeout(() => {
       if (currentWordIndex < sessionWords.length - 1) {
         setCurrentWordIndex((prev) => prev + 1);
         setUserInput("");
       } else {
-        // Session complete
-        finishSession([...results, wordResult]);
+        finishSession([...results, result]);
       }
-    }, 800);
+    }, 300);
   };
 
   const finishSession = async (allResults: WordResult[]) => {
@@ -237,42 +322,23 @@ function PracticeSession() {
 
     if (!currentUser) return;
 
-    // Calculate session stats
     const accuracy =
       allResults.filter((r) => r.correct).length / allResults.length;
     const avgTimePerWord =
-      allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length; // Already in seconds from timeSpent
+      allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length;
 
-    console.log("📊 Session Stats:", {
-      currentLevel: currentUser.stats.currentLevel,
-      accuracy,
-      avgTimePerWord,
-      totalWords: allResults.length,
-      correctWords: allResults.filter((r) => r.correct).length,
-    });
-
-    // Calculate new user level
     const newLevel = calculateNewUserLevel(
       currentUser.stats.currentLevel,
       accuracy,
       avgTimePerWord,
     );
 
-    console.log("📈 Level Change:", {
-      oldLevel: currentUser.stats.currentLevel,
-      newLevel,
-      difference: newLevel - currentUser.stats.currentLevel,
-    });
-
-    // Update user stats in Convex
     await updateUserStats({
       userId: currentUser._id,
       stats: {
         currentLevel: newLevel,
       },
     });
-
-    console.log("✅ Session completed. New level:", newLevel);
   };
 
   const restartSession = () => {
@@ -283,9 +349,16 @@ function PracticeSession() {
     setIsComplete(false);
     setStartTime(Date.now());
     setBackspaceCount(0);
+    setCorrectionsMade(0);
     setShowFeedback(null);
   };
 
+  // Focus input when mode changes
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [sentenceMode]);
+
+  // Loading state
   if (!currentUser || sessionWords.length === 0) {
     return (
       <>
@@ -302,263 +375,84 @@ function PracticeSession() {
     );
   }
 
+  // Session complete state
   if (isComplete) {
-    const accuracy = Math.round(
-      (results.filter((r) => r.correct).length / results.length) * 100,
-    );
-    const totalTime = Math.round(
-      results.reduce((sum, r) => sum + r.timeSpent, 0),
-    );
-    const struggleWords = results.filter(
-      (r) => r.hesitationDetected || r.backspaceCount > 3 || !r.correct,
-    );
-    const fastWords = results.filter(
-      (r) => r.correct && r.timeSpent < 2,
-    ).length;
-    const newLevel = currentUser?.stats.currentLevel ?? 1;
-
     return (
-      <>
-        <Header />
-        <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
-          <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
-            <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
-              Session Complete! 🎉
-            </h1>
-
-            <div className="space-y-6">
-              {/* Level Display */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-6 rounded-lg border-2 border-purple-300 dark:border-purple-700">
-                <div className="text-center mb-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    Current Level
-                  </p>
-                  <p className="text-5xl font-bold text-purple-600 dark:text-purple-400">
-                    {newLevel.toFixed(1)}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                    {accuracy >= 85
-                      ? "Great job! 🚀"
-                      : accuracy >= 70
-                        ? "Keep practicing! 💪"
-                        : "Take your time! 🌱"}
-                  </p>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${(newLevel % 1) * 100}%` }}
-                  />
-                </div>
-                <p className="text-center text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  Progress to Level {Math.ceil(newLevel)}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-4 gap-3">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 text-center">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {results.length}
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    Words
-                  </p>
-                </div>
-                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800 text-center">
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {accuracy}%
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    Accuracy
-                  </p>
-                </div>
-                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800 text-center">
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {totalTime}s
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    Time
-                  </p>
-                </div>
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 text-center">
-                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                    ⚡{fastWords}
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    Fast
-                  </p>
-                </div>
-              </div>
-
-              {struggleWords.length > 0 && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                  <h2 className="text-xl font-bold mb-3 text-black dark:text-white">
-                    Words to Review
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {struggleWords.map((r) => (
-                      <span
-                        key={r.wordId}
-                        className="px-3 py-1 bg-yellow-200 dark:bg-yellow-600/30 border border-yellow-300 dark:border-yellow-700 rounded-full text-sm font-mono text-yellow-900 dark:text-yellow-200"
-                      >
-                        {r.word}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
-                    These words will be added to your review bucket for extra
-                    practice
-                  </p>
-                </div>
-              )}
-
-              <div className="flex gap-4">
-                <button
-                  onClick={restartSession}
-                  className="flex-1 py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Practice Again
-                </button>
-                <Link
-                  href="/"
-                  className="flex-1 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Home
-                </Link>
-              </div>
-            </div>
-          </div>
-        </main>
-      </>
+      <SessionComplete
+        results={results}
+        currentLevel={currentUser.stats.currentLevel}
+        onRestart={restartSession}
+      />
     );
   }
 
+  // Active session
   return (
     <>
       <Header />
       <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
-        <div className="max-w-2xl w-full">
-          {/* Level and Progress */}
-          <div className="mb-8 space-y-4">
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-semibold">
-                  Level {currentUser.stats.currentLevel.toFixed(1)}
-                </span>
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Word {currentWordIndex + 1} of {sessionWords.length}
-              </div>
+        <div className="max-w-4xl w-full">
+          {/* Header with level and mode toggle */}
+          <div className="mb-6 flex justify-between items-center">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-semibold">
+                Level {currentUser.stats.currentLevel.toFixed(1)}
+              </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${(currentWordIndex / sessionWords.length) * 100}%`,
-                }}
-              />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={sentenceMode}
+                  onCheckedChange={setSentenceMode}
+                  id="sentence-mode"
+                />
+                <Label
+                  htmlFor="sentence-mode"
+                  className="text-sm text-gray-600 dark:text-gray-400"
+                >
+                  Sentence Mode
+                </Label>
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {currentWordIndex + 1} / {sessionWords.length}
+              </div>
             </div>
           </div>
 
-          {/* Main Card */}
-          <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold mb-2 text-black dark:text-white">
-                Practice Session
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Type the word you see below
-              </p>
-            </div>
-
-            {/* Word Display */}
-            <div className="mb-8 p-8 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700 relative">
-              <div className="text-6xl font-bold text-center text-black dark:text-white tracking-wider">
-                {currentWord.text}
-              </div>
-              {currentWord.sentenceContext && (
-                <p className="text-center text-gray-600 dark:text-gray-400 mt-4 text-lg">
-                  &ldquo;{currentWord.sentenceContext}&rdquo;
-                </p>
-              )}
-
-              {/* Visual Feedback */}
-              {showFeedback && (
-                <div className="absolute top-4 right-4 flex gap-2">
-                  {/* Correct/Incorrect Icon */}
-                  {showFeedback.type === "correct" ? (
-                    <div className="bg-green-500 text-white rounded-full p-3 shadow-lg animate-bounce">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="bg-red-500 text-white rounded-full p-3 shadow-lg animate-bounce">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </div>
-                  )}
-
-                  {/* Speed Icon */}
-                  {showFeedback.speed === "fast" && (
-                    <div className="bg-yellow-500 text-white rounded-full p-3 shadow-lg">
-                      <span className="text-2xl">⚡</span>
-                    </div>
-                  )}
-                  {showFeedback.speed === "slow" && (
-                    <div className="bg-blue-500 text-white rounded-full p-3 shadow-lg">
-                      <span className="text-2xl">🐌</span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Input */}
-            <div className="mb-6">
-              <input
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type the word here..."
-                autoFocus
-                className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <p className="text-center text-sm text-gray-500 dark:text-gray-500 mt-2">
-                Press Space or Enter to continue
-              </p>
-            </div>
-
-            <button
-              onClick={handleSubmitWord}
-              disabled={userInput.length === 0}
-              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              Next Word
-            </button>
+          {/* Progress bar */}
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
+            <div
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              style={{
+                width: `${((currentWordIndex + (userInput.length > 0 ? 0.5 : 0)) / sessionWords.length) * 100}%`,
+              }}
+            />
           </div>
+
+          {/* Mode-specific view */}
+          {sentenceMode ? (
+            <SentenceModeView
+              words={sessionWords}
+              currentWordIndex={currentWordIndex}
+              userInput={userInput}
+              letterStates={letterStates}
+              results={results}
+              inputRef={inputRef}
+              onInputChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+            />
+          ) : (
+            <SingleWordView
+              currentWord={currentWord}
+              userInput={userInput}
+              letterStates={letterStates}
+              showFeedback={showFeedback}
+              inputRef={inputRef}
+              onInputChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onSubmit={handleSubmitWord}
+            />
+          )}
         </div>
       </main>
     </>

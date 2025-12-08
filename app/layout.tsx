@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AccessibilityStyler } from "@/components/AccessibilityStyler";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PostHogProvider } from "@/components/PostHogProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,21 +36,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black text-black dark:text-white`}
       >
-        <ClerkProvider dynamic>
-          <ConvexClientProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <AccessibilityProvider>
-                <AccessibilityStyler />
-                {children}
-              </AccessibilityProvider>
-            </ThemeProvider>
-          </ConvexClientProvider>
-        </ClerkProvider>
+        <PostHogProvider>
+          <ClerkProvider dynamic>
+            <ConvexClientProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <AccessibilityProvider>
+                  <AccessibilityStyler />
+                  {children}
+                </AccessibilityProvider>
+              </ThemeProvider>
+            </ConvexClientProvider>
+          </ClerkProvider>
+        </PostHogProvider>
       </body>
     </html>
   );
