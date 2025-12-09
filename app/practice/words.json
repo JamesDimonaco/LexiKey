@@ -2920,863 +2920,4881 @@
   },
   {
     "id": "418",
-    "word": "phone",
-    "phonicsGroup": "digraph-ph",
-    "difficultyLevel": 5,
-    "sentenceContext": "Talk on the phone."
-  },
-  {
-    "id": "419",
     "word": "photo",
     "phonicsGroup": "digraph-ph",
     "difficultyLevel": 5,
     "sentenceContext": "Take a photo of me."
   },
   {
-    "id": "420",
+    "id": "419",
     "word": "graph",
     "phonicsGroup": "digraph-ph",
     "difficultyLevel": 5,
     "sentenceContext": "Draw a graph."
   },
   {
-    "id": "421",
+    "id": "420",
     "word": "whisper",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Please whisper in the library."
   },
   {
-    "id": "422",
+    "id": "421",
     "word": "chapter",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Read the next chapter."
   },
   {
-    "id": "423",
+    "id": "422",
     "word": "blanket",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Wrap up in a warm blanket."
   },
   {
-    "id": "424",
+    "id": "423",
     "word": "trumpet",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "She plays the trumpet."
   },
   {
-    "id": "425",
+    "id": "424",
     "word": "pumpkin",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Carve a pumpkin for fall."
   },
   {
-    "id": "426",
+    "id": "425",
     "word": "problem",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Solve the math problem."
   },
   {
-    "id": "427",
+    "id": "426",
     "word": "kingdom",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "The king ruled the kingdom."
   },
   {
-    "id": "428",
+    "id": "427",
     "word": "chicken",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "The chicken laid an egg."
   },
   {
-    "id": "429",
+    "id": "428",
     "word": "kitchen",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Mom cooks in the kitchen."
   },
   {
-    "id": "430",
+    "id": "429",
     "word": "mitten",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "I lost my red mitten."
   },
   {
-    "id": "431",
+    "id": "430",
     "word": "kitten",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "The tiny kitten purrs."
   },
   {
-    "id": "432",
+    "id": "431",
     "word": "button",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Push the red button."
   },
   {
-    "id": "433",
+    "id": "432",
     "word": "cotton",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "This shirt is made of cotton."
   },
   {
-    "id": "434",
+    "id": "433",
     "word": "hidden",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Find the hidden treasure."
   },
   {
-    "id": "435",
+    "id": "434",
     "word": "sudden",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "There was a sudden noise."
   },
   {
-    "id": "436",
+    "id": "435",
     "word": "lesson",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Today was a good lesson."
   },
   {
-    "id": "437",
+    "id": "436",
     "word": "ribbon",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Tie a pretty ribbon."
   },
   {
-    "id": "438",
+    "id": "437",
     "word": "winter",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Snow falls in winter."
   },
   {
-    "id": "439",
+    "id": "438",
     "word": "sister",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "My sister is older."
   },
   {
-    "id": "440",
+    "id": "439",
     "word": "monster",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "A scary monster."
   },
   {
-    "id": "441",
+    "id": "440",
     "word": "thunder",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Loud thunder scared the dog."
   },
   {
-    "id": "442",
+    "id": "441",
     "word": "number",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Pick a lucky number."
   },
   {
-    "id": "443",
+    "id": "442",
     "word": "summer",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "We swim in summer."
   },
   {
-    "id": "444",
+    "id": "443",
     "word": "hammer",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Hit the nail with a hammer."
   },
   {
-    "id": "445",
+    "id": "444",
     "word": "ladder",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Climb up the ladder."
   },
   {
-    "id": "446",
+    "id": "445",
     "word": "dinner",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Dinner is ready."
   },
   {
-    "id": "447",
+    "id": "446",
     "word": "winner",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "You are the winner!"
   },
   {
-    "id": "448",
+    "id": "447",
     "word": "happen",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "What did happen?"
   },
   {
-    "id": "449",
+    "id": "448",
     "word": "zipper",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Zip up the zipper."
   },
   {
-    "id": "450",
+    "id": "449",
     "word": "pepper",
     "phonicsGroup": "multi-syllable",
     "difficultyLevel": 7,
     "sentenceContext": "Add salt and pepper."
   },
   {
-    "id": "451",
+    "id": "450",
     "word": "breakfast",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Eat a healthy breakfast."
   },
   {
-    "id": "452",
+    "id": "451",
     "word": "rainbow",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "A colorful rainbow appeared."
   },
   {
-    "id": "453",
+    "id": "452",
     "word": "birthday",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Happy birthday to you!"
   },
   {
-    "id": "454",
+    "id": "453",
     "word": "airplane",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "The airplane flew high."
   },
   {
-    "id": "455",
+    "id": "454",
     "word": "something",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "I heard something strange."
   },
   {
-    "id": "456",
+    "id": "455",
     "word": "anything",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Is there anything to eat?"
   },
   {
-    "id": "457",
+    "id": "456",
     "word": "everyone",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Everyone is invited."
   },
   {
-    "id": "458",
+    "id": "457",
     "word": "anywhere",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "We can go anywhere."
   },
   {
-    "id": "459",
+    "id": "458",
     "word": "sometimes",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Sometimes it rains."
   },
   {
-    "id": "460",
+    "id": "459",
     "word": "outside",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Let us play outside."
   },
   {
-    "id": "461",
+    "id": "460",
     "word": "inside",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Come inside the house."
   },
   {
-    "id": "462",
+    "id": "461",
     "word": "without",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Do not leave without me."
   },
   {
-    "id": "463",
+    "id": "462",
     "word": "classroom",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "The classroom is quiet."
   },
   {
-    "id": "464",
+    "id": "463",
     "word": "bedroom",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "My bedroom is upstairs."
   },
   {
-    "id": "465",
+    "id": "464",
     "word": "bathroom",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Wash hands in the bathroom."
   },
   {
-    "id": "466",
+    "id": "465",
     "word": "cupcake",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "A chocolate cupcake."
   },
   {
-    "id": "467",
+    "id": "466",
     "word": "sunshine",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Enjoy the warm sunshine."
   },
   {
-    "id": "468",
+    "id": "467",
     "word": "moonlight",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Walk under the moonlight."
   },
   {
-    "id": "469",
+    "id": "468",
     "word": "football",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Throw the football."
   },
   {
-    "id": "470",
+    "id": "469",
     "word": "baseball",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Hit the baseball far."
   },
   {
-    "id": "471",
+    "id": "470",
     "word": "snowflake",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Each snowflake is unique."
   },
   {
-    "id": "472",
+    "id": "471",
     "word": "strawberry",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "A sweet red strawberry."
   },
   {
-    "id": "473",
+    "id": "472",
     "word": "butterfly",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "The butterfly landed on a flower."
   },
   {
-    "id": "474",
+    "id": "473",
     "word": "grandmother",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Visit grandmother on Sunday."
   },
   {
-    "id": "475",
+    "id": "474",
     "word": "grandfather",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Grandfather tells great stories."
   },
   {
-    "id": "476",
+    "id": "475",
     "word": "toothbrush",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Use your toothbrush twice a day."
   },
   {
-    "id": "477",
+    "id": "476",
     "word": "newspaper",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Dad reads the newspaper."
   },
   {
-    "id": "478",
+    "id": "477",
     "word": "waterfall",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "The waterfall is beautiful."
   },
   {
-    "id": "479",
+    "id": "478",
     "word": "playground",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Meet me at the playground."
   },
   {
-    "id": "480",
+    "id": "479",
     "word": "understand",
     "phonicsGroup": "compound",
     "difficultyLevel": 8,
     "sentenceContext": "Do you understand?"
   },
   {
-    "id": "481",
+    "id": "480",
     "word": "beautiful",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "What a beautiful sunset."
   },
   {
-    "id": "482",
+    "id": "481",
     "word": "different",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Each person is different."
   },
   {
-    "id": "483",
+    "id": "482",
     "word": "important",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "This is very important."
   },
   {
-    "id": "484",
+    "id": "483",
     "word": "remember",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Remember to study."
   },
   {
-    "id": "485",
+    "id": "484",
     "word": "together",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "We work better together."
   },
   {
-    "id": "486",
+    "id": "485",
     "word": "favorite",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Blue is my favorite color."
   },
   {
-    "id": "487",
+    "id": "486",
     "word": "interest",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "I have an interest in science."
   },
   {
-    "id": "488",
+    "id": "487",
     "word": "yesterday",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Yesterday was fun."
   },
   {
-    "id": "489",
+    "id": "488",
     "word": "tomorrow",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "See you tomorrow."
   },
   {
-    "id": "490",
+    "id": "489",
     "word": "mountain",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Climb the tall mountain."
   },
   {
-    "id": "491",
+    "id": "490",
     "word": "fountain",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Toss a coin in the fountain."
   },
   {
-    "id": "492",
+    "id": "491",
     "word": "question",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Ask a good question."
   },
   {
-    "id": "493",
+    "id": "492",
     "word": "children",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "The children are playing."
   },
   {
-    "id": "494",
+    "id": "493",
     "word": "sentence",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Write a complete sentence."
   },
   {
-    "id": "495",
+    "id": "494",
     "word": "complete",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Complete your homework."
   },
   {
-    "id": "496",
+    "id": "495",
     "word": "adventure",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Go on an adventure."
   },
   {
-    "id": "497",
+    "id": "496",
     "word": "terrible",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "That was a terrible storm."
   },
   {
-    "id": "498",
+    "id": "497",
     "word": "possible",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Anything is possible."
   },
   {
-    "id": "499",
+    "id": "498",
     "word": "probably",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "It will probably rain."
   },
   {
-    "id": "500",
+    "id": "499",
     "word": "suddenly",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Suddenly, the door opened."
   },
   {
-    "id": "501",
+    "id": "500",
     "word": "carefully",
     "phonicsGroup": "suffix-ly",
     "difficultyLevel": 9,
     "sentenceContext": "Walk carefully on the ice."
   },
   {
-    "id": "502",
+    "id": "501",
     "word": "wonderful",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "What a wonderful day!"
   },
   {
-    "id": "503",
+    "id": "502",
     "word": "attention",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Pay attention in class."
   },
   {
-    "id": "504",
+    "id": "503",
     "word": "direction",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Which direction is north?"
   },
   {
-    "id": "505",
+    "id": "504",
     "word": "dangerous",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Swimming alone is dangerous."
   },
   {
-    "id": "506",
+    "id": "505",
     "word": "chocolate",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "I love chocolate cake."
   },
   {
-    "id": "507",
+    "id": "506",
     "word": "vegetable",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Eat your vegetable."
   },
   {
-    "id": "508",
+    "id": "507",
     "word": "celebrate",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "Let us celebrate your success!"
   },
   {
-    "id": "509",
+    "id": "508",
     "word": "president",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "The president gave a speech."
   },
   {
-    "id": "510",
+    "id": "509",
     "word": "hospital",
     "phonicsGroup": "multi-syllable-complex",
     "difficultyLevel": 9,
     "sentenceContext": "The hospital helps sick people."
   },
   {
-    "id": "511",
+    "id": "510",
     "word": "encyclopedia",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Look it up in an encyclopedia."
   },
   {
-    "id": "512",
+    "id": "511",
     "word": "temperature",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Check the temperature outside."
   },
   {
-    "id": "513",
+    "id": "512",
     "word": "vocabulary",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Expand your vocabulary."
   },
   {
-    "id": "514",
+    "id": "513",
     "word": "environment",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Protect the environment."
   },
   {
-    "id": "515",
+    "id": "514",
     "word": "imagination",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Use your imagination."
   },
   {
-    "id": "516",
+    "id": "515",
     "word": "information",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "I need more information."
   },
   {
-    "id": "517",
+    "id": "516",
     "word": "communication",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Good communication is key."
   },
   {
-    "id": "518",
+    "id": "517",
     "word": "celebration",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "What a great celebration!"
   },
   {
-    "id": "519",
+    "id": "518",
     "word": "conversation",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Have a nice conversation."
   },
   {
-    "id": "520",
+    "id": "519",
     "word": "concentration",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "This requires concentration."
   },
   {
-    "id": "521",
+    "id": "520",
     "word": "particularly",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "I particularly like pizza."
   },
   {
-    "id": "522",
+    "id": "521",
     "word": "extraordinary",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "That was extraordinary!"
   },
   {
-    "id": "523",
+    "id": "522",
     "word": "immediately",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Come here immediately."
   },
   {
-    "id": "524",
+    "id": "523",
     "word": "unfortunately",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Unfortunately, I cannot come."
   },
   {
-    "id": "525",
+    "id": "524",
     "word": "responsibility",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Take responsibility for your actions."
   },
   {
-    "id": "526",
+    "id": "525",
     "word": "opportunity",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "This is a great opportunity."
   },
   {
-    "id": "527",
+    "id": "526",
     "word": "professional",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "She is a professional dancer."
   },
   {
-    "id": "528",
+    "id": "527",
     "word": "educational",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "This game is educational."
   },
   {
-    "id": "529",
+    "id": "528",
     "word": "refrigerator",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Put the milk in the refrigerator."
   },
   {
-    "id": "530",
+    "id": "529",
     "word": "accomplishment",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "That was a great accomplishment."
   },
   {
-    "id": "531",
+    "id": "530",
     "word": "characteristic",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Honesty is a good characteristic."
   },
   {
-    "id": "532",
+    "id": "531",
     "word": "determination",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Show determination and keep trying."
   },
   {
-    "id": "533",
+    "id": "532",
     "word": "entertainment",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Movies are entertainment."
   },
   {
-    "id": "534",
+    "id": "533",
     "word": "investigation",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "The investigation is ongoing."
   },
   {
-    "id": "535",
+    "id": "534",
     "word": "transportation",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Buses are public transportation."
   },
   {
-    "id": "536",
+    "id": "535",
     "word": "multiplication",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Practice your multiplication tables."
   },
   {
-    "id": "537",
+    "id": "536",
     "word": "approximately",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "It costs approximately ten dollars."
   },
   {
-    "id": "538",
+    "id": "537",
     "word": "independent",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Cats are very independent."
   },
   {
-    "id": "539",
+    "id": "538",
     "word": "pronunciation",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Practice your pronunciation."
   },
   {
-    "id": "540",
+    "id": "539",
     "word": "representative",
     "phonicsGroup": "multi-syllable-advanced",
     "difficultyLevel": 10,
     "sentenceContext": "Speak to a representative."
+  },
+  {
+    "id": "540",
+    "word": "the",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 1,
+    "sentenceContext": "The dog ran fast."
+  },
+  {
+    "id": "541",
+    "word": "and",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 1,
+    "sentenceContext": "Tom and Jerry are friends."
+  },
+  {
+    "id": "542",
+    "word": "are",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 1,
+    "sentenceContext": "We are going home."
+  },
+  {
+    "id": "543",
+    "word": "for",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 1,
+    "sentenceContext": "This is for you."
+  },
+  {
+    "id": "544",
+    "word": "not",
+    "phonicsGroup": "cvc-short-o",
+    "difficultyLevel": 1,
+    "sentenceContext": "I am not tired."
+  },
+  {
+    "id": "545",
+    "word": "you",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 1,
+    "sentenceContext": "I see you there."
+  },
+  {
+    "id": "546",
+    "word": "all",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "We are all here."
+  },
+  {
+    "id": "547",
+    "word": "she",
+    "phonicsGroup": "digraph-sh",
+    "difficultyLevel": 2,
+    "sentenceContext": "She is my friend."
+  },
+  {
+    "id": "548",
+    "word": "they",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 2,
+    "sentenceContext": "They went to school."
+  },
+  {
+    "id": "549",
+    "word": "what",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 2,
+    "sentenceContext": "What is your name?"
+  },
+  {
+    "id": "550",
+    "word": "their",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Their house is big."
+  },
+  {
+    "id": "551",
+    "word": "there",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Put it over there."
+  },
+  {
+    "id": "552",
+    "word": "would",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "I would like some water."
+  },
+  {
+    "id": "553",
+    "word": "could",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "You could try again."
+  },
+  {
+    "id": "554",
+    "word": "should",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "We should go now."
+  },
+  {
+    "id": "555",
+    "word": "about",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 3,
+    "sentenceContext": "Tell me about yourself."
+  },
+  {
+    "id": "556",
+    "word": "other",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Try the other door."
+  },
+  {
+    "id": "557",
+    "word": "which",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 3,
+    "sentenceContext": "Which one do you want?"
+  },
+  {
+    "id": "558",
+    "word": "people",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Many people came to the party."
+  },
+  {
+    "id": "559",
+    "word": "because",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "I stayed home because it rained."
+  },
+  {
+    "id": "560",
+    "word": "through",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 4,
+    "sentenceContext": "Walk through the door."
+  },
+  {
+    "id": "561",
+    "word": "thought",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 4,
+    "sentenceContext": "I thought about it."
+  },
+  {
+    "id": "562",
+    "word": "though",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 4,
+    "sentenceContext": "Even though it was cold."
+  },
+  {
+    "id": "563",
+    "word": "where",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 3,
+    "sentenceContext": "Where are you going?"
+  },
+  {
+    "id": "564",
+    "word": "before",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Wash your hands before eating."
+  },
+  {
+    "id": "565",
+    "word": "after",
+    "phonicsGroup": "blend-ft",
+    "difficultyLevel": 2,
+    "sentenceContext": "Come back after lunch."
+  },
+  {
+    "id": "566",
+    "word": "again",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 3,
+    "sentenceContext": "Try it again."
+  },
+  {
+    "id": "567",
+    "word": "little",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "The little puppy played."
+  },
+  {
+    "id": "568",
+    "word": "still",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Please sit still."
+  },
+  {
+    "id": "569",
+    "word": "well",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "You did well today."
+  },
+  {
+    "id": "570",
+    "word": "tell",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Please tell me a story."
+  },
+  {
+    "id": "571",
+    "word": "spell",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Can you spell your name?"
+  },
+  {
+    "id": "572",
+    "word": "call",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Call me tomorrow."
+  },
+  {
+    "id": "573",
+    "word": "fall",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Leaves fall in autumn."
+  },
+  {
+    "id": "574",
+    "word": "ball",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Throw the ball to me."
+  },
+  {
+    "id": "575",
+    "word": "wall",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Hang the picture on the wall."
+  },
+  {
+    "id": "576",
+    "word": "hall",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Walk down the hall."
+  },
+  {
+    "id": "577",
+    "word": "tall",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "The tree is tall."
+  },
+  {
+    "id": "578",
+    "word": "really",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "I really like pizza."
+  },
+  {
+    "id": "579",
+    "word": "finally",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "We finally arrived."
+  },
+  {
+    "id": "580",
+    "word": "usually",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "I usually wake up early."
+  },
+  {
+    "id": "581",
+    "word": "actually",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "It was actually quite easy."
+  },
+  {
+    "id": "582",
+    "word": "especially",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "I especially like chocolate."
+  },
+  {
+    "id": "583",
+    "word": "definitely",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "I will definitely come."
+  },
+  {
+    "id": "584",
+    "word": "necessary",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Water is necessary for life."
+  },
+  {
+    "id": "585",
+    "word": "separate",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Keep them separate."
+  },
+  {
+    "id": "586",
+    "word": "receive",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 5,
+    "sentenceContext": "Did you receive my letter?"
+  },
+  {
+    "id": "587",
+    "word": "believe",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 4,
+    "sentenceContext": "I believe in you."
+  },
+  {
+    "id": "588",
+    "word": "achieve",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 5,
+    "sentenceContext": "You can achieve your goals."
+  },
+  {
+    "id": "589",
+    "word": "friend",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 3,
+    "sentenceContext": "She is my best friend."
+  },
+  {
+    "id": "590",
+    "word": "field",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 3,
+    "sentenceContext": "Play in the field."
+  },
+  {
+    "id": "591",
+    "word": "piece",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 4,
+    "sentenceContext": "Have a piece of cake."
+  },
+  {
+    "id": "592",
+    "word": "weird",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 4,
+    "sentenceContext": "That was weird."
+  },
+  {
+    "id": "593",
+    "word": "height",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 5,
+    "sentenceContext": "What is your height?"
+  },
+  {
+    "id": "594",
+    "word": "weight",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 4,
+    "sentenceContext": "Check your weight."
+  },
+  {
+    "id": "595",
+    "word": "eight",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 3,
+    "sentenceContext": "I have eight apples."
+  },
+  {
+    "id": "596",
+    "word": "neighbor",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 5,
+    "sentenceContext": "My neighbor is friendly."
+  },
+  {
+    "id": "597",
+    "word": "foreign",
+    "phonicsGroup": "ie-ei-rule",
+    "difficultyLevel": 5,
+    "sentenceContext": "Learn a foreign language."
+  },
+  {
+    "id": "598",
+    "word": "enough",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "That is enough for now."
+  },
+  {
+    "id": "599",
+    "word": "tough",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "The test was tough."
+  },
+  {
+    "id": "600",
+    "word": "rough",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "The road was rough."
+  },
+  {
+    "id": "601",
+    "word": "cough",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Cover your mouth when you cough."
+  },
+  {
+    "id": "602",
+    "word": "laugh",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "We laugh at jokes."
+  },
+  {
+    "id": "603",
+    "word": "daughter",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "She is my daughter."
+  },
+  {
+    "id": "604",
+    "word": "caught",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "I caught the ball."
+  },
+  {
+    "id": "605",
+    "word": "taught",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "She taught me how to swim."
+  },
+  {
+    "id": "606",
+    "word": "bought",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "I bought a new book."
+  },
+  {
+    "id": "607",
+    "word": "brought",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "He brought his lunch."
+  },
+  {
+    "id": "608",
+    "word": "fought",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "They fought bravely."
+  },
+  {
+    "id": "609",
+    "word": "written",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "The letter was written yesterday."
+  },
+  {
+    "id": "610",
+    "word": "knew",
+    "phonicsGroup": "silent-k",
+    "difficultyLevel": 3,
+    "sentenceContext": "I knew the answer."
+  },
+  {
+    "id": "611",
+    "word": "knife",
+    "phonicsGroup": "silent-k",
+    "difficultyLevel": 4,
+    "sentenceContext": "Cut with a knife."
+  },
+  {
+    "id": "612",
+    "word": "knight",
+    "phonicsGroup": "silent-k",
+    "difficultyLevel": 4,
+    "sentenceContext": "The knight rode a horse."
+  },
+  {
+    "id": "613",
+    "word": "knock",
+    "phonicsGroup": "silent-k",
+    "difficultyLevel": 3,
+    "sentenceContext": "Knock on the door."
+  },
+  {
+    "id": "614",
+    "word": "answer",
+    "phonicsGroup": "silent-w",
+    "difficultyLevel": 4,
+    "sentenceContext": "Please answer the question."
+  },
+  {
+    "id": "615",
+    "word": "listen",
+    "phonicsGroup": "silent-t",
+    "difficultyLevel": 4,
+    "sentenceContext": "Listen to the music."
+  },
+  {
+    "id": "616",
+    "word": "island",
+    "phonicsGroup": "silent-s",
+    "difficultyLevel": 4,
+    "sentenceContext": "We visited an island."
+  },
+  {
+    "id": "617",
+    "word": "guard",
+    "phonicsGroup": "silent-u",
+    "difficultyLevel": 4,
+    "sentenceContext": "The guard stood watch."
+  },
+  {
+    "id": "618",
+    "word": "guess",
+    "phonicsGroup": "silent-u",
+    "difficultyLevel": 4,
+    "sentenceContext": "Guess what I found."
+  },
+  {
+    "id": "619",
+    "word": "guest",
+    "phonicsGroup": "silent-u",
+    "difficultyLevel": 4,
+    "sentenceContext": "Welcome our guest."
+  },
+  {
+    "id": "620",
+    "word": "guide",
+    "phonicsGroup": "silent-u",
+    "difficultyLevel": 4,
+    "sentenceContext": "The guide showed us around."
+  },
+  {
+    "id": "621",
+    "word": "guitar",
+    "phonicsGroup": "silent-u",
+    "difficultyLevel": 4,
+    "sentenceContext": "Play the guitar."
+  },
+  {
+    "id": "622",
+    "word": "beginning",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Start at the beginning."
+  },
+  {
+    "id": "623",
+    "word": "running",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "I like running in the park."
+  },
+  {
+    "id": "624",
+    "word": "swimming",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Swimming is fun."
+  },
+  {
+    "id": "625",
+    "word": "getting",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "I am getting better."
+  },
+  {
+    "id": "626",
+    "word": "sitting",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "She was sitting quietly."
+  },
+  {
+    "id": "627",
+    "word": "cutting",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Be careful when cutting."
+  },
+  {
+    "id": "628",
+    "word": "putting",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "I am putting things away."
+  },
+  {
+    "id": "629",
+    "word": "stopped",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "The car stopped suddenly."
+  },
+  {
+    "id": "630",
+    "word": "dropped",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "I dropped my phone."
+  },
+  {
+    "id": "631",
+    "word": "shopping",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "We went shopping today."
+  },
+  {
+    "id": "632",
+    "word": "hopping",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "The bunny was hopping."
+  },
+  {
+    "id": "633",
+    "word": "happening",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "What is happening?"
+  },
+  {
+    "id": "634",
+    "word": "occurred",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "The accident occurred yesterday."
+  },
+  {
+    "id": "635",
+    "word": "occurrence",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 7,
+    "sentenceContext": "It was a rare occurrence."
+  },
+  {
+    "id": "636",
+    "word": "difficult",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "The puzzle is difficult."
+  },
+  {
+    "id": "637",
+    "word": "disappear",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Watch the magic trick disappear."
+  },
+  {
+    "id": "638",
+    "word": "disappoint",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Do not disappoint me."
+  },
+  {
+    "id": "639",
+    "word": "success",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "The project was a success."
+  },
+  {
+    "id": "640",
+    "word": "address",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "What is your address?"
+  },
+  {
+    "id": "641",
+    "word": "across",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Walk across the street."
+  },
+  {
+    "id": "642",
+    "word": "accept",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Please accept my apology."
+  },
+  {
+    "id": "643",
+    "word": "access",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "You have access to the room."
+  },
+  {
+    "id": "644",
+    "word": "accommodate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 7,
+    "sentenceContext": "We can accommodate your request."
+  },
+  {
+    "id": "645",
+    "word": "committee",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "The committee will decide."
+  },
+  {
+    "id": "646",
+    "word": "recommend",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "I recommend this book."
+  },
+  {
+    "id": "647",
+    "word": "possess",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Do you possess the key."
+  },
+  {
+    "id": "648",
+    "word": "immediate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "We need immediate action."
+  },
+  {
+    "id": "649",
+    "word": "embarrass",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 7,
+    "sentenceContext": "Do not embarrass yourself."
+  },
+  {
+    "id": "650",
+    "word": "exaggerate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 7,
+    "sentenceContext": "Do not exaggerate the story."
+  },
+  {
+    "id": "651",
+    "word": "misspell",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not misspell your name."
+  },
+  {
+    "id": "652",
+    "word": "government",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "The government makes laws."
+  },
+  {
+    "id": "653",
+    "word": "experience",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "It was a great experience."
+  },
+  {
+    "id": "654",
+    "word": "excellent",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "You did an excellent job."
+  },
+  {
+    "id": "655",
+    "word": "except",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Everyone came except Tom."
+  },
+  {
+    "id": "656",
+    "word": "exist",
+    "phonicsGroup": "blend-st",
+    "difficultyLevel": 5,
+    "sentenceContext": "Does that place exist?"
+  },
+  {
+    "id": "657",
+    "word": "expect",
+    "phonicsGroup": "blend-ct",
+    "difficultyLevel": 5,
+    "sentenceContext": "I expect you to try."
+  },
+  {
+    "id": "658",
+    "word": "explain",
+    "phonicsGroup": "blend-pl",
+    "difficultyLevel": 5,
+    "sentenceContext": "Please explain the rule."
+  },
+  {
+    "id": "659",
+    "word": "February",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "February is the shortest month."
+  },
+  {
+    "id": "660",
+    "word": "Wednesday",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "We have class on Wednesday."
+  },
+  {
+    "id": "661",
+    "word": "schedule",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Check the schedule."
+  },
+  {
+    "id": "662",
+    "word": "rhythm",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Dance to the rhythm."
+  },
+  {
+    "id": "663",
+    "word": "calendar",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Mark it on the calendar."
+  },
+  {
+    "id": "664",
+    "word": "familiar",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "This place looks familiar."
+  },
+  {
+    "id": "665",
+    "word": "similar",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "They look very similar."
+  },
+  {
+    "id": "666",
+    "word": "regular",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "This is a regular meeting."
+  },
+  {
+    "id": "667",
+    "word": "popular",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "The song is very popular."
+  },
+  {
+    "id": "668",
+    "word": "natural",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "It looks natural."
+  },
+  {
+    "id": "669",
+    "word": "general",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "In general, it works well."
+  },
+  {
+    "id": "670",
+    "word": "several",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "I have several books."
+  },
+  {
+    "id": "671",
+    "word": "special",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Today is a special day."
+  },
+  {
+    "id": "672",
+    "word": "social",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "She has good social skills."
+  },
+  {
+    "id": "673",
+    "word": "official",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "This is the official report."
+  },
+  {
+    "id": "674",
+    "word": "physical",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Physical activity is important."
+  },
+  {
+    "id": "675",
+    "word": "medical",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "See a medical doctor."
+  },
+  {
+    "id": "676",
+    "word": "political",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "It is a political issue."
+  },
+  {
+    "id": "677",
+    "word": "practical",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Find a practical solution."
+  },
+  {
+    "id": "678",
+    "word": "original",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "This is the original copy."
+  },
+  {
+    "id": "679",
+    "word": "grateful",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "I am grateful for your help."
+  },
+  {
+    "id": "680",
+    "word": "powerful",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "The engine is powerful."
+  },
+  {
+    "id": "681",
+    "word": "useful",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "This tool is useful."
+  },
+  {
+    "id": "682",
+    "word": "peaceful",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "It was a peaceful morning."
+  },
+  {
+    "id": "683",
+    "word": "cheerful",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "She has a cheerful smile."
+  },
+  {
+    "id": "684",
+    "word": "always",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 3,
+    "sentenceContext": "I always brush my teeth."
+  },
+  {
+    "id": "685",
+    "word": "already",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "I have already finished."
+  },
+  {
+    "id": "686",
+    "word": "also",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 3,
+    "sentenceContext": "I also like pizza."
+  },
+  {
+    "id": "687",
+    "word": "although",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Although it rained, we went out."
+  },
+  {
+    "id": "688",
+    "word": "among",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 4,
+    "sentenceContext": "She was among friends."
+  },
+  {
+    "id": "689",
+    "word": "another",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Try another one."
+  },
+  {
+    "id": "690",
+    "word": "become",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 4,
+    "sentenceContext": "I want to become a doctor."
+  },
+  {
+    "id": "691",
+    "word": "been",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 3,
+    "sentenceContext": "I have been here before."
+  },
+  {
+    "id": "692",
+    "word": "begin",
+    "phonicsGroup": "cvc-short-i",
+    "difficultyLevel": 3,
+    "sentenceContext": "Let us begin the lesson."
+  },
+  {
+    "id": "693",
+    "word": "between",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "Stand between them."
+  },
+  {
+    "id": "694",
+    "word": "both",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Both answers are correct."
+  },
+  {
+    "id": "695",
+    "word": "business",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "He runs a business."
+  },
+  {
+    "id": "696",
+    "word": "certain",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Are you certain about that?"
+  },
+  {
+    "id": "697",
+    "word": "change",
+    "phonicsGroup": "digraph-ch",
+    "difficultyLevel": 3,
+    "sentenceContext": "Change is part of life."
+  },
+  {
+    "id": "698",
+    "word": "close",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Close the door please."
+  },
+  {
+    "id": "699",
+    "word": "company",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "She works for a big company."
+  },
+  {
+    "id": "700",
+    "word": "consider",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Consider all options."
+  },
+  {
+    "id": "701",
+    "word": "continue",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Please continue reading."
+  },
+  {
+    "id": "702",
+    "word": "course",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 4,
+    "sentenceContext": "Of course you can."
+  },
+  {
+    "id": "703",
+    "word": "develop",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Develop your skills."
+  },
+  {
+    "id": "704",
+    "word": "during",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "Stay quiet during class."
+  },
+  {
+    "id": "705",
+    "word": "early",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wake up early."
+  },
+  {
+    "id": "706",
+    "word": "every",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 3,
+    "sentenceContext": "Every day is a gift."
+  },
+  {
+    "id": "707",
+    "word": "example",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Here is an example."
+  },
+  {
+    "id": "708",
+    "word": "fact",
+    "phonicsGroup": "blend-ct",
+    "difficultyLevel": 3,
+    "sentenceContext": "That is a fact."
+  },
+  {
+    "id": "709",
+    "word": "family",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Family is important."
+  },
+  {
+    "id": "710",
+    "word": "feel",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 3,
+    "sentenceContext": "How do you feel?"
+  },
+  {
+    "id": "711",
+    "word": "few",
+    "phonicsGroup": "vowel-team-ew",
+    "difficultyLevel": 3,
+    "sentenceContext": "I have a few ideas."
+  },
+  {
+    "id": "712",
+    "word": "follow",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Follow the leader."
+  },
+  {
+    "id": "713",
+    "word": "form",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 3,
+    "sentenceContext": "Fill out the form."
+  },
+  {
+    "id": "714",
+    "word": "free",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 3,
+    "sentenceContext": "The bird is free."
+  },
+  {
+    "id": "715",
+    "word": "full",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "The glass is full."
+  },
+  {
+    "id": "716",
+    "word": "give",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Give me your hand."
+  },
+  {
+    "id": "717",
+    "word": "great",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "You did a great job."
+  },
+  {
+    "id": "718",
+    "word": "group",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 4,
+    "sentenceContext": "Join our group."
+  },
+  {
+    "id": "719",
+    "word": "head",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Use your head."
+  },
+  {
+    "id": "720",
+    "word": "hear",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "I can hear music."
+  },
+  {
+    "id": "721",
+    "word": "however",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "However, we tried again."
+  },
+  {
+    "id": "722",
+    "word": "idea",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "That is a good idea."
+  },
+  {
+    "id": "723",
+    "word": "include",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 5,
+    "sentenceContext": "Please include your name."
+  },
+  {
+    "id": "724",
+    "word": "issue",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "This is an important issue."
+  },
+  {
+    "id": "725",
+    "word": "just",
+    "phonicsGroup": "blend-st",
+    "difficultyLevel": 2,
+    "sentenceContext": "I just finished."
+  },
+  {
+    "id": "726",
+    "word": "keep",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 3,
+    "sentenceContext": "Keep up the good work."
+  },
+  {
+    "id": "727",
+    "word": "large",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 3,
+    "sentenceContext": "The pizza is large."
+  },
+  {
+    "id": "728",
+    "word": "lead",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Lead the way."
+  },
+  {
+    "id": "729",
+    "word": "learn",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "Learn something new."
+  },
+  {
+    "id": "730",
+    "word": "leave",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Time to leave."
+  },
+  {
+    "id": "731",
+    "word": "left",
+    "phonicsGroup": "blend-ft",
+    "difficultyLevel": 2,
+    "sentenceContext": "Turn left here."
+  },
+  {
+    "id": "732",
+    "word": "level",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "What level are you on?"
+  },
+  {
+    "id": "733",
+    "word": "local",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Support local shops."
+  },
+  {
+    "id": "734",
+    "word": "main",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 3,
+    "sentenceContext": "This is the main idea."
+  },
+  {
+    "id": "735",
+    "word": "major",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "It is a major change."
+  },
+  {
+    "id": "736",
+    "word": "matter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "It does not matter."
+  },
+  {
+    "id": "737",
+    "word": "mean",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "What do you mean?"
+  },
+  {
+    "id": "738",
+    "word": "member",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "She is a team member."
+  },
+  {
+    "id": "739",
+    "word": "minute",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wait a minute."
+  },
+  {
+    "id": "740",
+    "word": "money",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Save your money."
+  },
+  {
+    "id": "741",
+    "word": "move",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Move to the right."
+  },
+  {
+    "id": "742",
+    "word": "national",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "It is a national holiday."
+  },
+  {
+    "id": "743",
+    "word": "near",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Come near me."
+  },
+  {
+    "id": "744",
+    "word": "never",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 3,
+    "sentenceContext": "Never give up."
+  },
+  {
+    "id": "745",
+    "word": "new",
+    "phonicsGroup": "vowel-team-ew",
+    "difficultyLevel": 2,
+    "sentenceContext": "I got a new phone."
+  },
+  {
+    "id": "746",
+    "word": "next",
+    "phonicsGroup": "blend-xt",
+    "difficultyLevel": 2,
+    "sentenceContext": "What is next?"
+  },
+  {
+    "id": "747",
+    "word": "nothing",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 4,
+    "sentenceContext": "There is nothing here."
+  },
+  {
+    "id": "748",
+    "word": "once",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 3,
+    "sentenceContext": "Try it once."
+  },
+  {
+    "id": "749",
+    "word": "only",
+    "phonicsGroup": "sight-words",
+    "difficultyLevel": 3,
+    "sentenceContext": "There is only one."
+  },
+  {
+    "id": "750",
+    "word": "open",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Open the window."
+  },
+  {
+    "id": "751",
+    "word": "order",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "Place your order."
+  },
+  {
+    "id": "752",
+    "word": "place",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "This is the place."
+  },
+  {
+    "id": "753",
+    "word": "point",
+    "phonicsGroup": "diphthong-oi",
+    "difficultyLevel": 3,
+    "sentenceContext": "What is your point?"
+  },
+  {
+    "id": "754",
+    "word": "power",
+    "phonicsGroup": "diphthong-ow",
+    "difficultyLevel": 4,
+    "sentenceContext": "Turn on the power."
+  },
+  {
+    "id": "755",
+    "word": "present",
+    "phonicsGroup": "blend-pr",
+    "difficultyLevel": 4,
+    "sentenceContext": "Open your present."
+  },
+  {
+    "id": "756",
+    "word": "program",
+    "phonicsGroup": "blend-pr",
+    "difficultyLevel": 5,
+    "sentenceContext": "Run the program."
+  },
+  {
+    "id": "757",
+    "word": "provide",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 5,
+    "sentenceContext": "I will provide help."
+  },
+  {
+    "id": "758",
+    "word": "public",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "It is a public park."
+  },
+  {
+    "id": "759",
+    "word": "rather",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 4,
+    "sentenceContext": "I would rather stay."
+  },
+  {
+    "id": "760",
+    "word": "reach",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Reach for the stars."
+  },
+  {
+    "id": "761",
+    "word": "real",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Is this real?"
+  },
+  {
+    "id": "762",
+    "word": "reason",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 4,
+    "sentenceContext": "What is the reason?"
+  },
+  {
+    "id": "763",
+    "word": "report",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "Write a report."
+  },
+  {
+    "id": "764",
+    "word": "require",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 5,
+    "sentenceContext": "What do you require?"
+  },
+  {
+    "id": "765",
+    "word": "result",
+    "phonicsGroup": "blend-lt",
+    "difficultyLevel": 5,
+    "sentenceContext": "The result was great."
+  },
+  {
+    "id": "766",
+    "word": "room",
+    "phonicsGroup": "vowel-team-oo",
+    "difficultyLevel": 2,
+    "sentenceContext": "Clean your room."
+  },
+  {
+    "id": "767",
+    "word": "run",
+    "phonicsGroup": "cvc-short-u",
+    "difficultyLevel": 1,
+    "sentenceContext": "Run fast."
+  },
+  {
+    "id": "768",
+    "word": "school",
+    "phonicsGroup": "vowel-team-oo",
+    "difficultyLevel": 3,
+    "sentenceContext": "Go to school."
+  },
+  {
+    "id": "769",
+    "word": "seem",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 3,
+    "sentenceContext": "You seem tired."
+  },
+  {
+    "id": "770",
+    "word": "sense",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 4,
+    "sentenceContext": "That makes sense."
+  },
+  {
+    "id": "771",
+    "word": "serve",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "Serve the food."
+  },
+  {
+    "id": "772",
+    "word": "service",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "The service was great."
+  },
+  {
+    "id": "773",
+    "word": "since",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Since you asked."
+  },
+  {
+    "id": "774",
+    "word": "start",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 3,
+    "sentenceContext": "Start the game."
+  },
+  {
+    "id": "775",
+    "word": "state",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "What state do you live in?"
+  },
+  {
+    "id": "776",
+    "word": "story",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Tell me a story."
+  },
+  {
+    "id": "777",
+    "word": "study",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Study for the test."
+  },
+  {
+    "id": "778",
+    "word": "sure",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 3,
+    "sentenceContext": "Are you sure?"
+  },
+  {
+    "id": "779",
+    "word": "system",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "The system works well."
+  },
+  {
+    "id": "780",
+    "word": "take",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 2,
+    "sentenceContext": "Take your time."
+  },
+  {
+    "id": "781",
+    "word": "than",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 2,
+    "sentenceContext": "More than enough."
+  },
+  {
+    "id": "782",
+    "word": "think",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Think about it."
+  },
+  {
+    "id": "783",
+    "word": "those",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Take those books."
+  },
+  {
+    "id": "784",
+    "word": "three",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "I have three cats."
+  },
+  {
+    "id": "785",
+    "word": "today",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 3,
+    "sentenceContext": "Today is Monday."
+  },
+  {
+    "id": "786",
+    "word": "try",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 2,
+    "sentenceContext": "Try your best."
+  },
+  {
+    "id": "787",
+    "word": "under",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 3,
+    "sentenceContext": "Look under the bed."
+  },
+  {
+    "id": "788",
+    "word": "until",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wait until tomorrow."
+  },
+  {
+    "id": "789",
+    "word": "upon",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Once upon a time."
+  },
+  {
+    "id": "790",
+    "word": "use",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 2,
+    "sentenceContext": "Use your pencil."
+  },
+  {
+    "id": "791",
+    "word": "very",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 3,
+    "sentenceContext": "Very good work."
+  },
+  {
+    "id": "792",
+    "word": "want",
+    "phonicsGroup": "blend-nt",
+    "difficultyLevel": 2,
+    "sentenceContext": "What do you want?"
+  },
+  {
+    "id": "793",
+    "word": "water",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 3,
+    "sentenceContext": "Drink some water."
+  },
+  {
+    "id": "794",
+    "word": "week",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 3,
+    "sentenceContext": "See you next week."
+  },
+  {
+    "id": "795",
+    "word": "while",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 3,
+    "sentenceContext": "Wait a while."
+  },
+  {
+    "id": "796",
+    "word": "within",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 4,
+    "sentenceContext": "Within the box."
+  },
+  {
+    "id": "797",
+    "word": "word",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 3,
+    "sentenceContext": "Say the magic word."
+  },
+  {
+    "id": "798",
+    "word": "work",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 3,
+    "sentenceContext": "Hard work pays off."
+  },
+  {
+    "id": "799",
+    "word": "world",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "Travel the world."
+  },
+  {
+    "id": "800",
+    "word": "year",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "What year is it?"
+  },
+  {
+    "id": "801",
+    "word": "young",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 3,
+    "sentenceContext": "You are still young."
+  },
+  {
+    "id": "802",
+    "word": "your",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 2,
+    "sentenceContext": "This is your book."
+  },
+  {
+    "id": "803",
+    "word": "typing",
+    "phonicsGroup": "long-vowel-y",
+    "difficultyLevel": 4,
+    "sentenceContext": "Practice your typing."
+  },
+  {
+    "id": "804",
+    "word": "quickly",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Run quickly."
+  },
+  {
+    "id": "805",
+    "word": "slowly",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Walk slowly."
+  },
+  {
+    "id": "806",
+    "word": "exactly",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "That is exactly right."
+  },
+  {
+    "id": "807",
+    "word": "simply",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Simply do your best."
+  },
+  {
+    "id": "808",
+    "word": "clearly",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Speak clearly."
+  },
+  {
+    "id": "809",
+    "word": "nearly",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "We are nearly there."
+  },
+  {
+    "id": "810",
+    "word": "easily",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "You can do it easily."
+  },
+  {
+    "id": "811",
+    "word": "surely",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "That is surely true."
+  },
+  {
+    "id": "812",
+    "word": "hardly",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "I can hardly wait."
+  },
+  {
+    "id": "813",
+    "word": "recently",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "I recently moved here."
+  },
+  {
+    "id": "814",
+    "word": "apparently",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Apparently it rained."
+  },
+  {
+    "id": "815",
+    "word": "certainly",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "I will certainly help."
+  },
+  {
+    "id": "816",
+    "word": "currently",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "I am currently busy."
+  },
+  {
+    "id": "817",
+    "word": "generally",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Generally speaking."
+  },
+  {
+    "id": "818",
+    "word": "absolutely",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Absolutely correct."
+  },
+  {
+    "id": "819",
+    "word": "basically",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Basically it works."
+  },
+  {
+    "id": "820",
+    "word": "essentially",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "It is essentially the same."
+  },
+  {
+    "id": "821",
+    "word": "eventually",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "It will happen eventually."
+  },
+  {
+    "id": "822",
+    "word": "obviously",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Obviously that is true."
+  },
+  {
+    "id": "823",
+    "word": "originally",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Originally from here."
+  },
+  {
+    "id": "824",
+    "word": "specifically",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 7,
+    "sentenceContext": "Specifically this one."
+  },
+  {
+    "id": "825",
+    "word": "straight",
+    "phonicsGroup": "silent-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Go straight ahead."
+  },
+  {
+    "id": "826",
+    "word": "strength",
+    "phonicsGroup": "blend-str",
+    "difficultyLevel": 5,
+    "sentenceContext": "Build your strength."
+  },
+  {
+    "id": "827",
+    "word": "stretch",
+    "phonicsGroup": "blend-str",
+    "difficultyLevel": 4,
+    "sentenceContext": "Stretch your arms."
+  },
+  {
+    "id": "828",
+    "word": "string",
+    "phonicsGroup": "blend-str",
+    "difficultyLevel": 3,
+    "sentenceContext": "Tie the string."
+  },
+  {
+    "id": "829",
+    "word": "strong",
+    "phonicsGroup": "blend-str",
+    "difficultyLevel": 3,
+    "sentenceContext": "Stay strong."
+  },
+  {
+    "id": "830",
+    "word": "struck",
+    "phonicsGroup": "blend-str",
+    "difficultyLevel": 4,
+    "sentenceContext": "Lightning struck."
+  },
+  {
+    "id": "831",
+    "word": "structure",
+    "phonicsGroup": "blend-str",
+    "difficultyLevel": 5,
+    "sentenceContext": "Build a structure."
+  },
+  {
+    "id": "832",
+    "word": "struggle",
+    "phonicsGroup": "blend-str",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not struggle."
+  },
+  {
+    "id": "833",
+    "word": "student",
+    "phonicsGroup": "blend-st",
+    "difficultyLevel": 4,
+    "sentenceContext": "Be a good student."
+  },
+  {
+    "id": "834",
+    "word": "subject",
+    "phonicsGroup": "blend-ct",
+    "difficultyLevel": 5,
+    "sentenceContext": "What is your favorite subject?"
+  },
+  {
+    "id": "835",
+    "word": "submit",
+    "phonicsGroup": "blend-bm",
+    "difficultyLevel": 5,
+    "sentenceContext": "Submit your work."
+  },
+  {
+    "id": "836",
+    "word": "subscribe",
+    "phonicsGroup": "blend-scr",
+    "difficultyLevel": 6,
+    "sentenceContext": "Subscribe to the channel."
+  },
+  {
+    "id": "837",
+    "word": "subsequent",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 7,
+    "sentenceContext": "In subsequent chapters."
+  },
+  {
+    "id": "838",
+    "word": "substantial",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 7,
+    "sentenceContext": "A substantial amount."
+  },
+  {
+    "id": "839",
+    "word": "substitute",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Find a substitute."
+  },
+  {
+    "id": "840",
+    "word": "succeed",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "You will succeed."
+  },
+  {
+    "id": "841",
+    "word": "suffer",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not suffer in silence."
+  },
+  {
+    "id": "842",
+    "word": "sufficient",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "That is sufficient."
+  },
+  {
+    "id": "843",
+    "word": "suggest",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "I suggest we leave."
+  },
+  {
+    "id": "844",
+    "word": "summary",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Write a summary."
+  },
+  {
+    "id": "845",
+    "word": "support",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "I will support you."
+  },
+  {
+    "id": "846",
+    "word": "suppose",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "I suppose so."
+  },
+  {
+    "id": "847",
+    "word": "supply",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Supply and demand."
+  },
+  {
+    "id": "848",
+    "word": "surprise",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "What a surprise!"
+  },
+  {
+    "id": "849",
+    "word": "surround",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Trees surround the house."
+  },
+  {
+    "id": "850",
+    "word": "survey",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Take the survey."
+  },
+  {
+    "id": "851",
+    "word": "technique",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Learn the technique."
+  },
+  {
+    "id": "852",
+    "word": "technology",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Technology is advancing."
+  },
+  {
+    "id": "853",
+    "word": "telephone",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Answer the telephone."
+  },
+  {
+    "id": "854",
+    "word": "television",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Watch television."
+  },
+  {
+    "id": "855",
+    "word": "temporary",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "It is temporary."
+  },
+  {
+    "id": "856",
+    "word": "tendency",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "A natural tendency."
+  },
+  {
+    "id": "857",
+    "word": "territory",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Explore new territory."
+  },
+  {
+    "id": "858",
+    "word": "theory",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Test the theory."
+  },
+  {
+    "id": "859",
+    "word": "therefore",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 5,
+    "sentenceContext": "Therefore we must act."
+  },
+  {
+    "id": "860",
+    "word": "thousand",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 5,
+    "sentenceContext": "A thousand stars."
+  },
+  {
+    "id": "861",
+    "word": "threat",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 5,
+    "sentenceContext": "Face the threat."
+  },
+  {
+    "id": "862",
+    "word": "throughout",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 5,
+    "sentenceContext": "Throughout the day."
+  },
+  {
+    "id": "863",
+    "word": "throw",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 3,
+    "sentenceContext": "Throw the ball."
+  },
+  {
+    "id": "864",
+    "word": "toward",
+    "phonicsGroup": "diphthong-ow",
+    "difficultyLevel": 4,
+    "sentenceContext": "Walk toward me."
+  },
+  {
+    "id": "865",
+    "word": "traffic",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Heavy traffic today."
+  },
+  {
+    "id": "866",
+    "word": "training",
+    "phonicsGroup": "vowel-team-ai",
+    "difficultyLevel": 4,
+    "sentenceContext": "Start training early."
+  },
+  {
+    "id": "867",
+    "word": "transfer",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 5,
+    "sentenceContext": "Transfer the files."
+  },
+  {
+    "id": "868",
+    "word": "transform",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 6,
+    "sentenceContext": "Transform your life."
+  },
+  {
+    "id": "869",
+    "word": "transition",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 7,
+    "sentenceContext": "A smooth transition."
+  },
+  {
+    "id": "870",
+    "word": "translate",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 5,
+    "sentenceContext": "Translate the text."
+  },
+  {
+    "id": "871",
+    "word": "transport",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 5,
+    "sentenceContext": "Transport the goods."
+  },
+  {
+    "id": "872",
+    "word": "travel",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 4,
+    "sentenceContext": "Travel the world."
+  },
+  {
+    "id": "873",
+    "word": "treat",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Have a treat."
+  },
+  {
+    "id": "874",
+    "word": "treatment",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Get treatment now."
+  },
+  {
+    "id": "875",
+    "word": "treaty",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 5,
+    "sentenceContext": "Sign the treaty."
+  },
+  {
+    "id": "876",
+    "word": "tremendous",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "A tremendous effort."
+  },
+  {
+    "id": "877",
+    "word": "trend",
+    "phonicsGroup": "blend-nd",
+    "difficultyLevel": 4,
+    "sentenceContext": "Follow the trend."
+  },
+  {
+    "id": "878",
+    "word": "trial",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 5,
+    "sentenceContext": "A fair trial."
+  },
+  {
+    "id": "879",
+    "word": "tribe",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 4,
+    "sentenceContext": "Join the tribe."
+  },
+  {
+    "id": "880",
+    "word": "trick",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 3,
+    "sentenceContext": "Show me a trick."
+  },
+  {
+    "id": "881",
+    "word": "trigger",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Pull the trigger."
+  },
+  {
+    "id": "882",
+    "word": "trouble",
+    "phonicsGroup": "diphthong-ou",
+    "difficultyLevel": 5,
+    "sentenceContext": "Stay out of trouble."
+  },
+  {
+    "id": "883",
+    "word": "trust",
+    "phonicsGroup": "blend-tr",
+    "difficultyLevel": 4,
+    "sentenceContext": "Trust your instincts."
+  },
+  {
+    "id": "884",
+    "word": "truth",
+    "phonicsGroup": "digraph-th",
+    "difficultyLevel": 4,
+    "sentenceContext": "Tell the truth."
+  },
+  {
+    "id": "885",
+    "word": "typical",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "A typical day."
+  },
+  {
+    "id": "886",
+    "word": "ultimate",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "The ultimate goal."
+  },
+  {
+    "id": "887",
+    "word": "unable",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Unable to attend."
+  },
+  {
+    "id": "888",
+    "word": "uncertain",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "The future is uncertain."
+  },
+  {
+    "id": "889",
+    "word": "uncle",
+    "phonicsGroup": "blend-cl",
+    "difficultyLevel": 4,
+    "sentenceContext": "Visit my uncle."
+  },
+  {
+    "id": "890",
+    "word": "undergo",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Undergo surgery."
+  },
+  {
+    "id": "891",
+    "word": "unique",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "You are unique."
+  },
+  {
+    "id": "892",
+    "word": "unite",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 5,
+    "sentenceContext": "Unite together."
+  },
+  {
+    "id": "893",
+    "word": "universal",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "A universal truth."
+  },
+  {
+    "id": "894",
+    "word": "universe",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Explore the universe."
+  },
+  {
+    "id": "895",
+    "word": "university",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Study at university."
+  },
+  {
+    "id": "896",
+    "word": "unknown",
+    "phonicsGroup": "silent-k",
+    "difficultyLevel": 5,
+    "sentenceContext": "An unknown factor."
+  },
+  {
+    "id": "897",
+    "word": "unless",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Unless you try."
+  },
+  {
+    "id": "898",
+    "word": "unlike",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 4,
+    "sentenceContext": "Unlike before."
+  },
+  {
+    "id": "899",
+    "word": "unlikely",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "It is unlikely."
+  },
+  {
+    "id": "900",
+    "word": "unnecessary",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 7,
+    "sentenceContext": "That was unnecessary."
+  },
+  {
+    "id": "901",
+    "word": "unusual",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "An unusual sight."
+  },
+  {
+    "id": "902",
+    "word": "update",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Update the software."
+  },
+  {
+    "id": "903",
+    "word": "upgrade",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Upgrade your plan."
+  },
+  {
+    "id": "904",
+    "word": "upload",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Upload the file."
+  },
+  {
+    "id": "905",
+    "word": "upper",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "The upper floor."
+  },
+  {
+    "id": "906",
+    "word": "urban",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 5,
+    "sentenceContext": "Urban development."
+  },
+  {
+    "id": "907",
+    "word": "urge",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "I urge you to try."
+  },
+  {
+    "id": "908",
+    "word": "urgent",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 5,
+    "sentenceContext": "An urgent matter."
+  },
+  {
+    "id": "909",
+    "word": "usual",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "The usual time."
+  },
+  {
+    "id": "910",
+    "word": "vacation",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Go on vacation."
+  },
+  {
+    "id": "911",
+    "word": "valid",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "A valid point."
+  },
+  {
+    "id": "912",
+    "word": "valley",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Down in the valley."
+  },
+  {
+    "id": "913",
+    "word": "valuable",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "A valuable lesson."
+  },
+  {
+    "id": "914",
+    "word": "value",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 4,
+    "sentenceContext": "Add value."
+  },
+  {
+    "id": "915",
+    "word": "variety",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "A variety of options."
+  },
+  {
+    "id": "916",
+    "word": "various",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Various reasons."
+  },
+  {
+    "id": "917",
+    "word": "vast",
+    "phonicsGroup": "blend-st",
+    "difficultyLevel": 4,
+    "sentenceContext": "A vast ocean."
+  },
+  {
+    "id": "918",
+    "word": "version",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "The latest version."
+  },
+  {
+    "id": "919",
+    "word": "versus",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Team A versus Team B."
+  },
+  {
+    "id": "920",
+    "word": "victim",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Help the victim."
+  },
+  {
+    "id": "921",
+    "word": "victory",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Celebrate victory."
+  },
+  {
+    "id": "922",
+    "word": "video",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Watch the video."
+  },
+  {
+    "id": "923",
+    "word": "view",
+    "phonicsGroup": "vowel-team-ew",
+    "difficultyLevel": 3,
+    "sentenceContext": "Enjoy the view."
+  },
+  {
+    "id": "924",
+    "word": "village",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A small village."
+  },
+  {
+    "id": "925",
+    "word": "violence",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Stop the violence."
+  },
+  {
+    "id": "926",
+    "word": "virtual",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "A virtual meeting."
+  },
+  {
+    "id": "927",
+    "word": "virtue",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "A virtue to cherish."
+  },
+  {
+    "id": "928",
+    "word": "virus",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Catch a virus."
+  },
+  {
+    "id": "929",
+    "word": "visible",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Clearly visible."
+  },
+  {
+    "id": "930",
+    "word": "vision",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "A clear vision."
+  },
+  {
+    "id": "931",
+    "word": "visual",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Visual arts."
+  },
+  {
+    "id": "932",
+    "word": "vital",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "A vital role."
+  },
+  {
+    "id": "933",
+    "word": "voice",
+    "phonicsGroup": "diphthong-oi",
+    "difficultyLevel": 3,
+    "sentenceContext": "Raise your voice."
+  },
+  {
+    "id": "934",
+    "word": "volume",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 5,
+    "sentenceContext": "Turn up the volume."
+  },
+  {
+    "id": "935",
+    "word": "volunteer",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Volunteer your time."
+  },
+  {
+    "id": "936",
+    "word": "vote",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Cast your vote."
+  },
+  {
+    "id": "937",
+    "word": "vulnerable",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 7,
+    "sentenceContext": "Feel vulnerable."
+  },
+  {
+    "id": "938",
+    "word": "wage",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 4,
+    "sentenceContext": "A fair wage."
+  },
+  {
+    "id": "939",
+    "word": "wake",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Wake up early."
+  },
+  {
+    "id": "940",
+    "word": "walk",
+    "phonicsGroup": "silent-l",
+    "difficultyLevel": 3,
+    "sentenceContext": "Walk the dog."
+  },
+  {
+    "id": "941",
+    "word": "wander",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Wander around."
+  },
+  {
+    "id": "942",
+    "word": "warn",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "I warn you."
+  },
+  {
+    "id": "943",
+    "word": "warning",
+    "phonicsGroup": "r-controlled",
+    "difficultyLevel": 4,
+    "sentenceContext": "A warning sign."
+  },
+  {
+    "id": "944",
+    "word": "wash",
+    "phonicsGroup": "digraph-sh",
+    "difficultyLevel": 3,
+    "sentenceContext": "Wash your hands."
+  },
+  {
+    "id": "945",
+    "word": "waste",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 4,
+    "sentenceContext": "Do not waste time."
+  },
+  {
+    "id": "946",
+    "word": "wave",
+    "phonicsGroup": "silent-e",
+    "difficultyLevel": 3,
+    "sentenceContext": "Wave goodbye."
+  },
+  {
+    "id": "947",
+    "word": "weak",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "Feeling weak."
+  },
+  {
+    "id": "948",
+    "word": "wealth",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 5,
+    "sentenceContext": "Build wealth."
+  },
+  {
+    "id": "949",
+    "word": "weapon",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 5,
+    "sentenceContext": "A dangerous weapon."
+  },
+  {
+    "id": "950",
+    "word": "wear",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 3,
+    "sentenceContext": "What to wear?"
+  },
+  {
+    "id": "951",
+    "word": "weather",
+    "phonicsGroup": "vowel-team-ea",
+    "difficultyLevel": 4,
+    "sentenceContext": "Nice weather today."
+  },
+  {
+    "id": "952",
+    "word": "website",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Visit the website."
+  },
+  {
+    "id": "953",
+    "word": "weekend",
+    "phonicsGroup": "vowel-team-ee",
+    "difficultyLevel": 4,
+    "sentenceContext": "Happy weekend."
+  },
+  {
+    "id": "954",
+    "word": "welcome",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "You are welcome."
+  },
+  {
+    "id": "955",
+    "word": "welfare",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Child welfare."
+  },
+  {
+    "id": "956",
+    "word": "western",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 5,
+    "sentenceContext": "Western culture."
+  },
+  {
+    "id": "957",
+    "word": "whatever",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 4,
+    "sentenceContext": "Whatever you want."
+  },
+  {
+    "id": "958",
+    "word": "wheel",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 4,
+    "sentenceContext": "Turn the wheel."
+  },
+  {
+    "id": "959",
+    "word": "whenever",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 5,
+    "sentenceContext": "Whenever you are ready."
+  },
+  {
+    "id": "960",
+    "word": "whereas",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 6,
+    "sentenceContext": "Whereas before."
+  },
+  {
+    "id": "961",
+    "word": "whether",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 4,
+    "sentenceContext": "Whether or not."
+  },
+  {
+    "id": "962",
+    "word": "whole",
+    "phonicsGroup": "silent-w",
+    "difficultyLevel": 4,
+    "sentenceContext": "The whole thing."
+  },
+  {
+    "id": "963",
+    "word": "whose",
+    "phonicsGroup": "digraph-wh",
+    "difficultyLevel": 4,
+    "sentenceContext": "Whose book is this?"
+  },
+  {
+    "id": "964",
+    "word": "accident",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "It was an accident."
+  },
+  {
+    "id": "965",
+    "word": "account",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Open an account."
+  },
+  {
+    "id": "966",
+    "word": "accurate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Be accurate."
+  },
+  {
+    "id": "967",
+    "word": "accuse",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Do not accuse falsely."
+  },
+  {
+    "id": "968",
+    "word": "affect",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "How does it affect you?"
+  },
+  {
+    "id": "969",
+    "word": "afford",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Can you afford it?"
+  },
+  {
+    "id": "970",
+    "word": "aggressive",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Do not be aggressive."
+  },
+  {
+    "id": "971",
+    "word": "allow",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Allow me to help."
+  },
+  {
+    "id": "972",
+    "word": "announce",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Announce the winner."
+  },
+  {
+    "id": "973",
+    "word": "annual",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "The annual event."
+  },
+  {
+    "id": "974",
+    "word": "appear",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "You appear tired."
+  },
+  {
+    "id": "975",
+    "word": "apply",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Apply for the job."
+  },
+  {
+    "id": "976",
+    "word": "appoint",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Appoint a leader."
+  },
+  {
+    "id": "977",
+    "word": "appreciate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "I appreciate your help."
+  },
+  {
+    "id": "978",
+    "word": "approach",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Approach slowly."
+  },
+  {
+    "id": "979",
+    "word": "appropriate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 7,
+    "sentenceContext": "That is appropriate."
+  },
+  {
+    "id": "980",
+    "word": "approve",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do you approve?"
+  },
+  {
+    "id": "981",
+    "word": "arrange",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Arrange the flowers."
+  },
+  {
+    "id": "982",
+    "word": "arrest",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Under arrest."
+  },
+  {
+    "id": "983",
+    "word": "arrive",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "When will you arrive?"
+  },
+  {
+    "id": "984",
+    "word": "assess",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Assess the situation."
+  },
+  {
+    "id": "985",
+    "word": "assign",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Assign the task."
+  },
+  {
+    "id": "986",
+    "word": "assist",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "I will assist you."
+  },
+  {
+    "id": "987",
+    "word": "associate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Associate with friends."
+  },
+  {
+    "id": "988",
+    "word": "assume",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not assume."
+  },
+  {
+    "id": "989",
+    "word": "assure",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "I assure you."
+  },
+  {
+    "id": "990",
+    "word": "attach",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Attach the file."
+  },
+  {
+    "id": "991",
+    "word": "attack",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Under attack."
+  },
+  {
+    "id": "992",
+    "word": "attempt",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Make an attempt."
+  },
+  {
+    "id": "993",
+    "word": "attend",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Attend the meeting."
+  },
+  {
+    "id": "994",
+    "word": "attract",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Attract attention."
+  },
+  {
+    "id": "995",
+    "word": "balloon",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "The red balloon."
+  },
+  {
+    "id": "996",
+    "word": "banner",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Hang the banner."
+  },
+  {
+    "id": "997",
+    "word": "barrel",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A barrel of apples."
+  },
+  {
+    "id": "998",
+    "word": "battle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "The battle began."
+  },
+  {
+    "id": "999",
+    "word": "better",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "You can do better."
+  },
+  {
+    "id": "1000",
+    "word": "bitter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A bitter taste."
+  },
+  {
+    "id": "1001",
+    "word": "bottle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Pass the bottle."
+  },
+  {
+    "id": "1002",
+    "word": "bottom",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "At the bottom."
+  },
+  {
+    "id": "1003",
+    "word": "bubble",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Blow a bubble."
+  },
+  {
+    "id": "1004",
+    "word": "butter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Spread the butter."
+  },
+  {
+    "id": "1005",
+    "word": "cabbage",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Eat your cabbage."
+  },
+  {
+    "id": "1006",
+    "word": "carrot",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A fresh carrot."
+  },
+  {
+    "id": "1007",
+    "word": "cattle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "The cattle grazed."
+  },
+  {
+    "id": "1008",
+    "word": "channel",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Change the channel."
+  },
+  {
+    "id": "1009",
+    "word": "classic",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A classic movie."
+  },
+  {
+    "id": "1010",
+    "word": "collect",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Collect stamps."
+  },
+  {
+    "id": "1011",
+    "word": "college",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Go to college."
+  },
+  {
+    "id": "1012",
+    "word": "command",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Give a command."
+  },
+  {
+    "id": "1013",
+    "word": "comment",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Leave a comment."
+  },
+  {
+    "id": "1014",
+    "word": "commit",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Commit to the goal."
+  },
+  {
+    "id": "1015",
+    "word": "common",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A common problem."
+  },
+  {
+    "id": "1016",
+    "word": "communicate",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "Communicate clearly."
+  },
+  {
+    "id": "1017",
+    "word": "community",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 6,
+    "sentenceContext": "The local community."
+  },
+  {
+    "id": "1018",
+    "word": "connect",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Connect the wires."
+  },
+  {
+    "id": "1019",
+    "word": "conquer",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 6,
+    "sentenceContext": "Conquer your fears."
+  },
+  {
+    "id": "1020",
+    "word": "correct",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "That is correct."
+  },
+  {
+    "id": "1021",
+    "word": "cottage",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A small cottage."
+  },
+  {
+    "id": "1022",
+    "word": "cuddle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Cuddle the teddy bear."
+  },
+  {
+    "id": "1023",
+    "word": "current",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "The current situation."
+  },
+  {
+    "id": "1024",
+    "word": "dagger",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A sharp dagger."
+  },
+  {
+    "id": "1025",
+    "word": "dessert",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Have some dessert."
+  },
+  {
+    "id": "1026",
+    "word": "digging",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Digging in the sand."
+  },
+  {
+    "id": "1027",
+    "word": "dribble",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Dribble the ball."
+  },
+  {
+    "id": "1028",
+    "word": "effect",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "The effect was amazing."
+  },
+  {
+    "id": "1029",
+    "word": "effort",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Make an effort."
+  },
+  {
+    "id": "1030",
+    "word": "error",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Fix the error."
+  },
+  {
+    "id": "1031",
+    "word": "essay",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Write an essay."
+  },
+  {
+    "id": "1032",
+    "word": "fatter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Getting fatter."
+  },
+  {
+    "id": "1033",
+    "word": "filler",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Use a filler."
+  },
+  {
+    "id": "1034",
+    "word": "flatter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not flatter me."
+  },
+  {
+    "id": "1035",
+    "word": "floppy",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A floppy disk."
+  },
+  {
+    "id": "1036",
+    "word": "foggy",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A foggy morning."
+  },
+  {
+    "id": "1037",
+    "word": "gallery",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Visit the gallery."
+  },
+  {
+    "id": "1038",
+    "word": "giggle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Do not giggle."
+  },
+  {
+    "id": "1039",
+    "word": "glitter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Add some glitter."
+  },
+  {
+    "id": "1040",
+    "word": "gossip",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not gossip."
+  },
+  {
+    "id": "1041",
+    "word": "grammar",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Learn proper grammar."
+  },
+  {
+    "id": "1042",
+    "word": "gripping",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A gripping story."
+  },
+  {
+    "id": "1043",
+    "word": "gutter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Clean the gutter."
+  },
+  {
+    "id": "1044",
+    "word": "hatter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "The mad hatter."
+  },
+  {
+    "id": "1045",
+    "word": "hello",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 2,
+    "sentenceContext": "Say hello."
+  },
+  {
+    "id": "1046",
+    "word": "hippo",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A large hippo."
+  },
+  {
+    "id": "1047",
+    "word": "holler",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Do not holler."
+  },
+  {
+    "id": "1048",
+    "word": "hollow",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A hollow tree."
+  },
+  {
+    "id": "1049",
+    "word": "horror",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A horror movie."
+  },
+  {
+    "id": "1050",
+    "word": "hotter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Getting hotter."
+  },
+  {
+    "id": "1051",
+    "word": "huddle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Huddle together."
+  },
+  {
+    "id": "1052",
+    "word": "illness",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Recover from illness."
+  },
+  {
+    "id": "1053",
+    "word": "jelly",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Peanut butter and jelly."
+  },
+  {
+    "id": "1054",
+    "word": "kettle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Boil the kettle."
+  },
+  {
+    "id": "1055",
+    "word": "litter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Do not litter."
+  },
+  {
+    "id": "1056",
+    "word": "mammal",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A whale is a mammal."
+  },
+  {
+    "id": "1057",
+    "word": "manner",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Mind your manner."
+  },
+  {
+    "id": "1058",
+    "word": "marry",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "They will marry."
+  },
+  {
+    "id": "1059",
+    "word": "message",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Send a message."
+  },
+  {
+    "id": "1060",
+    "word": "middle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "In the middle."
+  },
+  {
+    "id": "1061",
+    "word": "million",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A million dollars."
+  },
+  {
+    "id": "1062",
+    "word": "mirror",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Look in the mirror."
+  },
+  {
+    "id": "1063",
+    "word": "muddy",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Muddy shoes."
+  },
+  {
+    "id": "1064",
+    "word": "mutter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Do not mutter."
+  },
+  {
+    "id": "1065",
+    "word": "noodle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Eat a noodle."
+  },
+  {
+    "id": "1066",
+    "word": "offer",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Make an offer."
+  },
+  {
+    "id": "1067",
+    "word": "office",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Go to the office."
+  },
+  {
+    "id": "1068",
+    "word": "oppose",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not oppose."
+  },
+  {
+    "id": "1069",
+    "word": "paddle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Paddle the boat."
+  },
+  {
+    "id": "1070",
+    "word": "parrot",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A talking parrot."
+  },
+  {
+    "id": "1071",
+    "word": "passage",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A secret passage."
+  },
+  {
+    "id": "1072",
+    "word": "passion",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Follow your passion."
+  },
+  {
+    "id": "1073",
+    "word": "pattern",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A nice pattern."
+  },
+  {
+    "id": "1074",
+    "word": "pizza",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Order a pizza."
+  },
+  {
+    "id": "1075",
+    "word": "pollute",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Do not pollute."
+  },
+  {
+    "id": "1076",
+    "word": "poodle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A fluffy poodle."
+  },
+  {
+    "id": "1077",
+    "word": "pretty",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "That is pretty."
+  },
+  {
+    "id": "1078",
+    "word": "puddle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Jump in the puddle."
+  },
+  {
+    "id": "1079",
+    "word": "puppet",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A hand puppet."
+  },
+  {
+    "id": "1080",
+    "word": "puzzle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Solve the puzzle."
+  },
+  {
+    "id": "1081",
+    "word": "rattle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Rattle the keys."
+  },
+  {
+    "id": "1082",
+    "word": "recess",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Time for recess."
+  },
+  {
+    "id": "1083",
+    "word": "riddle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Solve the riddle."
+  },
+  {
+    "id": "1084",
+    "word": "rubber",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A rubber band."
+  },
+  {
+    "id": "1085",
+    "word": "ruffle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Ruffle the feathers."
+  },
+  {
+    "id": "1086",
+    "word": "saddle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Put on the saddle."
+  },
+  {
+    "id": "1087",
+    "word": "scissors",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Cut with scissors."
+  },
+  {
+    "id": "1088",
+    "word": "settee",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Sit on the settee."
+  },
+  {
+    "id": "1089",
+    "word": "settle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Settle down."
+  },
+  {
+    "id": "1090",
+    "word": "shatter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Glass can shatter."
+  },
+  {
+    "id": "1091",
+    "word": "shelter",
+    "phonicsGroup": "multi-syllable",
+    "difficultyLevel": 4,
+    "sentenceContext": "Find shelter."
+  },
+  {
+    "id": "1092",
+    "word": "shuffle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Shuffle the cards."
+  },
+  {
+    "id": "1093",
+    "word": "silly",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "That is silly."
+  },
+  {
+    "id": "1094",
+    "word": "simmer",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Let it simmer."
+  },
+  {
+    "id": "1095",
+    "word": "skipper",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "The ship skipper."
+  },
+  {
+    "id": "1096",
+    "word": "slipper",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Wear a slipper."
+  },
+  {
+    "id": "1097",
+    "word": "soccer",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Play soccer."
+  },
+  {
+    "id": "1098",
+    "word": "sorry",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "I am sorry."
+  },
+  {
+    "id": "1099",
+    "word": "supper",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Time for supper."
+  },
+  {
+    "id": "1100",
+    "word": "swallow",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Swallow your food."
+  },
+  {
+    "id": "1101",
+    "word": "swimmer",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A fast swimmer."
+  },
+  {
+    "id": "1102",
+    "word": "taller",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Getting taller."
+  },
+  {
+    "id": "1103",
+    "word": "tattoo",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "A colorful tattoo."
+  },
+  {
+    "id": "1104",
+    "word": "terror",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Filled with terror."
+  },
+  {
+    "id": "1105",
+    "word": "toffee",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Eat some toffee."
+  },
+  {
+    "id": "1106",
+    "word": "tummy",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "My tummy hurts."
+  },
+  {
+    "id": "1107",
+    "word": "tunnel",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Through the tunnel."
+  },
+  {
+    "id": "1108",
+    "word": "twitter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Birds twitter."
+  },
+  {
+    "id": "1109",
+    "word": "umbrella",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 5,
+    "sentenceContext": "Open the umbrella."
+  },
+  {
+    "id": "1110",
+    "word": "utter",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Do not utter a word."
+  },
+  {
+    "id": "1111",
+    "word": "waffle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "Eat a waffle."
+  },
+  {
+    "id": "1112",
+    "word": "wiggle",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "Wiggle your toes."
+  },
+  {
+    "id": "1113",
+    "word": "willow",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 4,
+    "sentenceContext": "A willow tree."
+  },
+  {
+    "id": "1114",
+    "word": "yellow",
+    "phonicsGroup": "double-letters",
+    "difficultyLevel": 3,
+    "sentenceContext": "A yellow flower."
   }
 ]
