@@ -1,29 +1,26 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Switch } from "@/components/ui/switch";
-import { Header } from "@/components/Header";
 import { Word, UserProgress, PhonicsGroup, StruggleWord, WordResult } from "@/lib/types";
 import {
   AdaptiveSessionGenerator,
   calculateNewUserLevel,
 } from "@/lib/AdaptiveEngine";
-
-// Struggle word threshold constants
-const HESITATION_THRESHOLD = 1.5; // seconds
-const BACKSPACE_THRESHOLD = 3;
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
 import { Label } from "@/components/ui/label";
 import wordsData from "./words.json";
 
 import { LetterState } from "./types";
-import { AuthWall } from "./AuthWall";
 import { SentenceModeView } from "./SentenceModeView";
 import { SingleWordView } from "./SingleWordView";
 import { SessionComplete } from "./SessionComplete";
+
+// Struggle word threshold constants
+const HESITATION_THRESHOLD = 1.5; // seconds
+const BACKSPACE_THRESHOLD = 3;
 
 // Load words from JSON and transform to Word[] format
 const WORD_POOL: Word[] = wordsData.map(
@@ -42,22 +39,7 @@ const WORD_POOL: Word[] = wordsData.map(
   }),
 );
 
-export default function PracticePage() {
-  useSyncPlacementData();
-
-  return (
-    <>
-      <SignedOut>
-        <AuthWall />
-      </SignedOut>
-      <SignedIn>
-        <PracticeSession />
-      </SignedIn>
-    </>
-  );
-}
-
-function PracticeSession() {
+export function PracticeSession() {
   const { user } = useUser();
   const currentUser = useQuery(
     api.users.getCurrentUser,
@@ -367,17 +349,14 @@ function PracticeSession() {
   // Loading state - wait for user data and struggle words
   if (!currentUser || userStruggleWords === undefined || sessionWords.length === 0) {
     return (
-      <>
-        <Header />
-        <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
-          <div className="text-center">
-            <div className="text-6xl mb-4">⏳</div>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Loading your personalized session...
-            </p>
-          </div>
-        </main>
-      </>
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⏳</div>
+          <p className="text-xl text-gray-600 dark:text-gray-400">
+            Loading your personalized session...
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -394,79 +373,74 @@ function PracticeSession() {
 
   // Active session
   return (
-    <>
-      <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
-        <div className="max-w-4xl w-full">
-          {/* Header with level and mode toggle */}
-          <div className="mb-6 flex justify-between items-center">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-semibold">
-                Level {currentUser.stats.currentLevel.toFixed(1)}
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Label
-                  htmlFor="mode-toggle"
-                  className={`text-sm ${!sentenceMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
-                >
-                  Word
-                </Label>
-                <Switch
-                  checked={sentenceMode}
-                  onCheckedChange={setSentenceMode}
-                  id="mode-toggle"
-                />
-                <Label
-                  htmlFor="mode-toggle"
-                  className={`text-sm ${sentenceMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
-                >
-                  Sentence
-                </Label>
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {currentWordIndex + 1} / {sessionWords.length}
-              </div>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
-            <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{
-                width: `${((currentWordIndex + (userInput.length > 0 ? 0.5 : 0)) / sessionWords.length) * 100}%`,
-              }}
-            />
-          </div>
-
-          {/* Mode-specific view */}
-          {sentenceMode ? (
-            <SentenceModeView
-              words={sessionWords}
-              currentWordIndex={currentWordIndex}
-              userInput={userInput}
-              letterStates={letterStates}
-              results={results}
-              inputRef={inputRef}
-              onInputChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-            />
-          ) : (
-            <SingleWordView
-              currentWord={currentWord}
-              userInput={userInput}
-              letterStates={letterStates}
-              showFeedback={showFeedback}
-              inputRef={inputRef}
-              onInputChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              onSubmit={handleSubmitWord}
-            />
-          )}
+    <div className="max-w-4xl w-full mx-auto">
+      {/* Header with level and mode toggle */}
+      <div className="mb-6 flex justify-between items-center">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="font-semibold">
+            Level {currentUser.stats.currentLevel.toFixed(1)}
+          </span>
         </div>
-      </main>
-    </>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Label
+              htmlFor="mode-toggle"
+              className={`text-sm ${!sentenceMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+            >
+              Word
+            </Label>
+            <Switch
+              checked={sentenceMode}
+              onCheckedChange={setSentenceMode}
+              id="mode-toggle"
+            />
+            <Label
+              htmlFor="mode-toggle"
+              className={`text-sm ${sentenceMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+            >
+              Sentence
+            </Label>
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {currentWordIndex + 1} / {sessionWords.length}
+          </div>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
+        <div
+          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+          style={{
+            width: `${((currentWordIndex + (userInput.length > 0 ? 0.5 : 0)) / sessionWords.length) * 100}%`,
+          }}
+        />
+      </div>
+
+      {/* Mode-specific view */}
+      {sentenceMode ? (
+        <SentenceModeView
+          words={sessionWords}
+          currentWordIndex={currentWordIndex}
+          userInput={userInput}
+          letterStates={letterStates}
+          results={results}
+          inputRef={inputRef}
+          onInputChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+        />
+      ) : (
+        <SingleWordView
+          currentWord={currentWord}
+          userInput={userInput}
+          letterStates={letterStates}
+          showFeedback={showFeedback}
+          inputRef={inputRef}
+          onInputChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onSubmit={handleSubmitWord}
+        />
+      )}
+    </div>
   );
 }

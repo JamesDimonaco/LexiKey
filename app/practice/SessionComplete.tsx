@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { Header } from "@/components/Header";
-import { WordResult } from "./types";
+import { WordResult } from "@/lib/types";
+
+// Thresholds for determining struggle words (match practice page)
+const BACKSPACE_THRESHOLD = 3;
 
 type SessionCompleteProps = {
   results: WordResult[];
@@ -21,18 +24,12 @@ export function SessionComplete({
   const totalTime = Math.round(
     results.reduce((sum, r) => sum + r.timeSpent, 0),
   );
+  // Struggle words: hesitation OR too many backspaces
   const struggleWords = results.filter(
-    (r) =>
-      r.hesitationDetected ||
-      r.backspaceCount > 3 ||
-      !r.correct ||
-      r.correctionsMade > 2,
+    (r) => r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
   );
-  const avgLetterAccuracy = Math.round(
-    results.reduce((sum, r) => sum + r.letterAccuracy, 0) / results.length,
-  );
-  const totalCorrections = results.reduce(
-    (sum, r) => sum + r.correctionsMade,
+  const totalBackspaces = results.reduce(
+    (sum, r) => sum + r.backspaceCount,
     0,
   );
 
@@ -57,13 +54,8 @@ export function SessionComplete({
               wordsCount={results.length}
               accuracy={accuracy}
               totalTime={totalTime}
-              avgLetterAccuracy={avgLetterAccuracy}
+              totalBackspaces={totalBackspaces}
             />
-
-            {/* Corrections stat */}
-            {totalCorrections > 0 && (
-              <CorrectionsDisplay totalCorrections={totalCorrections} />
-            )}
 
             {/* Struggle words */}
             {struggleWords.length > 0 && (
@@ -133,12 +125,12 @@ function StatsGrid({
   wordsCount,
   accuracy,
   totalTime,
-  avgLetterAccuracy,
+  totalBackspaces,
 }: {
   wordsCount: number;
   accuracy: number;
   totalTime: number;
-  avgLetterAccuracy: number;
+  totalBackspaces: number;
 }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -158,8 +150,8 @@ function StatsGrid({
         colorClass="purple"
       />
       <StatCard
-        value={`${avgLetterAccuracy}%`}
-        label="First-Try"
+        value={totalBackspaces}
+        label="Backspaces"
         colorClass="yellow"
       />
     </div>
@@ -195,25 +187,6 @@ function StatCard({
   );
 }
 
-function CorrectionsDisplay({
-  totalCorrections,
-}: {
-  totalCorrections: number;
-}) {
-  return (
-    <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800 text-center">
-      <p className="text-lg">
-        <span className="font-bold text-orange-600 dark:text-orange-400">
-          {totalCorrections}
-        </span>
-        <span className="text-gray-600 dark:text-gray-400 ml-2">
-          corrections made (backspaced to fix mistakes)
-        </span>
-      </p>
-    </div>
-  );
-}
-
 function StruggleWordsDisplay({
   struggleWords,
 }: {
@@ -231,16 +204,16 @@ function StruggleWordsDisplay({
             className="px-3 py-1 bg-yellow-200 dark:bg-yellow-600/30 border border-yellow-300 dark:border-yellow-700 rounded-full text-sm font-mono text-yellow-900 dark:text-yellow-200"
           >
             {r.word}
-            {r.correctionsMade > 0 && (
+            {r.backspaceCount > BACKSPACE_THRESHOLD && (
               <span className="ml-1 text-xs text-yellow-600 dark:text-yellow-400">
-                ({r.correctionsMade} fixes)
+                ({r.backspaceCount} backspaces)
               </span>
             )}
           </span>
         ))}
       </div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
-        These words will be added to your review bucket for extra practice
+        These words have been added to your review bucket for extra practice
       </p>
     </div>
   );

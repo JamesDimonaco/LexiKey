@@ -5,26 +5,40 @@
  * Uses weighted probability buckets to balance new concepts, review, and confidence
  */
 
-import { Word, UserProgress, PhonicsGroup, WordStats } from "./types";
+import { Word, UserProgress, PhonicsGroup, StruggleWord } from "./types";
 import { posthog } from "@/components/PostHogProvider";
+
+/**
+ * Session configuration - easy to change these percentages
+ */
+export const SESSION_CONFIG = {
+  SIZE: 20,
+  STRUGGLE_PERCENT: 0.30,    // 30% struggle words
+  NEW_PERCENT: 0.50,         // 50% new concepts
+  CONFIDENCE_PERCENT: 0.20,  // 20% confidence boosters
+  STARTING_BOOSTERS: 2,      // Easy words at start for confidence
+};
 
 export class AdaptiveSessionGenerator {
   private allWords: Word[];
+  private userStruggleWords: StruggleWord[];
 
-  constructor(allWords: Word[]) {
+  constructor(allWords: Word[], userStruggleWords: StruggleWord[] = []) {
     this.allWords = allWords;
+    this.userStruggleWords = userStruggleWords;
   }
 
   /**
-   * Generates a 20-word session tailored to the user.
+   * Generates a personalized session tailored to the user.
    *
-   * Breakdown:
-   * - 30% Struggle words (recently missed or from struggle groups)
+   * Breakdown (configurable via SESSION_CONFIG):
+   * - 30% Struggle words (from bucket or struggle groups)
    * - 50% New concepts (at current level +/- 1)
-   * - 20% Confidence boosters (easy mastered words)
+   * - 20% Confidence boosters (easy words)
    */
   public generateSession(user: UserProgress): Word[] {
-    const SESSION_SIZE = 20;
+    const { SIZE, STRUGGLE_PERCENT, NEW_PERCENT, STARTING_BOOSTERS } = SESSION_CONFIG;
+
     const maxAvailableDifficulty = Math.max(
       ...this.allWords.map((w) => w.difficulty),
     );
@@ -43,44 +57,38 @@ export class AdaptiveSessionGenerator {
       });
     }
 
-    console.log("Generating session for user:", user);
-    console.log(
-      `Max word difficulty: ${maxAvailableDifficulty}, User level: ${user.currentLevel}`,
-    );
-
     // Bucket sizes
-    const struggleCount = Math.floor(SESSION_SIZE * 0.3); // 6 words
-    const newConceptCount = Math.floor(SESSION_SIZE * 0.5); // 10 words
-    const confidenceCount = SESSION_SIZE - struggleCount - newConceptCount; // 4 words
+    const struggleCount = Math.floor(SIZE * STRUGGLE_PERCENT);
+    const newConceptCount = Math.floor(SIZE * NEW_PERCENT);
+    const confidenceCount = SIZE - struggleCount - newConceptCount;
 
     const sessionWords: Word[] = [];
+    const usedWords = new Set<string>(); // Track words to prevent duplicates
 
     // 1. FILL STRUGGLE BUCKET (30%)
-    const struggleWords = this.getStruggleWords(user, struggleCount);
+    const struggleWords = this.getStruggleWords(user, struggleCount, usedWords);
     sessionWords.push(...struggleWords);
+    struggleWords.forEach(w => usedWords.add(w.text));
 
     // 2. FILL NEW CONCEPT BUCKET (50%)
-    const newWords = this.getNewWords(user, newConceptCount, sessionWords);
+    const newWords = this.getNewWords(user, newConceptCount, usedWords);
     sessionWords.push(...newWords);
+    newWords.forEach(w => usedWords.add(w.text));
 
     // 3. FILL CONFIDENCE BUCKET (20%)
-    const easyWords = this.getConfidenceBoosters(
-      user,
-      confidenceCount,
-      sessionWords,
-    );
+    const easyWords = this.getConfidenceBoosters(user, confidenceCount, usedWords);
 
-    // Start with 2 confidence boosters (don't shuffle these)
-    const startingBoost = easyWords.slice(0, 2);
-    const remainingEasy = easyWords.slice(2);
+    // Start with confidence boosters (don't shuffle these)
+    const startingBoost = easyWords.slice(0, STARTING_BOOSTERS);
+    const remainingEasy = easyWords.slice(STARTING_BOOSTERS);
 
-    // Shuffle everything except the first 2 confidence boosters
+    // Shuffle everything except the starting confidence boosters
     const shuffled = this.shuffle([
       ...remainingEasy,
       ...newWords,
       ...struggleWords,
     ]);
-    console.log("Shuffled words:", shuffled);
+
     return [...startingBoost, ...shuffled];
   }
 
@@ -96,7 +104,7 @@ export class AdaptiveSessionGenerator {
     // Map generic categories to their prefixes/patterns in words.json
     const groupPatterns: Record<PhonicsGroup, string[]> = {
       cvc: ["cvc-"],
-      "silent-e": ["silent-"], // Matches "silent-e", "silent-gh", "silent-kn", "silent-wr", etc.
+      "silent-e": ["silent-"],
       digraphs: ["digraph-"],
       blends: ["blends-", "end-blends-"],
       "vowel-teams": ["vowel-team-"],
@@ -109,50 +117,58 @@ export class AdaptiveSessionGenerator {
     const patterns = groupPatterns[struggleGroup];
     if (!patterns) return false;
 
-    // Check if word's phonicsGroup matches any pattern
     return patterns.some((pattern) => wordPhonicsGroup.startsWith(pattern));
   }
 
   /**
-   * Find words user failed recently or from struggle phonics groups
+   * Find struggle words from the user's bucket first, then from struggle groups
    */
-  private getStruggleWords(user: UserProgress, count: number): Word[] {
-    // Get words with low accuracy (<70%)
-    const missedWordIds = Object.entries(user.wordHistory)
-      .filter(([, stats]) => {
-        if (stats.timesSeen === 0) return false;
-        const accuracy = stats.timesCorrect / stats.timesSeen;
-        return accuracy < 0.7;
-      })
-      .sort((a, b) => b[1].lastSeenAt - a[1].lastSeenAt) // Most recent first
-      .map(([id]) => id);
+  private getStruggleWords(
+    user: UserProgress,
+    count: number,
+    usedWords: Set<string>,
+  ): Word[] {
+    const result: Word[] = [];
 
-    // Also include words from struggle phonics groups
-    const groupWords = this.allWords.filter(
-      (w) =>
-        user.struggleGroups.some((group) =>
-          this.matchesStruggleGroup(w.phonicsGroup, group),
-        ) && !missedWordIds.includes(w.id),
+    // Priority 1: Words from the struggle bucket (these are real struggles)
+    const bucketWordTexts = new Set(this.userStruggleWords.map((sw) => sw.word));
+    const bucketWords = this.allWords.filter(
+      (w) => bucketWordTexts.has(w.text) && !usedWords.has(w.text)
     );
 
-    const pool = [
-      ...this.allWords.filter((w) => missedWordIds.includes(w.id)),
-      ...groupWords,
-    ];
+    // Sort by consecutiveCorrect (prioritize words with 0 over 1-2)
+    bucketWords.sort((a, b) => {
+      const aProgress = this.userStruggleWords.find((sw) => sw.word === a.text)?.consecutiveCorrect ?? 0;
+      const bProgress = this.userStruggleWords.find((sw) => sw.word === b.text)?.consecutiveCorrect ?? 0;
+      return aProgress - bProgress; // Lower progress = higher priority
+    });
 
-    return pool.slice(0, count);
+    result.push(...bucketWords.slice(0, count));
+
+    // Priority 2: If we need more, get words from struggle phonics groups
+    if (result.length < count && user.struggleGroups.length > 0) {
+      const groupWords = this.allWords.filter(
+        (w) =>
+          !usedWords.has(w.text) &&
+          !result.some((r) => r.id === w.id) &&
+          user.struggleGroups.some((group) =>
+            this.matchesStruggleGroup(w.phonicsGroup, group)
+          )
+      );
+      result.push(...groupWords.slice(0, count - result.length));
+    }
+
+    return result;
   }
 
   /**
-   * Find words at user's current level that haven't been seen much
+   * Find words at user's current level (variety each session)
    */
   private getNewWords(
     user: UserProgress,
     count: number,
-    exclude: Word[],
+    usedWords: Set<string>,
   ): Word[] {
-    const excludeIds = new Set(exclude.map((w) => w.id));
-
     // Find the max difficulty available in the word pool
     const maxAvailableDifficulty = Math.max(
       ...this.allWords.map((w) => w.difficulty),
@@ -161,55 +177,38 @@ export class AdaptiveSessionGenerator {
     // Cap user level at max available difficulty for filtering
     const effectiveLevel = Math.min(user.currentLevel, maxAvailableDifficulty);
 
+    // Get words at current level that aren't already used
     const pool = this.allWords.filter((w) => {
-      if (excludeIds.has(w.id)) return false;
-
+      if (usedWords.has(w.text)) return false;
       const diffGap = Math.abs(w.difficulty - effectiveLevel);
-      const history = user.wordHistory[w.id];
-
-      // Prioritize unseen or rarely seen words
-      const isNew = !history || history.timesSeen < 3;
-
-      // Allow words within +/- 1 level
-      return diffGap <= 1 && isNew;
+      return diffGap <= 1; // Allow words within +/- 1 level
     });
 
-    // Sort by least seen
-    pool.sort((a, b) => {
-      const aCount = user.wordHistory[a.id]?.timesSeen || 0;
-      const bCount = user.wordHistory[b.id]?.timesSeen || 0;
-      return aCount - bCount;
-    });
+    // Shuffle to get variety each session
+    const shuffled = this.shuffle(pool);
 
-    // If still no words found (all seen 3+ times), relax the "new" constraint
-    if (pool.length === 0) {
-      const fallbackPool = this.allWords
-        .filter((w) => {
-          if (excludeIds.has(w.id)) return false;
-          const diffGap = Math.abs(w.difficulty - effectiveLevel);
-          return diffGap <= 2; // Widen the range slightly
-        })
-        .sort((a, b) => {
-          const aCount = user.wordHistory[a.id]?.timesSeen || 0;
-          const bCount = user.wordHistory[b.id]?.timesSeen || 0;
-          return aCount - bCount;
-        });
-      return fallbackPool.slice(0, count);
+    // If not enough words at level, widen the range
+    if (shuffled.length < count) {
+      const fallbackPool = this.allWords.filter((w) => {
+        if (usedWords.has(w.text)) return false;
+        if (shuffled.some((s) => s.id === w.id)) return false;
+        const diffGap = Math.abs(w.difficulty - effectiveLevel);
+        return diffGap <= 2; // Widen the range
+      });
+      return [...shuffled, ...this.shuffle(fallbackPool)].slice(0, count);
     }
 
-    return pool.slice(0, count);
+    return shuffled.slice(0, count);
   }
 
   /**
-   * Find easy words with high accuracy (>90%) for confidence
+   * Find easy words for confidence boosting at session start
    */
   private getConfidenceBoosters(
     user: UserProgress,
     count: number,
-    exclude: Word[],
+    usedWords: Set<string>,
   ): Word[] {
-    const excludeIds = new Set(exclude.map((w) => w.id));
-
     // Find the max difficulty available in the word pool
     const maxAvailableDifficulty = Math.max(
       ...this.allWords.map((w) => w.difficulty),
@@ -218,28 +217,18 @@ export class AdaptiveSessionGenerator {
     // Cap user level at max available difficulty
     const effectiveLevel = Math.min(user.currentLevel, maxAvailableDifficulty);
 
+    // Get easy words (below user level) that aren't struggle words
+    const struggleWordTexts = new Set(this.userStruggleWords.map((sw) => sw.word));
+
     const pool = this.allWords.filter((w) => {
-      if (excludeIds.has(w.id)) return false;
-
-      const history = user.wordHistory[w.id];
-      if (!history || history.timesSeen < 2) return false;
-
-      const accuracy = history.timesCorrect / history.timesSeen;
-      const isMastered = accuracy > 0.9 && history.consecutiveCorrect >= 2;
-      const isEasy = w.difficulty < effectiveLevel;
-
-      return isMastered && isEasy;
+      if (usedWords.has(w.text)) return false;
+      if (struggleWordTexts.has(w.text)) return false; // Don't use struggle words as boosters
+      return w.difficulty < effectiveLevel || w.difficulty <= 2;
     });
 
-    // Fallback: if no mastered words, just get easiest words
-    if (pool.length < count) {
-      const fallbackPool = this.allWords
-        .filter((w) => !excludeIds.has(w.id) && w.difficulty <= 2)
-        .sort((a, b) => a.difficulty - b.difficulty);
-      return [...pool, ...fallbackPool].slice(0, count);
-    }
-
-    return pool.slice(0, count);
+    // Shuffle and return
+    const shuffled = this.shuffle(pool);
+    return shuffled.slice(0, count);
   }
 
   /**
@@ -309,61 +298,3 @@ export function calculateNewUserLevel(
   return Math.min(Math.max(newLevel, 1), 10);
 }
 
-/**
- * Map specific phonicsGroup values from words.json to generic PhonicsGroup categories
- */
-function mapToGenericPhonicsGroup(specificGroup: string): PhonicsGroup | null {
-  if (specificGroup.startsWith("cvc-")) return "cvc";
-  if (specificGroup.startsWith("silent-")) return "silent-e"; // All silent patterns map to silent-e
-  if (specificGroup.startsWith("digraph-")) return "digraphs";
-  if (
-    specificGroup.startsWith("blends-") ||
-    specificGroup.startsWith("end-blends-")
-  )
-    return "blends";
-  if (specificGroup.startsWith("vowel-team-")) return "vowel-teams";
-  if (specificGroup.startsWith("r-controlled-")) return "r-controlled";
-  if (specificGroup.startsWith("diphthong-")) return "diphthongs";
-  if (specificGroup.startsWith("reversal-")) return "reversals";
-  if (specificGroup.startsWith("multi-syllable")) return "multi-syllable";
-  // Patterns like "glued-*", "soft-*", "trigraph-*", "welded-*", "ending-*", "suffix-*"
-  // don't map to PhonicsGroup types and will return null (excluded from struggle group detection)
-  return null;
-}
-
-/**
- * Detect struggle groups based on word history
- * Aggregates specific phonicsGroup values (e.g., "cvc-short-a") into generic categories (e.g., "cvc")
- */
-export function detectStruggleGroups(
-  allWords: Word[],
-  wordHistory: Record<string, WordStats>,
-): PhonicsGroup[] {
-  const groupAccuracy: Record<
-    PhonicsGroup,
-    { correct: number; total: number }
-  > = {} as Record<PhonicsGroup, { correct: number; total: number }>;
-
-  Object.entries(wordHistory).forEach(([wordId, stats]) => {
-    const word = allWords.find((w) => w.id === wordId);
-    if (!word) return;
-
-    const genericGroup = mapToGenericPhonicsGroup(word.phonicsGroup);
-    if (!genericGroup) return;
-
-    if (!groupAccuracy[genericGroup]) {
-      groupAccuracy[genericGroup] = { correct: 0, total: 0 };
-    }
-
-    groupAccuracy[genericGroup].correct += stats.timesCorrect;
-    groupAccuracy[genericGroup].total += stats.timesSeen;
-  });
-
-  // Return groups with <70% accuracy AND at least 5 attempts
-  return Object.entries(groupAccuracy)
-    .filter(([, stats]) => {
-      const accuracy = stats.correct / stats.total;
-      return stats.total >= 5 && accuracy < 0.7;
-    })
-    .map(([group]) => group as PhonicsGroup);
-}

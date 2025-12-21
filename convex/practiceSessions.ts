@@ -65,7 +65,6 @@ export const getSessionsByMode = query({
     mode: v.union(
       v.literal("lesson"),
       v.literal("practice"),
-      v.literal("assignment"),
       v.literal("review")
     ),
     limit: v.optional(v.number()),
@@ -218,21 +217,19 @@ export const createPracticeSession = mutation({
     mode: v.union(
       v.literal("lesson"),
       v.literal("practice"),
-      v.literal("assignment"),
       v.literal("review")
     ),
     phonicsGroupFocus: v.optional(v.string()),
-    assignmentId: v.optional(v.id("assignments")),
     wordsAttempted: v.number(),
     wordsCompleted: v.number(),
     accuracy: v.number(),
     averageWPM: v.optional(v.number()),
     durationSeconds: v.number(),
-    struggleWords: v.array(v.id("wordLibrary")),
+    struggleWords: v.array(v.string()), // Word texts (not IDs)
     wordResults: v.array(
       v.object({
-        wordId: v.id("wordLibrary"),
         word: v.string(),
+        phonicsGroup: v.string(),
         timeSpent: v.number(),
         backspaceCount: v.number(),
         wasCorrect: v.boolean(),

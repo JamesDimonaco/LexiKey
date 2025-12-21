@@ -21,45 +21,6 @@ export interface AccessibilitySettings {
   blindMode: boolean; // Hide text to force muscle memory
 }
 
-// Typing Session Types
-export interface TypingWord {
-  id: string;
-  word: string;
-  phonicsGroup: string;
-  difficultyLevel: number;
-  sentenceContext?: string;
-}
-
-export interface KeystrokeData {
-  char: string;
-  isCorrect: boolean;
-  timestamp: number;
-  hesitationTime: number; // Time since last keystroke
-  backspaceUsed: boolean;
-}
-
-export interface WordResult {
-  wordId: string;
-  word: string;
-  isCorrect: boolean;
-  timeSpent: number; // in seconds
-  keystrokeCount: number;
-  backspaceCount: number;
-  hesitated: boolean; // > 1.5s pause
-  timestamp: number;
-}
-
-export interface PracticeSession {
-  userId: string;
-  mode: "lesson" | "practice" | "assignment";
-  phonicsGroupFocus?: string;
-  wordsAttempted: number;
-  accuracy: number; // percentage
-  durationSeconds: number;
-  struggleWords: string[]; // word IDs
-  completedAt: number;
-}
-
 // Adaptive Learning Types
 export type PhonicsGroup =
   | "cvc"
@@ -80,21 +41,31 @@ export interface Word {
   sentenceContext?: string;
 }
 
-export interface WordStats {
-  timesSeen: number;
-  timesCorrect: number;
-  lastSeenAt: number; // Timestamp
-  consecutiveCorrect: number; // For "mastery" tracking
-  avgTimeSpent: number; // Average milliseconds per attempt
-  totalBackspaces: number;
+// Struggle word from DB bucket
+export interface StruggleWord {
+  word: string;
+  phonicsGroup: string;
+  consecutiveCorrect: number; // 0-3, graduates at 3
 }
 
+// Result for a single word in a practice session
+export interface WordResult {
+  wordId: string;
+  word: string;
+  phonicsGroup: string;
+  correct: boolean;
+  timeSpent: number; // in seconds
+  backspaceCount: number;
+  hesitationDetected: boolean; // >1.5s to type the word
+}
+
+// User's adaptive learning progress
 export interface UserProgress {
   userId: string;
   currentLevel: number; // 1-10, can be decimal like 3.5
   hasCompletedPlacementTest: boolean;
   struggleGroups: PhonicsGroup[];
-  wordHistory: Record<string, WordStats>; // Map of WordID -> Stats
+  struggleWords: StruggleWord[]; // Words in the struggle bucket
 }
 
 export interface PlacementTestResult {
