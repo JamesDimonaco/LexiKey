@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Word, WordResult } from "@/lib/types";
 import { LetterState } from "./types";
 
@@ -24,8 +25,34 @@ export function SentenceModeView({
   onInputChange,
   onKeyDown,
 }: SentenceModeViewProps) {
+  const [isFocused, setIsFocused] = useState(true);
+
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+  const handleContainerClick = () => inputRef.current?.focus();
+
   return (
-    <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+    <div
+      className={`
+        relative bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border transition-all cursor-text
+        ${isFocused
+          ? "border-gray-200 dark:border-gray-800"
+          : "border-gray-300 dark:border-gray-700"
+        }
+      `}
+      onClick={handleContainerClick}
+    >
+      {/* Unfocused overlay */}
+      {!isFocused && (
+        <div className="absolute inset-0 bg-gray-500/10 dark:bg-gray-900/50 rounded-lg flex items-center justify-center z-10">
+          <div className="bg-white dark:bg-gray-800 px-6 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <p className="text-gray-700 dark:text-gray-300 font-medium">
+              Click to continue typing
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* All words display */}
       <div className="flex flex-wrap gap-x-4 gap-y-3 mb-8 justify-center">
         {words.map((word, wordIdx) => {
@@ -65,6 +92,8 @@ export function SentenceModeView({
         value={userInput}
         onChange={onInputChange}
         onKeyDown={onKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         autoFocus
         className="sr-only"
         aria-label="Type the highlighted word"
@@ -72,15 +101,8 @@ export function SentenceModeView({
 
       {/* Instructions */}
       <p className="text-center text-sm text-gray-500 dark:text-gray-500">
-        Type the highlighted word • Press Space to advance • Click anywhere to
-        focus
+        Type the highlighted word • Press Space to advance
       </p>
-
-      {/* Click to focus overlay */}
-      <div
-        className="fixed inset-0 -z-10"
-        onClick={() => inputRef.current?.focus()}
-      />
     </div>
   );
 }

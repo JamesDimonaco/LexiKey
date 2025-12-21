@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Header } from "@/components/Header";
 import { WordResult } from "@/lib/types";
 
 // Thresholds for determining struggle words (match practice page)
@@ -34,53 +33,45 @@ export function SessionComplete({
   );
 
   return (
-    <>
-      <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col items-center justify-center">
-        <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
-          <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
-            Session Complete!
-          </h1>
+    <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+      <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
+        Session Complete!
+      </h1>
 
-          <div className="space-y-6">
-            {/* Level Display */}
-            <LevelDisplay
-              currentLevel={currentLevel}
-              accuracy={accuracy}
-            />
+      <div className="space-y-6">
+        {/* Level Display */}
+        <LevelDisplay currentLevel={currentLevel} accuracy={accuracy} />
 
-            {/* Stats Grid */}
-            <StatsGrid
-              wordsCount={results.length}
-              accuracy={accuracy}
-              totalTime={totalTime}
-              totalBackspaces={totalBackspaces}
-            />
+        {/* Stats Grid */}
+        <StatsGrid
+          wordsCount={results.length}
+          accuracy={accuracy}
+          totalTime={totalTime}
+          totalBackspaces={totalBackspaces}
+        />
 
-            {/* Struggle words */}
-            {struggleWords.length > 0 && (
-              <StruggleWordsDisplay struggleWords={struggleWords} />
-            )}
+        {/* Struggle words */}
+        {struggleWords.length > 0 && (
+          <StruggleWordsDisplay struggleWords={struggleWords} />
+        )}
 
-            {/* Actions */}
-            <div className="flex gap-4">
-              <button
-                onClick={onRestart}
-                className="flex-1 py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Practice Again
-              </button>
-              <Link
-                href="/"
-                className="flex-1 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-              >
-                Home
-              </Link>
-            </div>
-          </div>
+        {/* Actions */}
+        <div className="flex gap-4">
+          <button
+            onClick={onRestart}
+            className="flex-1 py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Practice Again
+          </button>
+          <Link
+            href="/"
+            className="flex-1 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            Home
+          </Link>
         </div>
-      </main>
-    </>
+      </div>
+    </div>
   );
 }
 

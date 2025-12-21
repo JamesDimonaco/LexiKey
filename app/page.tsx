@@ -5,27 +5,28 @@ import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { PracticeSession } from "./practice/PracticeSession";
+import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
 
 export default function Home() {
+  useSyncPlacementData();
+
   return (
     <>
       <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8 flex flex-col gap-8">
-        <div className="max-w-4xl mx-auto w-full">
-          <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold mb-4 text-black dark:text-white">LexiKey</h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Kinesthetic Literacy & Typing for Dyslexic Students
-            </p>
-          </div>
-          <Content />
-        </div>
+      <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
+        <SignedOut>
+          <LandingContent />
+        </SignedOut>
+        <SignedIn>
+          <AuthenticatedContent />
+        </SignedIn>
       </main>
     </>
   );
 }
 
-function Content() {
+function AuthenticatedContent() {
   const { user } = useUser();
   const currentUser = useQuery(
     api.users.getCurrentUser,
@@ -34,8 +35,52 @@ function Content() {
 
   const hasCompletedPlacementTest = currentUser?.stats.hasCompletedPlacementTest ?? false;
 
+  // Show placement test prompt if not completed
+  if (currentUser && !hasCompletedPlacementTest) {
+    return (
+      <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 text-center">
+          <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
+            Welcome to LexiKey!
+          </h2>
+          <p className="text-gray-700 dark:text-gray-400 mb-6">
+            Take a quick placement test to personalize your learning experience.
+          </p>
+          <Link
+            href="/placement-test"
+            className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Take Placement Test
+          </Link>
+          <button
+            onClick={() => {/* Skip for now - they can start practicing */}}
+            className="mt-4 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          >
+            <Link href="/practice">Skip for now</Link>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show practice session directly
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col items-center justify-center">
+      <PracticeSession />
+    </div>
+  );
+}
+
+function LandingContent() {
+  return (
+    <div className="max-w-4xl mx-auto w-full flex flex-col gap-8">
+      <div className="text-center mb-8">
+        <h1 className="text-5xl font-bold mb-4 text-black dark:text-white">LexiKey</h1>
+        <p className="text-xl text-gray-600 dark:text-gray-400">
+          Kinesthetic Literacy & Typing for Dyslexic Students
+        </p>
+      </div>
+
       <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
         <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">Welcome to LexiKey!</h2>
         <p className="text-gray-700 dark:text-gray-400 mb-6">
@@ -45,53 +90,11 @@ function Content() {
         </p>
 
         <div className="space-y-4">
-          {/* Primary CTA - changes based on placement test status */}
-          {!hasCompletedPlacementTest ? (
-            <Link
-              href="/placement-test"
-              className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Take Placement Test →
-            </Link>
-          ) : (
-            <SignedIn>
-              <Link
-                href="/practice"
-                className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Start Practice →
-              </Link>
-            </SignedIn>
-          )}
-
-          {/* Secondary CTA */}
-          {hasCompletedPlacementTest ? (
-            <Link
-              href="/placement-test"
-              className="block w-full py-2 text-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Retake Placement Test
-            </Link>
-          ) : (
-            <>
-              <SignedIn>
-                <Link
-                  href="/practice"
-                  className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Start Practice
-                </Link>
-              </SignedIn>
-
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <button className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                    Sign In to Practice
-                  </button>
-                </SignInButton>
-              </SignedOut>
-            </>
-          )}
+          <SignInButton mode="modal">
+            <button className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+              Get Started
+            </button>
+          </SignInButton>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <FeatureCard

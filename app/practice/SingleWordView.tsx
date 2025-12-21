@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Word } from "@/lib/types";
 import { LetterState } from "./types";
 
@@ -24,8 +25,33 @@ export function SingleWordView({
   onKeyDown,
   onSubmit,
 }: SingleWordViewProps) {
+  const [isFocused, setIsFocused] = useState(true);
+
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+  const handleContainerClick = () => inputRef.current?.focus();
+
   return (
-    <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+    <div
+      className={`
+        relative bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border transition-all
+        ${isFocused
+          ? "border-gray-200 dark:border-gray-800"
+          : "border-gray-300 dark:border-gray-700"
+        }
+      `}
+      onClick={handleContainerClick}
+    >
+      {/* Unfocused overlay */}
+      {!isFocused && (
+        <div className="absolute inset-0 bg-gray-500/10 dark:bg-gray-900/50 rounded-lg flex items-center justify-center z-10 cursor-pointer">
+          <div className="bg-white dark:bg-gray-800 px-6 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <p className="text-gray-700 dark:text-gray-300 font-medium">
+              Click to continue typing
+            </p>
+          </div>
+        </div>
+      )}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold mb-2 text-black dark:text-white">
           Practice Session
@@ -89,6 +115,8 @@ export function SingleWordView({
           value={userInput}
           onChange={onInputChange}
           onKeyDown={onKeyDown}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           placeholder="Type the word here..."
           autoFocus
           className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
