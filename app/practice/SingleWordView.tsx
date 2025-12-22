@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Word } from "@/lib/types";
 import { LetterState } from "./types";
 import { RevealButton } from "./RevealButton";
+import { RevealState } from "@/hooks/useReveal";
 
 type SingleWordViewProps = {
   currentWord: Word;
@@ -19,10 +20,7 @@ type SingleWordViewProps = {
   showHints?: boolean;
   // Dictation mode props
   dictationMode?: boolean;
-  wordRevealed?: boolean;
-  revealTimeRemaining?: number | null;
-  revealCount?: number;
-  onReveal?: () => void;
+  reveal: RevealState & { toggle: () => void };
   onRepeat?: () => void;
 };
 
@@ -38,10 +36,7 @@ export function SingleWordView({
   blindMode = false,
   showHints = false,
   dictationMode = false,
-  wordRevealed = false,
-  revealTimeRemaining = null,
-  revealCount = 0,
-  onReveal,
+  reveal,
   onRepeat,
 }: SingleWordViewProps) {
   const [isFocused, setIsFocused] = useState(true);
@@ -49,6 +44,13 @@ export function SingleWordView({
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
   const handleContainerClick = () => inputRef.current?.focus();
+
+  // Focus input when word becomes hidden (after reveal toggle)
+  useEffect(() => {
+    if (dictationMode && !reveal.isRevealed) {
+      inputRef.current?.focus();
+    }
+  }, [dictationMode, reveal.isRevealed]);
 
   return (
     <div
@@ -96,7 +98,7 @@ export function SingleWordView({
 
             // Determine what character to display
             let displayChar = char;
-            if (dictationMode && !wordRevealed) {
+            if (dictationMode && !reveal.isRevealed) {
               // In dictation mode: show typed char or "?" for untyped
               displayChar = typedChar !== undefined ? typedChar : "?";
             } else if (blindMode && typedChar !== undefined) {
@@ -107,10 +109,10 @@ export function SingleWordView({
             let colorClass = "text-gray-400 dark:text-gray-600"; // Default for "?" untyped
 
             if (typedChar !== undefined) {
-              if (blindMode || (dictationMode && !wordRevealed)) {
+              if (blindMode || (dictationMode && !reveal.isRevealed)) {
                 // In blind mode or dictation mode (not revealed), show neutral color
                 colorClass = "text-blue-500 dark:text-blue-400";
-              } else if (dictationMode && wordRevealed) {
+              } else if (dictationMode && reveal.isRevealed) {
                 // Revealed in dictation mode - still neutral while typing
                 colorClass = "text-blue-500 dark:text-blue-400";
               } else if (typedChar.toLowerCase() === char.toLowerCase()) {
@@ -118,7 +120,7 @@ export function SingleWordView({
               } else {
                 colorClass = "text-red-500 dark:text-red-400";
               }
-            } else if (!dictationMode || wordRevealed) {
+            } else if (!dictationMode || reveal.isRevealed) {
               // Untyped characters in normal mode or revealed dictation
               colorClass = "text-gray-800 dark:text-gray-200";
             }
@@ -162,11 +164,14 @@ export function SingleWordView({
             Repeat
           </button>
           <RevealButton
-            wordRevealed={wordRevealed}
-            revealTimeRemaining={revealTimeRemaining}
-            revealCount={revealCount}
-            onReveal={() => onReveal?.()}
-            onRefocus={() => inputRef.current?.focus()}
+            isRevealed={reveal.isRevealed}
+            isPermanent={reveal.isPermanent}
+            progress={reveal.progress}
+            nextDuration={reveal.nextDuration}
+            onToggle={() => {
+              reveal.toggle();
+              inputRef.current?.focus();
+            }}
           />
         </div>
       )}
@@ -183,16 +188,16 @@ export function SingleWordView({
           onBlur={handleBlur}
           placeholder={dictationMode ? "Type what you hear..." : "Type the word here..."}
           autoFocus
-          disabled={dictationMode && wordRevealed}
+          disabled={dictationMode && reveal.isRevealed}
           className={`w-full px-6 py-4 text-2xl text-center border-2 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono ${
-            dictationMode && wordRevealed
+            dictationMode && reveal.isRevealed
               ? "border-gray-200 dark:border-gray-800 opacity-50 cursor-not-allowed"
               : "border-gray-300 dark:border-gray-700"
           }`}
         />
         <p className="text-center text-sm text-gray-500 dark:text-gray-500 mt-2">
           {dictationMode
-            ? wordRevealed
+            ? reveal.isRevealed
               ? "Hide the word to continue typing"
               : "Listen and type • Press Space or Enter to continue"
             : "Press Space or Enter to continue"

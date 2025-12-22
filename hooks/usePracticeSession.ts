@@ -5,6 +5,7 @@ import { Word, UserProgress, PhonicsGroup, StruggleWord, WordResult } from "@/li
 import { AdaptiveSessionGenerator, calculateNewUserLevel, SessionOptions } from "@/lib/AdaptiveEngine";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useTTS } from "./useTTS";
+import { useReveal } from "./useReveal";
 import { LetterState } from "@/app/practice/types";
 import wordsData from "@/app/practice/words.json";
 
@@ -71,31 +72,18 @@ export function usePracticeSession({
   // Feedback state
   const [showFeedback, setShowFeedback] = useState<"correct" | "incorrect" | null>(null);
 
-  // Timed reveal state
-  const [revealCount, setRevealCount] = useState(0); // 0, 1, 2, 3+ for permanent
-  const [revealTimeRemaining, setRevealTimeRemaining] = useState<number | null>(null); // ms remaining, null = hidden
-  const revealTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Derived: word is revealed if there's time remaining or it's permanent (revealCount >= 3)
-  const wordRevealed = revealTimeRemaining !== null;
-
   const inputRef = useRef<HTMLInputElement>(null);
   const lastSpokenWordIdRef = useRef<string>("");
 
   const currentWord = sessionWords[currentWordIndex];
 
+  // Reveal state (extracted to dedicated hook)
+  const reveal = useReveal(currentWord?.id);
+
   // Speak word when it changes (only in dictation/Listen mode)
   useEffect(() => {
     if (!currentWord || !settings.dictationMode || !settings.ttsEnabled) return;
     if (lastSpokenWordIdRef.current === currentWord.id) return;
-
-    // Reset reveal state for new word
-    setRevealCount(0);
-    setRevealTimeRemaining(null);
-    if (revealTimerRef.current) {
-      clearInterval(revealTimerRef.current);
-      revealTimerRef.current = null;
-    }
 
     const timer = setTimeout(() => {
       lastSpokenWordIdRef.current = currentWord.id;
@@ -104,37 +92,6 @@ export function usePracticeSession({
 
     return () => clearTimeout(timer);
   }, [currentWord?.id, settings.dictationMode, settings.ttsEnabled, speakWord]);
-
-  // Timer countdown for timed reveal
-  useEffect(() => {
-    if (revealTimeRemaining === null || revealTimeRemaining === -1) {
-      // Not revealed or permanent - no timer needed
-      if (revealTimerRef.current) {
-        clearInterval(revealTimerRef.current);
-        revealTimerRef.current = null;
-      }
-      return;
-    }
-
-    // Start countdown timer
-    revealTimerRef.current = setInterval(() => {
-      setRevealTimeRemaining((prev) => {
-        if (prev === null || prev === -1) return prev;
-        const newTime = prev - 50; // Update every 50ms for smooth animation
-        if (newTime <= 0) {
-          return null; // Time's up, hide the word
-        }
-        return newTime;
-      });
-    }, 50);
-
-    return () => {
-      if (revealTimerRef.current) {
-        clearInterval(revealTimerRef.current);
-        revealTimerRef.current = null;
-      }
-    };
-  }, [revealTimeRemaining === null, revealTimeRemaining === -1]);
 
   // Generate adaptive session when user data loads
   useEffect(() => {
@@ -348,14 +305,8 @@ export function usePracticeSession({
     setBackspaceCount(0);
     setCorrectionsMade(0);
     setShowFeedback(null);
-    // Reset reveal state
-    setRevealCount(0);
-    setRevealTimeRemaining(null);
-    if (revealTimerRef.current) {
-      clearInterval(revealTimerRef.current);
-      revealTimerRef.current = null;
-    }
-  }, []);
+    reveal.reset();
+  }, [reveal]);
 
   // Restart session (generates new words)
   const restartSession = useCallback(() => {
@@ -385,35 +336,6 @@ export function usePracticeSession({
   }, [settings.ttsEnabled, updateSettings, resetSessionState]);
 
   // Dictation handlers
-  const handleReveal = useCallback(() => {
-    if (wordRevealed) {
-      // Currently revealed - hide it
-      setRevealTimeRemaining(null);
-      if (revealTimerRef.current) {
-        clearInterval(revealTimerRef.current);
-        revealTimerRef.current = null;
-      }
-    } else {
-      // Currently hidden - reveal with timed duration
-      const newCount = revealCount + 1;
-      setRevealCount(newCount);
-
-      if (newCount >= 3) {
-        // 3rd+ time: permanent reveal
-        setRevealTimeRemaining(-1);
-      } else {
-        // 1st time: 1s, 2nd time: 2s
-        setRevealTimeRemaining(newCount * 1000);
-      }
-    }
-  }, [wordRevealed, revealCount]);
-
-  // Get reveal duration info for UI
-  const getRevealDuration = useCallback(() => {
-    if (revealCount >= 2) return null; // Will be permanent next time
-    return (revealCount + 1) * 1000; // Next duration in ms
-  }, [revealCount]);
-
   const handleRepeat = useCallback(() => {
     if (currentWord) speakWord(currentWord.text);
   }, [currentWord, speakWord]);
@@ -437,9 +359,7 @@ export function usePracticeSession({
     sentenceMode,
     letterStates,
     showFeedback,
-    wordRevealed,
-    revealTimeRemaining,
-    revealCount,
+    reveal, // Reveal state object from useReveal hook
     inputRef,
     // Handlers
     handleInputChange,
@@ -448,10 +368,8 @@ export function usePracticeSession({
     restartSession,
     refreshSession,
     handleDictationToggle,
-    handleReveal,
     handleRepeat,
     setSentenceMode,
-    getRevealDuration,
   };
 }
 

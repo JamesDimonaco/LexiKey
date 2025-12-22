@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Word, WordResult } from "@/lib/types";
 import { LetterState } from "./types";
 import { RevealButton } from "./RevealButton";
+import { RevealState } from "@/hooks/useReveal";
 
 type SentenceModeViewProps = {
   words: Word[];
@@ -16,10 +17,7 @@ type SentenceModeViewProps = {
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   // Dictation mode props
   dictationMode?: boolean;
-  wordRevealed?: boolean;
-  revealTimeRemaining?: number | null;
-  revealCount?: number;
-  onReveal?: () => void;
+  reveal: RevealState & { toggle: () => void };
   onRepeat?: () => void;
   // Accessibility props
   blindMode?: boolean;
@@ -36,10 +34,7 @@ export function SentenceModeView({
   onInputChange,
   onKeyDown,
   dictationMode = false,
-  wordRevealed = false,
-  revealTimeRemaining = null,
-  revealCount = 0,
-  onReveal,
+  reveal,
   onRepeat,
   blindMode = false,
   showHints = false,
@@ -49,6 +44,13 @@ export function SentenceModeView({
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
   const handleContainerClick = () => inputRef.current?.focus();
+
+  // Focus input when word becomes hidden (after reveal toggle)
+  useEffect(() => {
+    if (dictationMode && !reveal.isRevealed) {
+      inputRef.current?.focus();
+    }
+  }, [dictationMode, reveal.isRevealed]);
 
   return (
     <div
@@ -106,7 +108,7 @@ export function SentenceModeView({
                   letterStates={letterStates}
                   blindMode={blindMode}
                   dictationMode={dictationMode}
-                  wordRevealed={wordRevealed}
+                  wordRevealed={reveal.isRevealed}
                 />
               ) : (
                 // In dictation mode, hide upcoming words too
@@ -135,11 +137,14 @@ export function SentenceModeView({
             Repeat
           </button>
           <RevealButton
-            wordRevealed={wordRevealed}
-            revealTimeRemaining={revealTimeRemaining}
-            revealCount={revealCount}
-            onReveal={() => onReveal?.()}
-            onRefocus={() => inputRef.current?.focus()}
+            isRevealed={reveal.isRevealed}
+            isPermanent={reveal.isPermanent}
+            progress={reveal.progress}
+            nextDuration={reveal.nextDuration}
+            onToggle={() => {
+              reveal.toggle();
+              inputRef.current?.focus();
+            }}
           />
         </div>
       )}
@@ -154,7 +159,7 @@ export function SentenceModeView({
         onFocus={handleFocus}
         onBlur={handleBlur}
         autoFocus
-        disabled={dictationMode && wordRevealed}
+        disabled={dictationMode && reveal.isRevealed}
         className="sr-only"
         aria-label="Type the highlighted word"
       />
@@ -162,7 +167,7 @@ export function SentenceModeView({
       {/* Instructions */}
       <p className="text-center text-sm text-gray-500 dark:text-gray-500">
         {dictationMode
-          ? wordRevealed
+          ? reveal.isRevealed
             ? "Hide the word to continue typing"
             : "Listen and type the word you hear • Press Space to advance"
           : "Type the highlighted word • Press Space to advance"
