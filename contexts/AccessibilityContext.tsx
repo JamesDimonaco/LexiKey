@@ -4,16 +4,32 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AccessibilitySettings } from '@/lib/types';
 
 const DEFAULT_SETTINGS: AccessibilitySettings = {
+  // Practice
+  sessionWordCount: 20,
+  capitalFrequency: 'never',
+  punctuationFrequency: 'never',
+  // Session mix
+  strugglePercent: 30,
+  newPercent: 50,
+  confidencePercent: 20,
+  startingBoosters: 2,
+  // Font
   font: 'helvetica',
   fontSize: 24,
   letterSpacing: 2,
+  // Cursor
   largeCursor: false,
-  highContrast: true,
+  // Contrast
+  highContrast: false,
+  // TTS
   ttsEnabled: true,
   voiceSpeed: 1.0,
-  showHints: true,
-  noTimerPressure: false,
+  dictationMode: false,
+  // UI
+  showHints: false,
+  showTimerPressure: false, // Changed from noTimerPressure
   blindMode: false,
+  showTypingSpeed: true,
 };
 
 interface AccessibilityContextType {
@@ -27,12 +43,14 @@ const AccessibilityContext = createContext<AccessibilityContextType | undefined>
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_SETTINGS);
 
-  // Load settings from localStorage on mount
+  // Load settings from localStorage on mount (merge with defaults for new settings)
   useEffect(() => {
     const saved = localStorage.getItem('lexikey-accessibility');
     if (saved) {
       try {
-        setSettings(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        // Merge with defaults so new settings get default values
+        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
       } catch (e) {
         console.error('Failed to load accessibility settings:', e);
       }

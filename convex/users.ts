@@ -101,6 +101,7 @@ export const searchUsers = query({
 
 /**
  * Create a new user
+ * Optionally accepts anonymous user data for migration
  */
 export const createUser = mutation({
   args: {
@@ -113,8 +114,20 @@ export const createUser = mutation({
       v.literal("parent"),
       v.literal("admin"),
     ),
+    // Optional anonymous data to migrate
+    anonymousData: v.optional(v.object({
+      currentLevel: v.number(),
+      totalWords: v.number(),
+      totalSessions: v.number(),
+      struggleWords: v.array(v.object({
+        word: v.string(),
+        phonicsGroup: v.string(),
+        consecutiveCorrect: v.number(),
+      })),
+      lastPracticeDate: v.union(v.string(), v.null()),
+    })),
   },
-  handler: async (ctx, { clerkId, name, email, role }) => {
+  handler: async (ctx, { clerkId, name, email, role, anonymousData }) => {
     // Check if user already exists
     const existing = await ctx.db
       .query("users")
@@ -127,7 +140,21 @@ export const createUser = mutation({
 
     const now = Date.now();
 
-    // Create user with default settings
+    // Start with default stats, then merge anonymous data if provided
+    const initialStats = {
+      totalWords: anonymousData?.totalWords ?? 0,
+      totalSessions: anonymousData?.totalSessions ?? 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastPracticeDate: anonymousData?.lastPracticeDate ?? undefined,
+      totalMinutesPracticed: 0,
+      averageAccuracy: 0,
+      currentLevel: anonymousData?.currentLevel ?? 1,
+      hasCompletedPlacementTest: false,
+      struggleGroups: [],
+    };
+
+    // Create user with default settings and potentially migrated stats
     const userId = await ctx.db.insert("users", {
       clerkId,
       name,
@@ -145,18 +172,7 @@ export const createUser = mutation({
         blindMode: false,
         cursorStyle: "standard",
       },
-      stats: {
-        totalWords: 0,
-        totalSessions: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        lastPracticeDate: undefined,
-        totalMinutesPracticed: 0,
-        averageAccuracy: 0,
-        currentLevel: 1,
-        hasCompletedPlacementTest: false,
-        struggleGroups: [],
-      },
+      stats: initialStats,
       subscription: {
         tier: "free",
         expiresAt: undefined,
@@ -165,6 +181,21 @@ export const createUser = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    // Migrate struggle words if anonymous data was provided
+    if (anonymousData?.struggleWords && anonymousData.struggleWords.length > 0) {
+      for (const sw of anonymousData.struggleWords) {
+        await ctx.db.insert("userStruggleWords", {
+          userId,
+          word: sw.word,
+          phonicsGroup: sw.phonicsGroup,
+          consecutiveCorrect: sw.consecutiveCorrect,
+          totalAttempts: 1,
+          lastSeenAt: now,
+          createdAt: now,
+        });
+      }
+    }
 
     return userId;
   },

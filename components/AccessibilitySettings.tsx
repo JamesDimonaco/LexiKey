@@ -44,16 +44,25 @@ export function AccessibilitySettings({ onClose }: AccessibilitySettingsProps) {
   const handleReset = () => {
     resetSettings();
     setTempSettings({
+      sessionWordCount: 20,
+      capitalFrequency: "never",
+      punctuationFrequency: "never",
+      strugglePercent: 30,
+      newPercent: 50,
+      confidencePercent: 20,
+      startingBoosters: 2,
       font: "helvetica",
       fontSize: 24,
       letterSpacing: 2,
       largeCursor: false,
-      highContrast: true,
+      highContrast: false,
       ttsEnabled: true,
       voiceSpeed: 1.0,
-      showHints: true,
-      noTimerPressure: false,
+      dictationMode: false,
+      showHints: false,
+      showTimerPressure: false,
       blindMode: false,
+      showTypingSpeed: true,
     });
   };
 
@@ -225,13 +234,13 @@ export function AccessibilitySettings({ onClose }: AccessibilitySettingsProps) {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={tempSettings.noTimerPressure}
+              checked={tempSettings.showTimerPressure}
               onChange={(e) =>
-                updateTempSettings({ noTimerPressure: e.target.checked })
+                updateTempSettings({ showTimerPressure: e.target.checked })
               }
               className="w-4 h-4 accent-blue-500"
             />
-            <span className="text-sm text-gray-300">No Timer Pressure</span>
+            <span className="text-sm text-gray-300">Show Session Stats (time &amp; backspaces)</span>
           </label>
 
           <label className="flex items-center gap-2">

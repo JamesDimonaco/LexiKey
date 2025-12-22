@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { SignUpButton } from "@clerk/nextjs";
 import { WordResult } from "@/lib/types";
 
 // Thresholds for determining struggle words (match practice page)
@@ -10,19 +12,41 @@ type SessionCompleteProps = {
   results: WordResult[];
   currentLevel: number;
   onRestart: () => void;
+  showTimerPressure?: boolean;
+  isAnonymous?: boolean;
+  showTypingSpeed?: boolean;
+  // Mode tracking
+  inputMode: "visible" | "voice";
+  displayMode: "sentence" | "word";
 };
 
 export function SessionComplete({
   results,
   currentLevel,
   onRestart,
+  showTimerPressure = false,
+  isAnonymous = false,
+  showTypingSpeed = true,
+  inputMode,
+  displayMode,
 }: SessionCompleteProps) {
+  // Only show WPM in sentence mode with visible words (not voice/dictation)
+  const shouldShowWPM = showTypingSpeed && displayMode === "sentence" && inputMode === "visible";
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const accuracy = Math.round(
     (results.filter((r) => r.correct).length / results.length) * 100,
   );
   const totalTime = Math.round(
     results.reduce((sum, r) => sum + r.timeSpent, 0),
   );
+  const totalTimeMinutes = totalTime / 60;
+
+  // Calculate WPM (words per minute)
+  // Using standard: WPM = (total characters / 5) / time in minutes
+  const totalCharacters = results.reduce((sum, r) => sum + r.word.length, 0);
+  const wpm = totalTimeMinutes > 0 ? Math.round((totalCharacters / 5) / totalTimeMinutes) : 0;
+
   // Struggle words: hesitation OR too many backspaces
   const struggleWords = results.filter(
     (r) => r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
@@ -32,13 +56,52 @@ export function SessionComplete({
     0,
   );
 
+  // Handle Enter key to restart
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        onRestart();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onRestart]);
+
+  // Focus container for keyboard events
+  useEffect(() => {
+    containerRef.current?.focus();
+  }, []);
+
   return (
-    <div className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+    <div
+      ref={containerRef}
+      tabIndex={-1}
+      className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 outline-none"
+    >
       <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
         Session Complete!
       </h1>
 
       <div className="space-y-6">
+        {/* Sign up prompt for anonymous users */}
+        {isAnonymous && (
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-5 rounded-lg border border-green-200 dark:border-green-800">
+            <h2 className="text-lg font-bold text-green-800 dark:text-green-300 mb-2">
+              Save Your Progress
+            </h2>
+            <p className="text-sm text-green-700 dark:text-green-400 mb-4">
+              Create a free account to save your level, track struggle words across sessions, and unlock personalized practice.
+            </p>
+            <SignUpButton mode="modal">
+              <button className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                Create Free Account
+              </button>
+            </SignUpButton>
+          </div>
+        )}
+
         {/* Level Display */}
         <LevelDisplay currentLevel={currentLevel} accuracy={accuracy} />
 
@@ -48,6 +111,9 @@ export function SessionComplete({
           accuracy={accuracy}
           totalTime={totalTime}
           totalBackspaces={totalBackspaces}
+          showTimerPressure={showTimerPressure}
+          showTypingSpeed={shouldShowWPM}
+          wpm={wpm}
         />
 
         {/* Struggle words */}
@@ -62,6 +128,7 @@ export function SessionComplete({
             className="flex-1 py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
           >
             Practice Again
+            <span className="block text-sm font-normal opacity-75">Press Enter</span>
           </button>
           <Link
             href="/"
@@ -117,14 +184,48 @@ function StatsGrid({
   accuracy,
   totalTime,
   totalBackspaces,
+  showTimerPressure = false,
+  showTypingSpeed = true,
+  wpm = 0,
 }: {
   wordsCount: number;
   accuracy: number;
   totalTime: number;
   totalBackspaces: number;
+  showTimerPressure?: boolean;
+  showTypingSpeed?: boolean;
+  wpm?: number;
 }) {
+  // When showTimerPressure is false, only show words, accuracy, and optionally WPM
+  if (!showTimerPressure) {
+    return (
+      <div className={`grid ${showTypingSpeed ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
+        <StatCard
+          value={wordsCount}
+          label="Words"
+          colorClass="blue"
+        />
+        <StatCard
+          value={`${accuracy}%`}
+          label="Accuracy"
+          colorClass="green"
+        />
+        {showTypingSpeed && (
+          <StatCard
+            value={`${wpm}`}
+            label="WPM"
+            colorClass="purple"
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Calculate grid columns based on what's shown
+  const cols = showTypingSpeed ? 5 : 4;
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className={`grid grid-cols-2 md:grid-cols-${cols} gap-3`}>
       <StatCard
         value={wordsCount}
         label="Words"
@@ -135,10 +236,17 @@ function StatsGrid({
         label="Accuracy"
         colorClass="green"
       />
+      {showTypingSpeed && (
+        <StatCard
+          value={`${wpm}`}
+          label="WPM"
+          colorClass="purple"
+        />
+      )}
       <StatCard
         value={`${totalTime}s`}
         label="Time"
-        colorClass="purple"
+        colorClass="yellow"
       />
       <StatCard
         value={totalBackspaces}

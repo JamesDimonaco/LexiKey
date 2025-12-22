@@ -92,6 +92,16 @@ export default defineSchema({
       v.literal("review") // Bucket review
     ),
 
+    // Practice mode settings
+    inputMode: v.optional(v.union(
+      v.literal("visible"), // Words shown on screen
+      v.literal("voice") // Dictation mode - words spoken
+    )),
+    displayMode: v.optional(v.union(
+      v.literal("sentence"), // Multiple words shown
+      v.literal("word") // Single word at a time
+    )),
+
     // What was practiced
     phonicsGroupFocus: v.optional(v.string()), // If focusing on specific phonics
 
@@ -99,7 +109,7 @@ export default defineSchema({
     wordsAttempted: v.number(),
     wordsCompleted: v.number(),
     accuracy: v.number(), // 0-100 percentage
-    averageWPM: v.optional(v.number()),
+    averageWPM: v.optional(v.number()), // Only recorded for sentence+visible mode
     durationSeconds: v.number(),
 
     // Words that need review (stored as strings, not IDs)

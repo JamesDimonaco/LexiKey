@@ -9,15 +9,29 @@ import { Word, UserProgress, PhonicsGroup, StruggleWord } from "./types";
 import { posthog } from "@/components/PostHogProvider";
 
 /**
- * Session configuration - easy to change these percentages
+ * Session configuration defaults - can be overridden via SessionOptions
  */
 export const SESSION_CONFIG = {
-  SIZE: 20,
-  STRUGGLE_PERCENT: 0.30,    // 30% struggle words
-  NEW_PERCENT: 0.50,         // 50% new concepts
-  CONFIDENCE_PERCENT: 0.20,  // 20% confidence boosters
-  STARTING_BOOSTERS: 2,      // Easy words at start for confidence
+  DEFAULT_SIZE: 20,
+  DEFAULT_STRUGGLE_PERCENT: 0.30,
+  DEFAULT_NEW_PERCENT: 0.50,
+  DEFAULT_CONFIDENCE_PERCENT: 0.20,
+  DEFAULT_STARTING_BOOSTERS: 2,
 };
+
+/**
+ * Session options passed to generateSession
+ */
+export interface SessionOptions {
+  wordCount?: number;
+  capitalFrequency?: "never" | "sometimes" | "often";
+  punctuationFrequency?: "never" | "sometimes" | "often";
+  // Session mix - percentages (0-100)
+  strugglePercent?: number;
+  newPercent?: number;
+  confidencePercent?: number;
+  startingBoosters?: number;
+}
 
 export class AdaptiveSessionGenerator {
   private allWords: Word[];
@@ -36,8 +50,18 @@ export class AdaptiveSessionGenerator {
    * - 50% New concepts (at current level +/- 1)
    * - 20% Confidence boosters (easy words)
    */
-  public generateSession(user: UserProgress): Word[] {
-    const { SIZE, STRUGGLE_PERCENT, NEW_PERCENT, STARTING_BOOSTERS } = SESSION_CONFIG;
+  public generateSession(user: UserProgress, options: SessionOptions = {}): Word[] {
+    const {
+      DEFAULT_SIZE,
+      DEFAULT_STRUGGLE_PERCENT,
+      DEFAULT_NEW_PERCENT,
+      DEFAULT_STARTING_BOOSTERS,
+    } = SESSION_CONFIG;
+
+    const SIZE = options.wordCount ?? DEFAULT_SIZE;
+    const STRUGGLE_PERCENT = (options.strugglePercent ?? DEFAULT_STRUGGLE_PERCENT * 100) / 100;
+    const NEW_PERCENT = (options.newPercent ?? DEFAULT_NEW_PERCENT * 100) / 100;
+    const STARTING_BOOSTERS = options.startingBoosters ?? DEFAULT_STARTING_BOOSTERS;
 
     const maxAvailableDifficulty = Math.max(
       ...this.allWords.map((w) => w.difficulty),
@@ -89,7 +113,44 @@ export class AdaptiveSessionGenerator {
       ...struggleWords,
     ]);
 
-    return [...startingBoost, ...shuffled];
+    const finalWords = [...startingBoost, ...shuffled];
+
+    // Apply word transformations (capitals, punctuation)
+    return this.applyWordTransformations(finalWords, options);
+  }
+
+  /**
+   * Apply capitals and punctuation to words based on settings
+   */
+  private applyWordTransformations(words: Word[], options: SessionOptions): Word[] {
+    const { capitalFrequency = "never", punctuationFrequency = "never" } = options;
+
+    // Calculate how many words to transform
+    const capitalChance = capitalFrequency === "never" ? 0 : capitalFrequency === "sometimes" ? 0.15 : 0.35;
+    const punctuationChance = punctuationFrequency === "never" ? 0 : punctuationFrequency === "sometimes" ? 0.15 : 0.35;
+
+    const punctuationMarks = [".", ",", "!", "?"];
+
+    return words.map((word) => {
+      let text = word.text;
+
+      // Apply capitalization
+      if (capitalChance > 0 && Math.random() < capitalChance) {
+        text = text.charAt(0).toUpperCase() + text.slice(1);
+      }
+
+      // Apply punctuation
+      if (punctuationChance > 0 && Math.random() < punctuationChance) {
+        const mark = punctuationMarks[Math.floor(Math.random() * punctuationMarks.length)];
+        text = text + mark;
+      }
+
+      // Return new word object if modified
+      if (text !== word.text) {
+        return { ...word, text };
+      }
+      return word;
+    });
   }
 
   /**

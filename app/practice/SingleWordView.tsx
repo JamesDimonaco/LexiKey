@@ -13,6 +13,14 @@ type SingleWordViewProps = {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
+  // Accessibility props
+  blindMode?: boolean;
+  showHints?: boolean;
+  // Dictation mode props
+  dictationMode?: boolean;
+  wordRevealed?: boolean;
+  onReveal?: () => void;
+  onRepeat?: () => void;
 };
 
 export function SingleWordView({
@@ -24,6 +32,12 @@ export function SingleWordView({
   onInputChange,
   onKeyDown,
   onSubmit,
+  blindMode = false,
+  showHints = false,
+  dictationMode = false,
+  wordRevealed = false,
+  onReveal,
+  onRepeat,
 }: SingleWordViewProps) {
   const [isFocused, setIsFocused] = useState(true);
 
@@ -73,25 +87,46 @@ export function SingleWordView({
         <div className="text-6xl font-bold text-center tracking-wider font-mono">
           {currentWord.text.split("").map((char, charIdx) => {
             const typedChar = userInput[charIdx];
+            const state = letterStates[charIdx];
 
-            let colorClass = "text-gray-800 dark:text-gray-200";
+            // Determine what character to display
+            let displayChar = char;
+            if (dictationMode && !wordRevealed) {
+              // In dictation mode: show typed char or "?" for untyped
+              displayChar = typedChar !== undefined ? typedChar : "?";
+            } else if (blindMode && typedChar !== undefined) {
+              displayChar = "•";
+            }
+
+            // Determine color
+            let colorClass = "text-gray-400 dark:text-gray-600"; // Default for "?" untyped
 
             if (typedChar !== undefined) {
-              if (typedChar.toLowerCase() === char.toLowerCase()) {
+              if (blindMode || (dictationMode && !wordRevealed)) {
+                // In blind mode or dictation mode (not revealed), show neutral color
+                colorClass = "text-blue-500 dark:text-blue-400";
+              } else if (dictationMode && wordRevealed) {
+                // Revealed in dictation mode - still neutral while typing
+                colorClass = "text-blue-500 dark:text-blue-400";
+              } else if (typedChar.toLowerCase() === char.toLowerCase()) {
                 colorClass = "text-green-600 dark:text-green-400";
               } else {
                 colorClass = "text-red-500 dark:text-red-400";
               }
+            } else if (!dictationMode || wordRevealed) {
+              // Untyped characters in normal mode or revealed dictation
+              colorClass = "text-gray-800 dark:text-gray-200";
             }
 
-            const state = letterStates[charIdx];
             const showCorrectionDot =
+              !blindMode &&
+              !dictationMode &&
               state?.wasEverWrong &&
               typedChar?.toLowerCase() === char.toLowerCase();
 
             return (
               <span key={charIdx} className={`relative ${colorClass}`}>
-                {char}
+                {displayChar}
                 {showCorrectionDot && (
                   <span className="absolute -top-2 -right-1 w-2 h-2 bg-yellow-500 rounded-full" />
                 )}
@@ -100,12 +135,41 @@ export function SingleWordView({
           })}
         </div>
 
-        {currentWord.sentenceContext && (
+        {/* Hint - hidden in dictation mode */}
+        {showHints && !dictationMode && currentWord.sentenceContext && (
           <p className="text-center text-gray-600 dark:text-gray-400 mt-4 text-lg">
             &ldquo;{currentWord.sentenceContext}&rdquo;
           </p>
         )}
       </div>
+
+      {/* Dictation mode controls */}
+      {dictationMode && (
+        <div className="flex justify-center gap-3 mb-6 relative z-20">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRepeat?.();
+              inputRef.current?.focus();
+            }}
+            className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors font-medium"
+          >
+            Repeat
+          </button>
+          {!wordRevealed && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onReveal?.();
+                inputRef.current?.focus();
+              }}
+              className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors font-medium"
+            >
+              Reveal
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Input */}
       <div className="mb-6">
@@ -117,12 +181,15 @@ export function SingleWordView({
           onKeyDown={onKeyDown}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          placeholder="Type the word here..."
+          placeholder={dictationMode ? "Type what you hear..." : "Type the word here..."}
           autoFocus
           className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
         />
         <p className="text-center text-sm text-gray-500 dark:text-gray-500 mt-2">
-          Press Space or Enter to continue
+          {dictationMode
+            ? "Listen and type • Press Space or Enter to continue"
+            : "Press Space or Enter to continue"
+          }
         </p>
       </div>
 

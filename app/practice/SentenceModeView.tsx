@@ -13,6 +13,14 @@ type SentenceModeViewProps = {
   inputRef: React.RefObject<HTMLInputElement | null>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  // Dictation mode props
+  dictationMode?: boolean;
+  wordRevealed?: boolean;
+  onReveal?: () => void;
+  onRepeat?: () => void;
+  // Accessibility props
+  blindMode?: boolean;
+  showHints?: boolean;
 };
 
 export function SentenceModeView({
@@ -24,6 +32,12 @@ export function SentenceModeView({
   inputRef,
   onInputChange,
   onKeyDown,
+  dictationMode = false,
+  wordRevealed = false,
+  onReveal,
+  onRepeat,
+  blindMode = false,
+  showHints = false,
 }: SentenceModeViewProps) {
   const [isFocused, setIsFocused] = useState(true);
 
@@ -53,6 +67,15 @@ export function SentenceModeView({
         </div>
       )}
 
+      {/* Hint display - above the grid, hidden in dictation mode */}
+      {showHints && !dictationMode && words[currentWordIndex]?.sentenceContext && (
+        <div className="mb-4 text-center">
+          <p className="text-gray-600 dark:text-gray-400 text-lg italic">
+            &ldquo;{words[currentWordIndex].sentenceContext}&rdquo;
+          </p>
+        </div>
+      )}
+
       {/* All words display */}
       <div className="flex flex-wrap gap-x-4 gap-y-3 mb-8 justify-center">
         {words.map((word, wordIdx) => {
@@ -76,14 +99,50 @@ export function SentenceModeView({
                   word={word}
                   userInput={userInput}
                   letterStates={letterStates}
+                  blindMode={blindMode}
+                  dictationMode={dictationMode}
+                  wordRevealed={wordRevealed}
                 />
               ) : (
-                word.text
+                // In dictation mode, hide upcoming words too
+                dictationMode && !isCompleted ? (
+                  <span className="text-gray-300 dark:text-gray-700">{"?".repeat(word.text.length)}</span>
+                ) : (
+                  word.text
+                )
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Dictation mode controls */}
+      {dictationMode && (
+        <div className="flex justify-center gap-3 mb-6 relative z-20">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRepeat?.();
+              inputRef.current?.focus();
+            }}
+            className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors font-medium"
+          >
+            Repeat
+          </button>
+          {!wordRevealed && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onReveal?.();
+                inputRef.current?.focus();
+              }}
+              className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors font-medium"
+            >
+              Reveal
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Hidden input for capturing keystrokes */}
       <input
@@ -101,7 +160,10 @@ export function SentenceModeView({
 
       {/* Instructions */}
       <p className="text-center text-sm text-gray-500 dark:text-gray-500">
-        Type the highlighted word • Press Space to advance
+        {dictationMode
+          ? "Listen and type the word you hear • Press Space to advance"
+          : "Type the highlighted word • Press Space to advance"
+        }
       </p>
     </div>
   );
@@ -112,10 +174,16 @@ function CurrentWordDisplay({
   word,
   userInput,
   letterStates,
+  blindMode = false,
+  dictationMode = false,
+  wordRevealed = false,
 }: {
   word: Word;
   userInput: string;
   letterStates: LetterState[];
+  blindMode?: boolean;
+  dictationMode?: boolean;
+  wordRevealed?: boolean;
 }) {
   return (
     <span>
@@ -123,24 +191,45 @@ function CurrentWordDisplay({
         const state = letterStates[charIdx];
         const typedChar = userInput[charIdx];
 
-        let colorClass = "text-gray-800 dark:text-gray-200"; // Not yet typed
+        // Determine what character to display
+        let displayChar = char;
+        if (dictationMode && !wordRevealed) {
+          // In dictation mode: show typed char or "?" for untyped
+          displayChar = typedChar !== undefined ? typedChar : "?";
+        } else if (blindMode && typedChar !== undefined) {
+          displayChar = "•";
+        }
+
+        // Determine color
+        let colorClass = "text-gray-400 dark:text-gray-600"; // Default for "?" untyped
 
         if (typedChar !== undefined) {
-          if (typedChar.toLowerCase() === char.toLowerCase()) {
+          if (blindMode || (dictationMode && !wordRevealed)) {
+            // In blind mode or dictation mode (not revealed), show neutral color
+            colorClass = "text-blue-500 dark:text-blue-400";
+          } else if (dictationMode && wordRevealed) {
+            // Revealed in dictation mode - still neutral while typing
+            colorClass = "text-blue-500 dark:text-blue-400";
+          } else if (typedChar.toLowerCase() === char.toLowerCase()) {
             colorClass = "text-green-600 dark:text-green-400";
           } else {
             colorClass = "text-red-500 dark:text-red-400";
           }
+        } else if (!dictationMode || wordRevealed) {
+          // Untyped characters in normal mode or revealed dictation
+          colorClass = "text-gray-800 dark:text-gray-200";
         }
 
-        // Show correction indicator (was wrong but now fixed)
+        // Show correction indicator (was wrong but now fixed) - hide in blind/dictation mode
         const showCorrectionDot =
+          !blindMode &&
+          !dictationMode &&
           state?.wasEverWrong &&
           typedChar?.toLowerCase() === char.toLowerCase();
 
         return (
           <span key={charIdx} className={`relative ${colorClass}`}>
-            {char}
+            {displayChar}
             {showCorrectionDot && (
               <span className="absolute -top-1 -right-0.5 w-1.5 h-1.5 bg-yellow-500 rounded-full" />
             )}

@@ -1,353 +1,100 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Word, UserProgress, PhonicsGroup, StruggleWord, WordResult } from "@/lib/types";
-import {
-  AdaptiveSessionGenerator,
-  calculateNewUserLevel,
-} from "@/lib/AdaptiveEngine";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { Label } from "@/components/ui/label";
-import wordsData from "./words.json";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { useUserProgress } from "@/hooks/useUserProgress";
+import { usePracticeSession, BACKSPACE_THRESHOLD } from "@/hooks/usePracticeSession";
+import { StruggleWord, WordResult } from "@/lib/types";
 
-import { LetterState } from "./types";
 import { SentenceModeView } from "./SentenceModeView";
 import { SingleWordView } from "./SingleWordView";
 import { SessionComplete } from "./SessionComplete";
 
-// Struggle word threshold constants
-const HESITATION_THRESHOLD = 1.5; // seconds
-const BACKSPACE_THRESHOLD = 3;
-
-// Load words from JSON and transform to Word[] format
-const WORD_POOL: Word[] = wordsData.map(
-  (w: {
-    id: string;
-    word: string;
-    difficultyLevel: number;
-    phonicsGroup: string;
-    sentenceContext?: string;
-  }) => ({
-    id: w.id,
-    text: w.word,
-    difficulty: w.difficultyLevel,
-    phonicsGroup: w.phonicsGroup as PhonicsGroup,
-    sentenceContext: w.sentenceContext,
-  }),
-);
-
 export function PracticeSession() {
-  const { user } = useUser();
-  const currentUser = useQuery(
-    api.users.getCurrentUser,
-    user?.id ? { clerkId: user.id } : "skip",
-  );
-  const createUser = useMutation(api.users.createUser);
-  const updateUserStats = useMutation(api.users.updateUserStats);
-  const batchProcessWordResults = useMutation(api.struggleWords.batchProcessWordResults);
+  const { settings } = useAccessibility();
 
-  // Fetch struggle words from DB
-  const userStruggleWords = useQuery(
-    api.struggleWords.getUserStruggleWords,
-    currentUser?._id ? { userId: currentUser._id } : "skip",
-  );
+  // User progress (handles auth/anonymous, data migration)
+  const {
+    isAnonymous,
+    isLoading: isUserLoading,
+    effectiveLevel,
+    effectiveStruggleWords,
+    currentUser,
+    anonymousUser,
+    updateAnonymousStats,
+    updateUserStats,
+    batchProcessWordResults,
+  } = useUserProgress();
 
-  // Auto-create user if they don't exist in Convex
-  useEffect(() => {
-    if (!user || currentUser !== null) return;
+  // Handle finishing session - save results to appropriate storage
+  const handleFinishSession = useCallback(async (allResults: WordResult[], newLevel: number) => {
+    const struggleWordsToAdd: StruggleWord[] = allResults
+      .filter((r) => r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD)
+      .map((r) => ({
+        word: r.word,
+        phonicsGroup: r.phonicsGroup,
+        consecutiveCorrect: 0,
+      }));
 
-    const createUserIfNeeded = async () => {
-      try {
-        await createUser({
-          clerkId: user.id,
-          name: user.fullName || user.firstName || "User",
-          email: user.primaryEmailAddress?.emailAddress,
-          role: "student",
-        });
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        if (!errorMessage?.includes("already exists")) {
-          console.error("Failed to create user:", error);
-        }
-      }
-    };
+    if (isAnonymous) {
+      updateAnonymousStats(allResults.length, newLevel, struggleWordsToAdd);
+    } else if (currentUser) {
+      const wordResultsForBucket = allResults.map((r) => ({
+        word: r.word,
+        phonicsGroup: r.phonicsGroup,
+        wasStruggle: r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
+      }));
 
-    createUserIfNeeded();
-  }, [user, currentUser, createUser]);
-
-  // Core state
-  const [sessionWords, setSessionWords] = useState<Word[]>([]);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [userInput, setUserInput] = useState("");
-  const [results, setResults] = useState<WordResult[]>([]);
-  const [isComplete, setIsComplete] = useState(false);
-
-  // Mode state - default to sentence mode
-  const [sentenceMode, setSentenceMode] = useState(true);
-
-  // Tracking state
-  const [startTime, setStartTime] = useState(Date.now());
-  const [backspaceCount, setBackspaceCount] = useState(0);
-  const [correctionsMade, setCorrectionsMade] = useState(0);
-  const [letterStates, setLetterStates] = useState<LetterState[]>([]);
-  const [wasLastKeyBackspace, setWasLastKeyBackspace] = useState(false);
-
-  // Single word mode feedback
-  const [showFeedback, setShowFeedback] = useState<
-    "correct" | "incorrect" | null
-  >(null);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const currentWord = sessionWords[currentWordIndex];
-
-  // Generate adaptive session when user data and struggle words load
-  useEffect(() => {
-    if (!currentUser || sessionWords.length > 0) return;
-    // Wait for struggle words to load (can be empty array, but not undefined)
-    if (userStruggleWords === undefined) return;
-
-    // Convert DB struggle words to StruggleWord type
-    const struggleWords: StruggleWord[] = userStruggleWords.map((sw) => ({
-      word: sw.word,
-      phonicsGroup: sw.phonicsGroup,
-      consecutiveCorrect: sw.consecutiveCorrect,
-    }));
-
-    const userProgress: UserProgress = {
-      userId: currentUser._id,
-      currentLevel: currentUser.stats.currentLevel,
-      hasCompletedPlacementTest: currentUser.stats.hasCompletedPlacementTest,
-      struggleGroups: (currentUser.stats.struggleGroups || []) as PhonicsGroup[],
-      struggleWords,
-    };
-
-    const generator = new AdaptiveSessionGenerator(WORD_POOL, struggleWords);
-    const generatedWords = generator.generateSession(userProgress);
-    setSessionWords(generatedWords);
-  }, [currentUser, sessionWords.length, userStruggleWords]);
-
-  // Initialize letter states when word changes
-  useEffect(() => {
-    if (currentWord) {
-      setLetterStates(
-        currentWord.text.split("").map((char) => ({
-          expected: char.toLowerCase(),
-          typed: null,
-          wasCorrectFirstTry: true,
-          wasEverWrong: false,
-        })),
-      );
-      setStartTime(Date.now());
-      setBackspaceCount(0);
-      setCorrectionsMade(0);
-      setShowFeedback(null);
-      setWasLastKeyBackspace(false);
-    }
-  }, [currentWord, currentWordIndex]);
-
-  // Calculate result for current word
-  const calculateWordResult = useCallback((): WordResult => {
-    if (!currentWord) {
-      return {
-        wordId: "",
-        word: "",
-        phonicsGroup: "",
-        correct: false,
-        timeSpent: 0,
-        backspaceCount: 0,
-        hesitationDetected: false,
-      };
-    }
-
-    const timeSpent = (Date.now() - startTime) / 1000;
-    const isCorrect =
-      userInput.toLowerCase() === currentWord.text.toLowerCase();
-
-    return {
-      wordId: currentWord.id,
-      word: currentWord.text,
-      phonicsGroup: currentWord.phonicsGroup,
-      correct: isCorrect,
-      timeSpent,
-      backspaceCount,
-      hesitationDetected: timeSpent > HESITATION_THRESHOLD,
-    };
-  }, [currentWord, userInput, startTime, backspaceCount]);
-
-  // Handle input change with letter tracking
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    const oldLength = userInput.length;
-    const newLength = newValue.length;
-
-    // Detect backspace (correction)
-    if (newLength < oldLength) {
-      if (!wasLastKeyBackspace && oldLength > 0) {
-        // User just started backspacing after typing - this is a correction
-        setCorrectionsMade((prev) => prev + 1);
-      }
-      setWasLastKeyBackspace(true);
-
-      // Update letter states for deleted characters
-      setLetterStates((prev) =>
-        prev.map((state, i) => {
-          if (i >= newLength) {
-            return { ...state, typed: null };
-          }
-          return state;
+      await Promise.all([
+        batchProcessWordResults({
+          userId: currentUser._id,
+          results: wordResultsForBucket,
         }),
-      );
-    } else {
-      setWasLastKeyBackspace(false);
-
-      // Update letter states for new character
-      const newCharIndex = newLength - 1;
-      const newChar = newValue[newCharIndex];
-
-      if (newCharIndex < letterStates.length) {
-        setLetterStates((prev) =>
-          prev.map((state, i) => {
-            if (i === newCharIndex) {
-              const isCorrect = newChar.toLowerCase() === state.expected;
-              return {
-                ...state,
-                typed: newChar,
-                wasCorrectFirstTry:
-                  state.typed === null ? isCorrect : state.wasCorrectFirstTry,
-                wasEverWrong: state.wasEverWrong || !isCorrect,
-              };
-            }
-            return state;
-          }),
-        );
-      }
+        updateUserStats({
+          userId: currentUser._id,
+          stats: { currentLevel: newLevel },
+        }),
+      ]);
     }
+  }, [isAnonymous, currentUser, updateAnonymousStats, updateUserStats, batchProcessWordResults]);
 
-    setUserInput(newValue);
-  };
+  // Session state and handlers
+  const {
+    sessionWords,
+    currentWordIndex,
+    currentWord,
+    userInput,
+    results,
+    isComplete,
+    isLoading: isSessionLoading,
+    sentenceMode,
+    letterStates,
+    showFeedback,
+    wordRevealed,
+    inputRef,
+    handleInputChange,
+    handleKeyDown,
+    handleSubmitWord,
+    restartSession,
+    refreshSession,
+    handleDictationToggle,
+    handleReveal,
+    handleRepeat,
+    setSentenceMode,
+  } = usePracticeSession({
+    isAnonymous,
+    isUserLoading,
+    effectiveLevel,
+    effectiveStruggleWords,
+    currentUser,
+    anonymousUser,
+    onFinishSession: handleFinishSession,
+  });
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace") {
-      setBackspaceCount((prev) => prev + 1);
-    }
-
-    // In single word mode, advance on Enter or Space
-    if (
-      !sentenceMode &&
-      (e.key === "Enter" || e.key === " ") &&
-      userInput.length > 0
-    ) {
-      e.preventDefault();
-      handleSubmitWord();
-    }
-
-    // In sentence mode, space advances to next word (even if not fully correct)
-    if (sentenceMode && e.key === " " && userInput.length > 0) {
-      e.preventDefault();
-      advanceToNextWord(
-        userInput.toLowerCase() === currentWord?.text.toLowerCase(),
-      );
-    }
-  };
-
-  const advanceToNextWord = (wasCorrect: boolean) => {
-    const result = calculateWordResult();
-    result.correct = wasCorrect;
-    setResults((prev) => [...prev, result]);
-
-    if (currentWordIndex < sessionWords.length - 1) {
-      setCurrentWordIndex((prev) => prev + 1);
-      setUserInput("");
-    } else {
-      finishSession([...results, result]);
-    }
-  };
-
-  const handleSubmitWord = () => {
-    if (!currentWord) return;
-
-    const result = calculateWordResult();
-    const isCorrect =
-      userInput.toLowerCase() === currentWord.text.toLowerCase();
-
-    // Show brief feedback in single word mode
-    setShowFeedback(isCorrect ? "correct" : "incorrect");
-
-    setResults((prev) => [...prev, result]);
-
-    // Brief delay for feedback, then advance
-    setTimeout(() => {
-      if (currentWordIndex < sessionWords.length - 1) {
-        setCurrentWordIndex((prev) => prev + 1);
-        setUserInput("");
-      } else {
-        finishSession([...results, result]);
-      }
-    }, 300);
-  };
-
-  const finishSession = async (allResults: WordResult[]) => {
-    setIsComplete(true);
-
-    if (!currentUser) return;
-
-    const accuracy =
-      allResults.filter((r) => r.correct).length / allResults.length;
-    const avgTimePerWord =
-      allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length;
-
-    const newLevel = calculateNewUserLevel(
-      currentUser.stats.currentLevel,
-      accuracy,
-      avgTimePerWord,
-    );
-
-    // Process struggle words - determine which words were struggles
-    const wordResultsForBucket = allResults.map((r) => ({
-      word: r.word,
-      phonicsGroup: r.phonicsGroup,
-      // A word is a struggle if: hesitation OR too many backspaces
-      wasStruggle: r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
-    }));
-
-    // Save struggle words to DB and update user stats in parallel
-    await Promise.all([
-      batchProcessWordResults({
-        userId: currentUser._id,
-        results: wordResultsForBucket,
-      }),
-      updateUserStats({
-        userId: currentUser._id,
-        stats: {
-          currentLevel: newLevel,
-        },
-      }),
-    ]);
-  };
-
-  const restartSession = () => {
-    setSessionWords([]);
-    setCurrentWordIndex(0);
-    setUserInput("");
-    setResults([]);
-    setIsComplete(false);
-    setStartTime(Date.now());
-    setBackspaceCount(0);
-    setCorrectionsMade(0);
-    setShowFeedback(null);
-  };
-
-  // Focus input when mode changes
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [sentenceMode]);
-
-  // Loading state - wait for user data and struggle words
-  if (!currentUser || userStruggleWords === undefined || sessionWords.length === 0) {
+  // Loading state
+  if (isUserLoading || isSessionLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <div className="text-center">
@@ -360,13 +107,18 @@ export function PracticeSession() {
     );
   }
 
-  // Session complete state
+  // Session complete
   if (isComplete) {
     return (
       <SessionComplete
         results={results}
-        currentLevel={currentUser.stats.currentLevel}
+        currentLevel={effectiveLevel}
         onRestart={restartSession}
+        showTimerPressure={settings.showTimerPressure}
+        isAnonymous={isAnonymous}
+        showTypingSpeed={settings.showTypingSpeed}
+        inputMode={settings.dictationMode ? "voice" : "visible"}
+        displayMode={sentenceMode ? "sentence" : "word"}
       />
     );
   }
@@ -374,14 +126,36 @@ export function PracticeSession() {
   // Active session
   return (
     <div className="max-w-4xl w-full mx-auto">
-      {/* Header with level and mode toggle */}
-      <div className="mb-6 flex justify-between items-center">
+      {/* Header with level and mode toggles */}
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="text-sm text-gray-600 dark:text-gray-400">
           <span className="font-semibold">
-            Level {currentUser.stats.currentLevel.toFixed(1)}
+            Level {effectiveLevel.toFixed(1)}
           </span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Dictation Mode Toggle */}
+          <div className="flex items-center gap-2">
+            <Label
+              htmlFor="dictation-toggle"
+              className={`text-sm ${!settings.dictationMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+            >
+              Visible
+            </Label>
+            <Switch
+              checked={settings.dictationMode}
+              onCheckedChange={handleDictationToggle}
+              id="dictation-toggle"
+            />
+            <Label
+              htmlFor="dictation-toggle"
+              className={`text-sm ${settings.dictationMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+            >
+              Listen
+            </Label>
+          </div>
+
+          {/* Word/Sentence Mode Toggle */}
           <div className="flex items-center gap-2">
             <Label
               htmlFor="mode-toggle"
@@ -401,8 +175,22 @@ export function PracticeSession() {
               Sentence
             </Label>
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            {currentWordIndex + 1} / {sessionWords.length}
+          <div className="flex items-center gap-2">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              {currentWordIndex + 1} / {sessionWords.length}
+            </div>
+            <button
+              onClick={refreshSession}
+              className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+              title="Get new words"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                <path d="M16 21h5v-5"/>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -428,6 +216,12 @@ export function PracticeSession() {
           inputRef={inputRef}
           onInputChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          dictationMode={settings.dictationMode}
+          wordRevealed={wordRevealed}
+          onReveal={handleReveal}
+          onRepeat={handleRepeat}
+          blindMode={settings.blindMode}
+          showHints={settings.showHints}
         />
       ) : (
         <SingleWordView
@@ -439,6 +233,12 @@ export function PracticeSession() {
           onInputChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onSubmit={handleSubmitWord}
+          blindMode={settings.blindMode}
+          showHints={settings.showHints}
+          dictationMode={settings.dictationMode}
+          wordRevealed={wordRevealed}
+          onReveal={handleReveal}
+          onRepeat={handleRepeat}
         />
       )}
     </div>

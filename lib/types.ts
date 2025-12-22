@@ -1,5 +1,16 @@
 // Accessibility Settings Types
 export interface AccessibilitySettings {
+  // Practice settings
+  sessionWordCount: number; // 10-50
+  capitalFrequency: "never" | "sometimes" | "often";
+  punctuationFrequency: "never" | "sometimes" | "often";
+
+  // Session mix settings (percentages that should sum to 100)
+  strugglePercent: number; // 0-100, default 30
+  newPercent: number; // 0-100, default 50
+  confidencePercent: number; // 0-100, default 20
+  startingBoosters: number; // 0-5, default 2
+
   // Font settings
   font: "helvetica" | "arial" | "opendyslexic";
   fontSize: number; // in px
@@ -14,11 +25,24 @@ export interface AccessibilitySettings {
   // TTS settings
   ttsEnabled: boolean;
   voiceSpeed: number; // 0.5 to 2.0
+  dictationMode: boolean; // Hide word, speak it aloud for user to type
 
   // UI settings
   showHints: boolean;
-  noTimerPressure: boolean;
+  showTimerPressure: boolean; // Show time/backspace stats on session complete
   blindMode: boolean; // Hide text to force muscle memory
+  showTypingSpeed: boolean; // Show WPM on session complete
+}
+
+// Anonymous user data stored in localStorage
+export interface AnonymousUserData {
+  deviceId: string;
+  currentLevel: number;
+  totalWords: number;
+  totalSessions: number;
+  struggleWords: StruggleWord[];
+  lastPracticeDate: string | null;
+  createdAt: string;
 }
 
 // Adaptive Learning Types
