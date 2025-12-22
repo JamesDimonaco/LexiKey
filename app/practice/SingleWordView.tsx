@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Word } from "@/lib/types";
 import { LetterState } from "./types";
+import { RevealButton } from "./RevealButton";
 
 type SingleWordViewProps = {
   currentWord: Word;
@@ -19,6 +20,8 @@ type SingleWordViewProps = {
   // Dictation mode props
   dictationMode?: boolean;
   wordRevealed?: boolean;
+  revealTimeRemaining?: number | null;
+  revealCount?: number;
   onReveal?: () => void;
   onRepeat?: () => void;
 };
@@ -36,6 +39,8 @@ export function SingleWordView({
   showHints = false,
   dictationMode = false,
   wordRevealed = false,
+  revealTimeRemaining = null,
+  revealCount = 0,
   onReveal,
   onRepeat,
 }: SingleWordViewProps) {
@@ -156,18 +161,13 @@ export function SingleWordView({
           >
             Repeat
           </button>
-          {!wordRevealed && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onReveal?.();
-                inputRef.current?.focus();
-              }}
-              className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors font-medium"
-            >
-              Reveal
-            </button>
-          )}
+          <RevealButton
+            wordRevealed={wordRevealed}
+            revealTimeRemaining={revealTimeRemaining}
+            revealCount={revealCount}
+            onReveal={() => onReveal?.()}
+            onRefocus={() => inputRef.current?.focus()}
+          />
         </div>
       )}
 
@@ -183,11 +183,18 @@ export function SingleWordView({
           onBlur={handleBlur}
           placeholder={dictationMode ? "Type what you hear..." : "Type the word here..."}
           autoFocus
-          className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+          disabled={dictationMode && wordRevealed}
+          className={`w-full px-6 py-4 text-2xl text-center border-2 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono ${
+            dictationMode && wordRevealed
+              ? "border-gray-200 dark:border-gray-800 opacity-50 cursor-not-allowed"
+              : "border-gray-300 dark:border-gray-700"
+          }`}
         />
         <p className="text-center text-sm text-gray-500 dark:text-gray-500 mt-2">
           {dictationMode
-            ? "Listen and type • Press Space or Enter to continue"
+            ? wordRevealed
+              ? "Hide the word to continue typing"
+              : "Listen and type • Press Space or Enter to continue"
             : "Press Space or Enter to continue"
           }
         </p>

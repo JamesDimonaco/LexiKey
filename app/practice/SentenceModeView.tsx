@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Word, WordResult } from "@/lib/types";
 import { LetterState } from "./types";
+import { RevealButton } from "./RevealButton";
 
 type SentenceModeViewProps = {
   words: Word[];
@@ -16,6 +17,8 @@ type SentenceModeViewProps = {
   // Dictation mode props
   dictationMode?: boolean;
   wordRevealed?: boolean;
+  revealTimeRemaining?: number | null;
+  revealCount?: number;
   onReveal?: () => void;
   onRepeat?: () => void;
   // Accessibility props
@@ -34,6 +37,8 @@ export function SentenceModeView({
   onKeyDown,
   dictationMode = false,
   wordRevealed = false,
+  revealTimeRemaining = null,
+  revealCount = 0,
   onReveal,
   onRepeat,
   blindMode = false,
@@ -129,18 +134,13 @@ export function SentenceModeView({
           >
             Repeat
           </button>
-          {!wordRevealed && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onReveal?.();
-                inputRef.current?.focus();
-              }}
-              className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors font-medium"
-            >
-              Reveal
-            </button>
-          )}
+          <RevealButton
+            wordRevealed={wordRevealed}
+            revealTimeRemaining={revealTimeRemaining}
+            revealCount={revealCount}
+            onReveal={() => onReveal?.()}
+            onRefocus={() => inputRef.current?.focus()}
+          />
         </div>
       )}
 
@@ -154,6 +154,7 @@ export function SentenceModeView({
         onFocus={handleFocus}
         onBlur={handleBlur}
         autoFocus
+        disabled={dictationMode && wordRevealed}
         className="sr-only"
         aria-label="Type the highlighted word"
       />
@@ -161,7 +162,9 @@ export function SentenceModeView({
       {/* Instructions */}
       <p className="text-center text-sm text-gray-500 dark:text-gray-500">
         {dictationMode
-          ? "Listen and type the word you hear • Press Space to advance"
+          ? wordRevealed
+            ? "Hide the word to continue typing"
+            : "Listen and type the word you hear • Press Space to advance"
           : "Type the highlighted word • Press Space to advance"
         }
       </p>

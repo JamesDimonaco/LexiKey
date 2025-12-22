@@ -73,6 +73,8 @@ export function PracticeSession() {
     letterStates,
     showFeedback,
     wordRevealed,
+    revealTimeRemaining,
+    revealCount,
     inputRef,
     handleInputChange,
     handleKeyDown,
@@ -218,6 +220,8 @@ export function PracticeSession() {
           onKeyDown={handleKeyDown}
           dictationMode={settings.dictationMode}
           wordRevealed={wordRevealed}
+          revealTimeRemaining={revealTimeRemaining}
+          revealCount={revealCount}
           onReveal={handleReveal}
           onRepeat={handleRepeat}
           blindMode={settings.blindMode}
@@ -237,6 +241,8 @@ export function PracticeSession() {
           showHints={settings.showHints}
           dictationMode={settings.dictationMode}
           wordRevealed={wordRevealed}
+          revealTimeRemaining={revealTimeRemaining}
+          revealCount={revealCount}
           onReveal={handleReveal}
           onRepeat={handleRepeat}
         />
