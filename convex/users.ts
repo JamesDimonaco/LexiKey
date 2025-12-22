@@ -346,6 +346,83 @@ export const updateUserSubscription = mutation({
 });
 
 /**
+ * Migrate anonymous user data to an existing authenticated user
+ * Called when user signs up but webhook created their account before client could migrate
+ */
+export const migrateAnonymousData = mutation({
+  args: {
+    clerkId: v.string(),
+    anonymousData: v.object({
+      currentLevel: v.number(),
+      totalWords: v.number(),
+      totalSessions: v.number(),
+      struggleWords: v.array(v.object({
+        word: v.string(),
+        phonicsGroup: v.string(),
+        consecutiveCorrect: v.number(),
+      })),
+      lastPracticeDate: v.union(v.string(), v.null()),
+    }),
+  },
+  handler: async (ctx, { clerkId, anonymousData }) => {
+    // Find user by clerkId
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const now = Date.now();
+
+    // Merge stats: add totals, take higher level
+    const mergedStats = {
+      ...user.stats,
+      totalWords: user.stats.totalWords + anonymousData.totalWords,
+      totalSessions: user.stats.totalSessions + anonymousData.totalSessions,
+      currentLevel: Math.max(user.stats.currentLevel, anonymousData.currentLevel),
+      lastPracticeDate: anonymousData.lastPracticeDate ?? user.stats.lastPracticeDate,
+    };
+
+    // Update user with merged stats
+    await ctx.db.patch(user._id, {
+      stats: mergedStats,
+      updatedAt: now,
+    });
+
+    // Migrate struggle words (only add ones that don't exist)
+    if (anonymousData.struggleWords.length > 0) {
+      // Get existing struggle words for this user
+      const existingStruggleWords = await ctx.db
+        .query("userStruggleWords")
+        .withIndex("by_userId", (q) => q.eq("userId", user._id))
+        .collect();
+
+      const existingWordSet = new Set(existingStruggleWords.map(sw => sw.word));
+
+      // Insert only new struggle words
+      for (const sw of anonymousData.struggleWords) {
+        if (!existingWordSet.has(sw.word)) {
+          await ctx.db.insert("userStruggleWords", {
+            userId: user._id,
+            word: sw.word,
+            phonicsGroup: sw.phonicsGroup,
+            consecutiveCorrect: sw.consecutiveCorrect,
+            totalAttempts: 1,
+            lastSeenAt: now,
+            createdAt: now,
+          });
+        }
+      }
+    }
+
+    return { success: true, userId: user._id };
+  },
+});
+
+/**
  * Delete user (soft delete - could also add isDeleted flag)
  */
 export const deleteUser = mutation({

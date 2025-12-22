@@ -29,6 +29,7 @@ export function useUserProgress() {
     user?.id ? { clerkId: user.id } : "skip",
   );
   const createUser = useMutation(api.users.createUser);
+  const migrateAnonymousData = useMutation(api.users.migrateAnonymousData);
   const updateUserStats = useMutation(api.users.updateUserStats);
   const batchProcessWordResults = useMutation(api.struggleWords.batchProcessWordResults);
 
@@ -55,45 +56,71 @@ export function useUserProgress() {
       }));
 
   // Auto-create user if they don't exist in Convex
-  // Also migrate anonymous data if available
+  // Also migrate anonymous data if available (handles webhook race condition)
   useEffect(() => {
-    if (!user || currentUser !== null) return;
+    if (!user) return;
 
-    const createUserIfNeeded = async () => {
-      try {
-        // Check for anonymous data to migrate
-        const anonData = getDataForMigration();
-        const anonymousData = anonData ? {
-          currentLevel: anonData.currentLevel,
-          totalWords: anonData.totalWords,
-          totalSessions: anonData.totalSessions,
-          struggleWords: anonData.struggleWords,
-          lastPracticeDate: anonData.lastPracticeDate,
-        } : undefined;
+    const handleUserAndMigration = async () => {
+      // Check for anonymous data to migrate
+      const anonData = getDataForMigration();
 
-        await createUser({
-          clerkId: user.id,
-          name: user.fullName || user.firstName || "User",
-          email: user.primaryEmailAddress?.emailAddress,
-          role: "student",
-          anonymousData,
-        });
+      // Only migrate if there's meaningful data (at least 1 word practiced)
+      const hasDataToMigrate = anonData && anonData.totalWords > 0;
 
-        // Clear anonymous data after successful migration
-        if (anonData) {
-          clearAnonymousData();
+      if (currentUser === null) {
+        // User doesn't exist in Convex yet - create with migration
+        try {
+          const anonymousData = hasDataToMigrate ? {
+            currentLevel: anonData.currentLevel,
+            totalWords: anonData.totalWords,
+            totalSessions: anonData.totalSessions,
+            struggleWords: anonData.struggleWords,
+            lastPracticeDate: anonData.lastPracticeDate,
+          } : undefined;
+
+          await createUser({
+            clerkId: user.id,
+            name: user.fullName || user.firstName || "User",
+            email: user.primaryEmailAddress?.emailAddress,
+            role: "student",
+            anonymousData,
+          });
+
+          // Clear anonymous data after successful migration
+          if (hasDataToMigrate) {
+            clearAnonymousData();
+          }
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          if (!errorMessage?.includes("already exists")) {
+            console.error("Failed to create user:", error);
+          }
         }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        if (!errorMessage?.includes("already exists")) {
-          console.error("Failed to create user:", error);
+      } else if (hasDataToMigrate) {
+        // User exists (webhook created them) but we have anonymous data to migrate
+        try {
+          await migrateAnonymousData({
+            clerkId: user.id,
+            anonymousData: {
+              currentLevel: anonData.currentLevel,
+              totalWords: anonData.totalWords,
+              totalSessions: anonData.totalSessions,
+              struggleWords: anonData.struggleWords,
+              lastPracticeDate: anonData.lastPracticeDate,
+            },
+          });
+
+          // Clear anonymous data after successful migration
+          clearAnonymousData();
+        } catch (error) {
+          console.error("Failed to migrate anonymous data:", error);
         }
       }
     };
 
-    createUserIfNeeded();
-  }, [user, currentUser, createUser, getDataForMigration, clearAnonymousData]);
+    handleUserAndMigration();
+  }, [user, currentUser, createUser, migrateAnonymousData, getDataForMigration, clearAnonymousData]);
 
   // Loading state
   const isLoading = isAnonymous
