@@ -63,7 +63,21 @@ function HomeContent() {
 
   // Show practice session for everyone (anonymous and authenticated)
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto">
+      {/* Subtle placement test banner for anonymous users */}
+      {isAnonymous && (
+        <div className="w-full mb-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <p className="text-sm text-blue-800 dark:text-blue-200">
+            Take a quick placement test to find your level
+          </p>
+          <Link
+            href="/placement-test"
+            className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 whitespace-nowrap"
+          >
+            Take Test →
+          </Link>
+        </div>
+      )}
       <PracticeSession />
     </div>
   );
