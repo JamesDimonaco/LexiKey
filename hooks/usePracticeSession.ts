@@ -89,7 +89,7 @@ export function usePracticeSession({
   const [sentenceMode, setSentenceMode] = useState(true);
 
   // Tracking state
-  const [startTime, setStartTime] = useState(Date.now());
+  const [startTime, setStartTime] = useState<number | null>(null);
   const [backspaceCount, setBackspaceCount] = useState(0);
   const [correctionsMade, setCorrectionsMade] = useState(0);
   const [letterStates, setLetterStates] = useState<LetterState[]>([]);
@@ -201,7 +201,7 @@ export function usePracticeSession({
           wasEverWrong: false,
         })),
       );
-      setStartTime(Date.now());
+      setStartTime(null); // Timer starts on first keystroke, not when word appears
       setBackspaceCount(0);
       setCorrectionsMade(0);
       setShowFeedback(null);
@@ -224,7 +224,8 @@ export function usePracticeSession({
       };
     }
 
-    const timeSpent = (Date.now() - startTime) / 1000;
+    // If startTime is null, user hasn't started typing yet - use 0
+    const timeSpent = startTime ? (Date.now() - startTime) / 1000 : 0;
     const isCorrect =
       userInput.toLowerCase() === currentWord.text.toLowerCase();
 
@@ -287,6 +288,11 @@ export function usePracticeSession({
       const oldLength = userInput.length;
       const newLength = newValue.length;
 
+      // Start timer on first keystroke (when going from 0 to 1 character)
+      if (oldLength === 0 && newLength > 0 && startTime === null) {
+        setStartTime(Date.now());
+      }
+
       if (newLength < oldLength) {
         if (!wasLastKeyBackspace && oldLength > 0) {
           setCorrectionsMade((prev) => prev + 1);
@@ -328,7 +334,7 @@ export function usePracticeSession({
 
       setUserInput(newValue);
     },
-    [userInput.length, wasLastKeyBackspace, letterStates.length],
+    [userInput.length, wasLastKeyBackspace, letterStates.length, startTime],
   );
 
   // Advance to next word
@@ -457,7 +463,7 @@ export function usePracticeSession({
     setUserInput("");
     setResults([]);
     setIsComplete(false);
-    setStartTime(Date.now());
+    setStartTime(null); // Timer starts on first keystroke
     setBackspaceCount(0);
     setCorrectionsMade(0);
     setShowFeedback(null);
