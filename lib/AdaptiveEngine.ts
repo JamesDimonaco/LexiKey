@@ -81,27 +81,36 @@ export class AdaptiveSessionGenerator {
       });
     }
 
-    // Bucket sizes
-    const struggleCount = Math.floor(SIZE * STRUGGLE_PERCENT);
-    const newConceptCount = Math.floor(SIZE * NEW_PERCENT);
-    const confidenceCount = SIZE - struggleCount - newConceptCount;
+    // Bucket sizes (targets - may not be fully filled)
+    const struggleTarget = Math.floor(SIZE * STRUGGLE_PERCENT);
+    const newConceptTarget = Math.floor(SIZE * NEW_PERCENT);
+    const confidenceTarget = SIZE - struggleTarget - newConceptTarget;
 
-    const sessionWords: Word[] = [];
     const usedWords = new Set<string>(); // Track words to prevent duplicates
 
-    // 1. FILL STRUGGLE BUCKET (30%)
+    // 1. FILL STRUGGLE BUCKET
     // Note: getStruggleWords marks only actual bucket words with isStruggle: true
-    const struggleWords = this.getStruggleWords(user, struggleCount, usedWords);
-    sessionWords.push(...struggleWords);
+    const struggleWords = this.getStruggleWords(user, struggleTarget, usedWords);
     struggleWords.forEach(w => usedWords.add(w.text));
 
-    // 2. FILL NEW CONCEPT BUCKET (50%)
-    const newWords = this.getNewWords(user, newConceptCount, usedWords);
-    sessionWords.push(...newWords);
+    // 2. FILL NEW CONCEPT BUCKET
+    const newWords = this.getNewWords(user, newConceptTarget, usedWords);
     newWords.forEach(w => usedWords.add(w.text));
 
-    // 3. FILL CONFIDENCE BUCKET (20%)
-    const easyWords = this.getConfidenceBoosters(user, confidenceCount, usedWords);
+    // 3. FILL CONFIDENCE BUCKET
+    const easyWords = this.getConfidenceBoosters(user, confidenceTarget, usedWords);
+    easyWords.forEach(w => usedWords.add(w.text));
+
+    // 4. FILL ANY REMAINING SLOTS with words at user's level
+    // This ensures we always return the requested word count
+    const totalSoFar = struggleWords.length + newWords.length + easyWords.length;
+    const remaining = SIZE - totalSoFar;
+
+    let fillerWords: Word[] = [];
+    if (remaining > 0) {
+      fillerWords = this.getNewWords(user, remaining, usedWords);
+      fillerWords.forEach(w => usedWords.add(w.text));
+    }
 
     // Start with confidence boosters (don't shuffle these)
     const startingBoost = easyWords.slice(0, STARTING_BOOSTERS);
@@ -112,6 +121,7 @@ export class AdaptiveSessionGenerator {
       ...remainingEasy,
       ...newWords,
       ...struggleWords,
+      ...fillerWords,
     ]);
 
     const finalWords = [...startingBoost, ...shuffled];
@@ -185,6 +195,7 @@ export class AdaptiveSessionGenerator {
   /**
    * Find struggle words from the user's bucket first, then from struggle groups
    * Only marks words from the actual bucket as isStruggle (not group words)
+   * If not enough struggle words, returns what's available (caller will fill with normal words)
    */
   private getStruggleWords(
     user: UserProgress,
@@ -224,6 +235,7 @@ export class AdaptiveSessionGenerator {
       result.push(...groupWords.slice(0, count - result.length));
     }
 
+    // Return what we found (may be less than count - caller will fill with normal words)
     return result;
   }
 

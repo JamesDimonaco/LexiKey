@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { SignUpButton } from "@clerk/nextjs";
 import { WordResult } from "@/lib/types";
 
@@ -122,21 +121,13 @@ export function SessionComplete({
         )}
 
         {/* Actions */}
-        <div className="flex gap-4">
-          <button
-            onClick={onRestart}
-            className="flex-1 py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Practice Again
-            <span className="block text-sm font-normal opacity-75">Press Enter</span>
-          </button>
-          <Link
-            href="/"
-            className="flex-1 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-          >
-            Home
-          </Link>
-        </div>
+        <button
+          onClick={onRestart}
+          className="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Practice Again
+          <span className="block text-sm font-normal opacity-75">Press Enter</span>
+        </button>
       </div>
     </div>
   );

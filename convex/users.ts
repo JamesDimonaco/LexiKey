@@ -377,12 +377,12 @@ export const migrateAnonymousData = mutation({
 
     const now = Date.now();
 
-    // Merge stats: add totals, take higher level
+    // Merge stats: add totals, use the level passed by the client (user's choice)
     const mergedStats = {
       ...user.stats,
       totalWords: user.stats.totalWords + anonymousData.totalWords,
       totalSessions: user.stats.totalSessions + anonymousData.totalSessions,
-      currentLevel: Math.max(user.stats.currentLevel, anonymousData.currentLevel),
+      currentLevel: anonymousData.currentLevel, // Use the level chosen by user
       lastPracticeDate: anonymousData.lastPracticeDate ?? user.stats.lastPracticeDate,
     };
 
@@ -418,7 +418,10 @@ export const migrateAnonymousData = mutation({
       }
     }
 
-    return { success: true, userId: user._id };
+    return {
+      success: true,
+      userId: user._id,
+    };
   },
 });
 

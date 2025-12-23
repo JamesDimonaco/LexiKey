@@ -1,8 +1,18 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Word, UserProgress, PhonicsGroup, StruggleWord, WordResult } from "@/lib/types";
-import { AdaptiveSessionGenerator, calculateNewUserLevel, SessionOptions } from "@/lib/AdaptiveEngine";
+import {
+  Word,
+  UserProgress,
+  PhonicsGroup,
+  StruggleWord,
+  WordResult,
+} from "@/lib/types";
+import {
+  AdaptiveSessionGenerator,
+  calculateNewUserLevel,
+  SessionOptions,
+} from "@/lib/AdaptiveEngine";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useTTS } from "./useTTS";
 import { useReveal } from "./useReveal";
@@ -10,13 +20,13 @@ import { LetterState } from "@/app/practice/types";
 import wordsData from "@/app/practice/words.json";
 
 // Struggle word threshold constants
-const HESITATION_BASE_TIME = 0.5; // base seconds to read/process the word
+const HESITATION_BASE_TIME = 0.6; // base seconds to read/process the word
 const HESITATION_PER_CHAR = 0.3; // seconds per character (reasonable typing speed)
 const BACKSPACE_THRESHOLD = 4;
 
 // Calculate hesitation threshold based on word length
 function getHesitationThreshold(wordLength: number): number {
-  return HESITATION_BASE_TIME + (wordLength * HESITATION_PER_CHAR);
+  return HESITATION_BASE_TIME + wordLength * HESITATION_PER_CHAR;
 }
 
 // Load words from JSON and transform to Word[] format
@@ -41,7 +51,16 @@ interface UsePracticeSessionProps {
   isUserLoading: boolean;
   effectiveLevel: number;
   effectiveStruggleWords: StruggleWord[];
-  currentUser: { _id: string; stats: { hasCompletedPlacementTest: boolean; struggleGroups?: string[] } } | null | undefined;
+  currentUser:
+    | {
+        _id: string;
+        stats: {
+          hasCompletedPlacementTest: boolean;
+          struggleGroups?: string[];
+        };
+      }
+    | null
+    | undefined;
   anonymousUser: { deviceId: string } | null;
   onFinishSession: (results: WordResult[], newLevel: number) => Promise<void>;
 }
@@ -76,7 +95,9 @@ export function usePracticeSession({
   const [wasLastKeyBackspace, setWasLastKeyBackspace] = useState(false);
 
   // Feedback state
-  const [showFeedback, setShowFeedback] = useState<"correct" | "incorrect" | null>(null);
+  const [showFeedback, setShowFeedback] = useState<
+    "correct" | "incorrect" | null
+  >(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const lastSpokenWordIdRef = useRef<string>("");
@@ -105,10 +126,16 @@ export function usePracticeSession({
     if (isUserLoading) return;
 
     const userProgress: UserProgress = {
-      userId: isAnonymous ? (anonymousUser?.deviceId ?? "anon") : currentUser!._id,
+      userId: isAnonymous
+        ? (anonymousUser?.deviceId ?? "anon")
+        : currentUser!._id,
       currentLevel: effectiveLevel,
-      hasCompletedPlacementTest: isAnonymous ? false : (currentUser?.stats.hasCompletedPlacementTest ?? false),
-      struggleGroups: isAnonymous ? [] : ((currentUser?.stats.struggleGroups || []) as PhonicsGroup[]),
+      hasCompletedPlacementTest: isAnonymous
+        ? false
+        : (currentUser?.stats.hasCompletedPlacementTest ?? false),
+      struggleGroups: isAnonymous
+        ? []
+        : ((currentUser?.stats.struggleGroups || []) as PhonicsGroup[]),
       struggleWords: effectiveStruggleWords,
     };
 
@@ -122,8 +149,14 @@ export function usePracticeSession({
       startingBoosters: settings.startingBoosters,
     };
 
-    const generator = new AdaptiveSessionGenerator(WORD_POOL, effectiveStruggleWords);
-    const generatedWords = generator.generateSession(userProgress, sessionOptions);
+    const generator = new AdaptiveSessionGenerator(
+      WORD_POOL,
+      effectiveStruggleWords,
+    );
+    const generatedWords = generator.generateSession(
+      userProgress,
+      sessionOptions,
+    );
     setSessionWords(generatedWords);
   }, [
     isAnonymous,
@@ -177,7 +210,8 @@ export function usePracticeSession({
     }
 
     const timeSpent = (Date.now() - startTime) / 1000;
-    const isCorrect = userInput.toLowerCase() === currentWord.text.toLowerCase();
+    const isCorrect =
+      userInput.toLowerCase() === currentWord.text.toLowerCase();
 
     return {
       wordId: currentWord.id,
@@ -187,89 +221,113 @@ export function usePracticeSession({
       userInput,
       timeSpent,
       backspaceCount,
-      hesitationDetected: timeSpent > getHesitationThreshold(currentWord.text.length),
+      hesitationDetected:
+        timeSpent > getHesitationThreshold(currentWord.text.length),
     };
   }, [currentWord, userInput, startTime, backspaceCount]);
 
   // Finish session handler
-  const finishSession = useCallback(async (allResults: WordResult[]) => {
-    setIsComplete(true);
+  const finishSession = useCallback(
+    async (allResults: WordResult[]) => {
+      setIsComplete(true);
 
-    const accuracy = allResults.filter((r) => r.correct).length / allResults.length;
-    const avgTimePerWord = allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length;
-    const newLevel = calculateNewUserLevel(effectiveLevel, accuracy, avgTimePerWord);
+      const accuracy =
+        allResults.filter((r) => r.correct).length / allResults.length;
+      const avgTimePerWord =
+        allResults.reduce((sum, r) => sum + r.timeSpent, 0) / allResults.length;
+      const newLevel = calculateNewUserLevel(
+        effectiveLevel,
+        accuracy,
+        avgTimePerWord,
+      );
 
-    await onFinishSession(allResults, newLevel);
-  }, [effectiveLevel, onFinishSession]);
+      await onFinishSession(allResults, newLevel);
+    },
+    [effectiveLevel, onFinishSession],
+  );
 
   // Input change handler with letter tracking
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    const oldLength = userInput.length;
-    const newLength = newValue.length;
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      const oldLength = userInput.length;
+      const newLength = newValue.length;
 
-    if (newLength < oldLength) {
-      if (!wasLastKeyBackspace && oldLength > 0) {
-        setCorrectionsMade((prev) => prev + 1);
-      }
-      setWasLastKeyBackspace(true);
+      if (newLength < oldLength) {
+        if (!wasLastKeyBackspace && oldLength > 0) {
+          setCorrectionsMade((prev) => prev + 1);
+        }
+        setWasLastKeyBackspace(true);
 
-      setLetterStates((prev) =>
-        prev.map((state, i) => {
-          if (i >= newLength) {
-            return { ...state, typed: null };
-          }
-          return state;
-        }),
-      );
-    } else {
-      setWasLastKeyBackspace(false);
-
-      const newCharIndex = newLength - 1;
-      const newChar = newValue[newCharIndex];
-
-      if (newCharIndex < letterStates.length) {
         setLetterStates((prev) =>
           prev.map((state, i) => {
-            if (i === newCharIndex) {
-              const isCorrect = newChar.toLowerCase() === state.expected;
-              return {
-                ...state,
-                typed: newChar,
-                wasCorrectFirstTry: state.typed === null ? isCorrect : state.wasCorrectFirstTry,
-                wasEverWrong: state.wasEverWrong || !isCorrect,
-              };
+            if (i >= newLength) {
+              return { ...state, typed: null };
             }
             return state;
           }),
         );
-      }
-    }
+      } else {
+        setWasLastKeyBackspace(false);
 
-    setUserInput(newValue);
-  }, [userInput.length, wasLastKeyBackspace, letterStates.length]);
+        const newCharIndex = newLength - 1;
+        const newChar = newValue[newCharIndex];
+
+        if (newCharIndex < letterStates.length) {
+          setLetterStates((prev) =>
+            prev.map((state, i) => {
+              if (i === newCharIndex) {
+                const isCorrect = newChar.toLowerCase() === state.expected;
+                return {
+                  ...state,
+                  typed: newChar,
+                  wasCorrectFirstTry:
+                    state.typed === null ? isCorrect : state.wasCorrectFirstTry,
+                  wasEverWrong: state.wasEverWrong || !isCorrect,
+                };
+              }
+              return state;
+            }),
+          );
+        }
+      }
+
+      setUserInput(newValue);
+    },
+    [userInput.length, wasLastKeyBackspace, letterStates.length],
+  );
 
   // Advance to next word
-  const advanceToNextWord = useCallback((wasCorrect: boolean) => {
-    const result = calculateWordResult();
-    result.correct = wasCorrect;
-    const newResults = [...results, result];
-    setResults(newResults);
+  const advanceToNextWord = useCallback(
+    (wasCorrect: boolean) => {
+      const result = calculateWordResult();
+      result.correct = wasCorrect;
+      const newResults = [...results, result];
+      setResults(newResults);
 
-    if (currentWordIndex < sessionWords.length - 1) {
-      setCurrentWordIndex((prev) => prev + 1);
-      setUserInput("");
-    } else {
-      finishSession(newResults);
-    }
-  }, [calculateWordResult, results, currentWordIndex, sessionWords.length, finishSession]);
+      if (currentWordIndex < sessionWords.length - 1) {
+        setCurrentWordIndex((prev) => prev + 1);
+        setUserInput("");
+      } else {
+        finishSession(newResults);
+      }
+    },
+    [
+      calculateWordResult,
+      results,
+      currentWordIndex,
+      sessionWords.length,
+      finishSession,
+    ],
+  );
 
   // Submit word (single word mode)
   const handleSubmitWord = useCallback(() => {
     if (!currentWord) return;
 
     const result = calculateWordResult();
-    const isCorrect = userInput.toLowerCase() === currentWord.text.toLowerCase();
+    const isCorrect =
+      userInput.toLowerCase() === currentWord.text.toLowerCase();
 
     setShowFeedback(isCorrect ? "correct" : "incorrect");
 
@@ -284,24 +342,47 @@ export function usePracticeSession({
         finishSession(newResults);
       }
     }, 300);
-  }, [currentWord, calculateWordResult, userInput, results, currentWordIndex, sessionWords.length, finishSession]);
+  }, [
+    currentWord,
+    calculateWordResult,
+    userInput,
+    results,
+    currentWordIndex,
+    sessionWords.length,
+    finishSession,
+  ]);
 
   // Key down handler
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace") {
-      setBackspaceCount((prev) => prev + 1);
-    }
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Backspace") {
+        setBackspaceCount((prev) => prev + 1);
+      }
 
-    if (!sentenceMode && (e.key === "Enter" || e.key === " ") && userInput.length > 0) {
-      e.preventDefault();
-      handleSubmitWord();
-    }
+      if (
+        !sentenceMode &&
+        (e.key === "Enter" || e.key === " ") &&
+        userInput.length > 0
+      ) {
+        e.preventDefault();
+        handleSubmitWord();
+      }
 
-    if (sentenceMode && e.key === " " && userInput.length > 0) {
-      e.preventDefault();
-      advanceToNextWord(userInput.toLowerCase() === currentWord?.text.toLowerCase());
-    }
-  }, [sentenceMode, userInput, handleSubmitWord, advanceToNextWord, currentWord?.text]);
+      if (sentenceMode && e.key === " " && userInput.length > 0) {
+        e.preventDefault();
+        advanceToNextWord(
+          userInput.toLowerCase() === currentWord?.text.toLowerCase(),
+        );
+      }
+    },
+    [
+      sentenceMode,
+      userInput,
+      handleSubmitWord,
+      advanceToNextWord,
+      currentWord?.text,
+    ],
+  );
 
   // Reset session state (keeps same words)
   const resetSessionState = useCallback(() => {
@@ -330,18 +411,21 @@ export function usePracticeSession({
   }, [resetSessionState]);
 
   // Dictation mode toggle - regenerates new words to prevent cheating
-  const handleDictationToggle = useCallback((enabled: boolean) => {
-    updateSettings({
-      dictationMode: enabled,
-      ttsEnabled: enabled ? true : settings.ttsEnabled,
-    });
+  const handleDictationToggle = useCallback(
+    (enabled: boolean) => {
+      updateSettings({
+        dictationMode: enabled,
+        ttsEnabled: enabled ? true : settings.ttsEnabled,
+      });
 
-    // Generate new words to prevent cheating
-    setSessionWords([]);
-    resetSessionState();
+      // Generate new words to prevent cheating
+      setSessionWords([]);
+      resetSessionState();
 
-    setTimeout(() => inputRef.current?.focus(), 100);
-  }, [settings.ttsEnabled, updateSettings, resetSessionState]);
+      setTimeout(() => inputRef.current?.focus(), 100);
+    },
+    [settings.ttsEnabled, updateSettings, resetSessionState],
+  );
 
   // Dictation handlers
   const handleRepeat = useCallback(() => {

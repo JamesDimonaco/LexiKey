@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { PracticeSession } from "./practice/PracticeSession";
+import { MergeDialog } from "@/components/MergeDialog";
 import { useUserProgress } from "@/hooks/useUserProgress";
 
 export default function Home() {
@@ -18,7 +19,14 @@ export default function Home() {
 }
 
 function HomeContent() {
-  const { isAnonymous, isLoading, currentUser } = useUserProgress();
+  const {
+    isAnonymous,
+    isLoading,
+    currentUser,
+    pendingMigration,
+    handleMerge,
+    handleDiscard,
+  } = useUserProgress();
   const [hasCompletedPlacementTest, setHasCompletedPlacementTest] = useState(false);
 
   // Check if anonymous user has completed placement test
@@ -39,6 +47,27 @@ function HomeContent() {
             Loading...
           </p>
         </div>
+      </div>
+    );
+  }
+
+  // Show merge dialog for existing users with anonymous data
+  if (pendingMigration && currentUser) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <MergeDialog
+          anonymousData={{
+            totalWords: pendingMigration.totalWords,
+            currentLevel: pendingMigration.currentLevel,
+            struggleWordsCount: pendingMigration.struggleWords.length,
+          }}
+          accountData={{
+            totalWords: currentUser.stats.totalWords,
+            currentLevel: currentUser.stats.currentLevel,
+          }}
+          onMerge={handleMerge}
+          onDiscard={handleDiscard}
+        />
       </div>
     );
   }
