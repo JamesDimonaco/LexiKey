@@ -18,6 +18,7 @@ import { useTTS } from "./useTTS";
 import { useReveal } from "./useReveal";
 import { LetterState } from "@/app/practice/types";
 import wordsData from "@/app/practice/words.json";
+import { trackEvent } from "./usePostHog";
 
 // Struggle word threshold constants
 const HESITATION_BASE_TIME = 0.6; // base seconds to read/process the word
@@ -158,6 +159,20 @@ export function usePracticeSession({
       sessionOptions,
     );
     setSessionWords(generatedWords);
+
+    // Track session started
+    trackEvent("practice_session_started", {
+      wordCount: generatedWords.length,
+      userLevel: effectiveLevel,
+      isAnonymous,
+      hasCompletedPlacementTest: userProgress.hasCompletedPlacementTest,
+      struggleWordsCount: effectiveStruggleWords.length,
+      sessionOptions: {
+        strugglePercent: sessionOptions.strugglePercent,
+        newPercent: sessionOptions.newPercent,
+        confidencePercent: sessionOptions.confidencePercent,
+      },
+    });
   }, [
     isAnonymous,
     isUserLoading,
@@ -241,9 +256,28 @@ export function usePracticeSession({
         avgTimePerWord,
       );
 
+      // Track session completion
+      const totalTime = allResults.reduce((sum, r) => sum + r.timeSpent, 0);
+      const struggleWords = allResults.filter(
+        (r) => !r.correct || r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD
+      );
+
+      trackEvent("practice_session_completed", {
+        wordCount: allResults.length,
+        accuracy: Math.round(accuracy * 100),
+        avgTimePerWord: Math.round(avgTimePerWord * 100) / 100,
+        totalTime: Math.round(totalTime),
+        oldLevel: effectiveLevel,
+        newLevel,
+        struggleWordsCount: struggleWords.length,
+        isAnonymous,
+        sentenceMode,
+        dictationMode: settings.dictationMode,
+      });
+
       await onFinishSession(allResults, newLevel);
     },
-    [effectiveLevel, onFinishSession],
+    [effectiveLevel, onFinishSession, isAnonymous, sentenceMode, settings.dictationMode],
   );
 
   // Input change handler with letter tracking
@@ -329,6 +363,21 @@ export function usePracticeSession({
     const isCorrect =
       userInput.toLowerCase() === currentWord.text.toLowerCase();
 
+    // Track word completion
+    trackEvent("practice_word_completed", {
+      word: currentWord.text,
+      correct: isCorrect,
+      timeSpent: Math.round(result.timeSpent * 100) / 100,
+      backspaceCount: result.backspaceCount,
+      hesitationDetected: result.hesitationDetected,
+      wordIndex: currentWordIndex + 1,
+      totalWords: sessionWords.length,
+      difficulty: currentWord.difficulty,
+      phonicsGroup: currentWord.phonicsGroup,
+      sentenceMode,
+      dictationMode: settings.dictationMode,
+    });
+
     setShowFeedback(isCorrect ? "correct" : "incorrect");
 
     const newResults = [...results, result];
@@ -370,9 +419,27 @@ export function usePracticeSession({
 
       if (sentenceMode && e.key === " " && userInput.length > 0) {
         e.preventDefault();
-        advanceToNextWord(
-          userInput.toLowerCase() === currentWord?.text.toLowerCase(),
-        );
+        const isCorrect = userInput.toLowerCase() === currentWord?.text.toLowerCase();
+
+        // Track word completion in sentence mode
+        if (currentWord) {
+          const result = calculateWordResult();
+          trackEvent("practice_word_completed", {
+            word: currentWord.text,
+            correct: isCorrect,
+            timeSpent: Math.round(result.timeSpent * 100) / 100,
+            backspaceCount: result.backspaceCount,
+            hesitationDetected: result.hesitationDetected,
+            wordIndex: currentWordIndex + 1,
+            totalWords: sessionWords.length,
+            difficulty: currentWord.difficulty,
+            phonicsGroup: currentWord.phonicsGroup,
+            sentenceMode: true,
+            dictationMode: settings.dictationMode,
+          });
+        }
+
+        advanceToNextWord(isCorrect);
       }
     },
     [
@@ -399,20 +466,34 @@ export function usePracticeSession({
 
   // Restart session (generates new words)
   const restartSession = useCallback(() => {
+    trackEvent("practice_session_restarted", {
+      previousWordCount: sessionWords.length,
+      previousResultsCount: results.length,
+    });
     setSessionWords([]); // This triggers regeneration
     resetSessionState();
-  }, [resetSessionState]);
+  }, [resetSessionState, sessionWords.length, results.length]);
 
   // Refresh session with new words
   const refreshSession = useCallback(() => {
+    trackEvent("practice_session_refreshed", {
+      previousWordCount: sessionWords.length,
+      currentWordIndex,
+    });
     setSessionWords([]); // Clear to trigger regeneration
     resetSessionState();
     setTimeout(() => inputRef.current?.focus(), 100);
-  }, [resetSessionState]);
+  }, [resetSessionState, sessionWords.length, currentWordIndex]);
 
   // Dictation mode toggle - regenerates new words to prevent cheating
   const handleDictationToggle = useCallback(
     (enabled: boolean) => {
+      trackEvent("dictation_mode_toggled", {
+        enabled,
+        previousMode: settings.dictationMode,
+        wordIndex: currentWordIndex,
+      });
+
       updateSettings({
         dictationMode: enabled,
         ttsEnabled: enabled ? true : settings.ttsEnabled,
@@ -424,7 +505,7 @@ export function usePracticeSession({
 
       setTimeout(() => inputRef.current?.focus(), 100);
     },
-    [settings.ttsEnabled, updateSettings, resetSessionState],
+    [settings.ttsEnabled, settings.dictationMode, updateSettings, resetSessionState, currentWordIndex],
   );
 
   // Dictation handlers

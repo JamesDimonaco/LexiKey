@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { SignUpButton } from "@clerk/nextjs";
 import { WordResult } from "@/lib/types";
+import { trackEvent } from "@/hooks/usePostHog";
 
 // Thresholds for determining struggle words (match practice page)
 const BACKSPACE_THRESHOLD = 4;
@@ -71,6 +72,18 @@ export function SessionComplete({
   // Focus container for keyboard events
   useEffect(() => {
     containerRef.current?.focus();
+    
+    // Track session complete view
+    trackEvent("session_complete_viewed", {
+      accuracy,
+      wordCount: results.length,
+      struggleWordsCount: struggleWords.length,
+      totalTime,
+      wpm: shouldShowWPM ? wpm : null,
+      isAnonymous,
+      inputMode,
+      displayMode,
+    });
   }, []);
 
   return (

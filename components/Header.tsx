@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { ModeToggle } from "@/components/mode-toggle";
+import { trackEvent } from "@/hooks/usePostHog";
 
 export function Header() {
   return (
@@ -27,12 +28,18 @@ export function Header() {
         <ModeToggle />
         <SignedOut>
           <SignInButton mode="modal">
-            <button className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <button
+              onClick={() => trackEvent("sign_in_clicked")}
+              className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
               Sign In
             </button>
           </SignInButton>
           <SignUpButton mode="modal">
-            <button className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+              onClick={() => trackEvent("sign_up_clicked")}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Sign Up
             </button>
           </SignUpButton>

@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { PracticeSession } from "./practice/PracticeSession";
 import { MergeDialog } from "@/components/MergeDialog";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { usePostHogPageView } from "@/hooks/usePostHog";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
 }
 
 function HomeContent() {
+  usePostHogPageView();
   const {
     isAnonymous,
     isLoading,
