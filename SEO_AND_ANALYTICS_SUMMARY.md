@@ -3,11 +3,13 @@
 ## ✅ Completed SEO Features
 
 ### 1. Sitemap & Robots
+
 - **Sitemap**: `app/sitemap.ts` - Dynamically generates sitemap with all routes
 - **Robots**: `app/robots.ts` - Allows all crawlers, disallows API routes
 - Both files use `NEXT_PUBLIC_SITE_URL` environment variable
 
 ### 2. Enhanced Metadata
+
 - **Root Layout** (`app/layout.tsx`):
   - Comprehensive meta tags (title, description, keywords)
   - Open Graph tags for social sharing
@@ -17,6 +19,7 @@
   - Canonical URLs
 
 ### 3. SEO Configuration
+
 - Meta tags configured for:
   - Title templates
   - Description with keywords
@@ -31,11 +34,13 @@
 ### Events Tracked
 
 #### Page Views
+
 - Automatic page view tracking on all routes
 - User identification when signed in
 - Path tracking for navigation analysis
 
 #### Practice Session Events
+
 - `practice_session_started` - When a new session begins
 - `practice_word_completed` - Each word typed (with accuracy, time, difficulty)
 - `practice_session_completed` - Session finished (with stats)
@@ -46,14 +51,17 @@
 - `session_complete_viewed` - When completion screen is shown
 
 #### Placement Test Events
+
 - `placement_test_word_completed` - Each word in placement test
 - `placement_test_completed` - Test finished with results
 
 #### Settings Events
+
 - `settings_changed` - Any setting modification (tracks what changed)
 - `settings_reset` - Settings reset to defaults
 
 #### Authentication Events
+
 - `sign_in_clicked` - Sign in button clicked
 - `sign_up_clicked` - Sign up button clicked
 - `user_signed_in` - User successfully authenticated (tracked automatically)
@@ -61,6 +69,7 @@
 ### Event Properties
 
 All events include relevant context:
+
 - User level and progress
 - Word difficulty and phonics groups
 - Accuracy and timing metrics
@@ -71,7 +80,7 @@ All events include relevant context:
 
 ```bash
 # SEO
-NEXT_PUBLIC_SITE_URL=https://lexikey.app
+NEXT_PUBLIC_SITE_URL=https://lexikey.org
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your-verification-code
 
 # PostHog
@@ -82,6 +91,7 @@ NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 ## Next Steps
 
 ### SEO
+
 1. ✅ Set up Google Search Console (see `GOOGLE_SEARCH_CONSOLE_SETUP.md`)
 2. Create `public/og-image.png` (1200x630px) for social sharing
 3. Create `public/manifest.json` for PWA support
@@ -89,6 +99,7 @@ NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 5. Monitor Search Console for indexing status
 
 ### PostHog
+
 1. Verify events are appearing in PostHog dashboard
 2. Set up funnels for key user journeys:
    - Sign up → Placement test → Practice session
@@ -106,12 +117,14 @@ NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 ## Files Modified
 
 ### SEO
+
 - `app/layout.tsx` - Enhanced metadata
 - `app/sitemap.ts` - Created sitemap generator
 - `app/robots.ts` - Created robots.txt generator
 - `GOOGLE_SEARCH_CONSOLE_SETUP.md` - Setup guide
 
 ### PostHog
+
 - `hooks/usePostHog.ts` - Created tracking utilities
 - `app/page.tsx` - Added page view tracking
 - `app/practice/page.tsx` - Added page view tracking
@@ -125,6 +138,7 @@ NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 ## Testing
 
 ### SEO Testing
+
 1. Check sitemap: `https://your-domain.com/sitemap.xml`
 2. Check robots: `https://your-domain.com/robots.txt`
 3. Validate meta tags using:
@@ -133,6 +147,7 @@ NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
    - [Twitter Card Validator](https://cards-dev.twitter.com/validator)
 
 ### PostHog Testing
+
 1. Open browser console
 2. Check for PostHog initialization
 3. Perform actions and verify events in PostHog dashboard

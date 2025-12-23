@@ -85,7 +85,7 @@ After a few days/weeks, check:
 Make sure these are set in your production environment:
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://lexikey.app
+NEXT_PUBLIC_SITE_URL=https://lexikey.org
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your-verification-code
 ```
 
@@ -104,16 +104,19 @@ NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your-verification-code
 ## Troubleshooting
 
 ### Sitemap Not Found
+
 - Ensure `app/sitemap.ts` exists and exports default function
 - Check that `NEXT_PUBLIC_SITE_URL` is set correctly
 - Verify sitemap is accessible at `/sitemap.xml`
 
 ### Verification Failed
+
 - Double-check meta tag is in `<head>` section
 - Ensure site is deployed and accessible
 - Try a different verification method
 
 ### Pages Not Indexing
+
 - Check robots.txt isn't blocking crawlers
 - Ensure pages return 200 status codes
 - Use URL Inspection tool to debug specific pages

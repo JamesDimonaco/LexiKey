@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lexikey.app';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lexikey.org';
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -96,7 +96,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lexikey.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lexikey.org';
   
   return (
     <html lang="en" suppressHydrationWarning>
