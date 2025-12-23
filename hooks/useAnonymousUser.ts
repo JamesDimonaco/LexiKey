@@ -6,6 +6,13 @@ import { AnonymousUserData, StruggleWord } from '@/lib/types';
 const STORAGE_KEY = 'lexikey-anonymous-user';
 const DEFAULT_LEVEL = 5;
 
+// Word result for processing struggle words
+interface WordResultForBucket {
+  word: string;
+  phonicsGroup: string;
+  wasStruggle: boolean;
+}
+
 // Generate a unique device ID
 function generateDeviceId(): string {
   return 'anon_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
@@ -66,23 +73,49 @@ export function useAnonymousUser() {
   }, []);
 
   // Update anonymous user stats after a session
+  // Now accepts ALL word results (not just struggled ones) to properly track graduation
   const updateStats = useCallback((
     wordsCompleted: number,
     newLevel: number,
-    struggleWordsToAdd: StruggleWord[]
+    wordResults: WordResultForBucket[]
   ) => {
     if (!anonymousUser) return;
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Merge struggle words (update existing or add new)
+    // Process all word results (same logic as Convex batchProcessWordResults)
     const updatedStruggleWords = [...anonymousUser.struggleWords];
-    for (const sw of struggleWordsToAdd) {
-      const existingIndex = updatedStruggleWords.findIndex(w => w.word === sw.word);
-      if (existingIndex >= 0) {
-        updatedStruggleWords[existingIndex] = sw;
+
+    for (const result of wordResults) {
+      const existingIndex = updatedStruggleWords.findIndex(w => w.word === result.word);
+
+      if (result.wasStruggle) {
+        // User struggled with this word
+        if (existingIndex >= 0) {
+          // Reset consecutive counter
+          updatedStruggleWords[existingIndex] = {
+            ...updatedStruggleWords[existingIndex],
+            consecutiveCorrect: 0,
+          };
+        } else {
+          // Add new struggle word
+          updatedStruggleWords.push({
+            word: result.word,
+            phonicsGroup: result.phonicsGroup,
+            consecutiveCorrect: 0,
+          });
+        }
       } else {
-        updatedStruggleWords.push(sw);
+        // User got it correct (no struggle)
+        if (existingIndex >= 0) {
+          // Increment consecutive correct
+          const newConsecutive = updatedStruggleWords[existingIndex].consecutiveCorrect + 1;
+          updatedStruggleWords[existingIndex] = {
+            ...updatedStruggleWords[existingIndex],
+            consecutiveCorrect: newConsecutive,
+          };
+        }
+        // If word not in bucket and user got it correct, do nothing
       }
     }
 

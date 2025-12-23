@@ -30,23 +30,18 @@ export function PracticeSession() {
 
   // Handle finishing session - save results to appropriate storage
   const handleFinishSession = useCallback(async (allResults: WordResult[], newLevel: number) => {
-    const struggleWordsToAdd: StruggleWord[] = allResults
-      .filter((r) => r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD)
-      .map((r) => ({
-        word: r.word,
-        phonicsGroup: r.phonicsGroup,
-        consecutiveCorrect: 0,
-      }));
+    // Build word results with wasStruggle flag for bucket processing
+    // A word is a struggle if: incorrect, took too long, or required many corrections
+    const wordResultsForBucket = allResults.map((r) => ({
+      word: r.word,
+      phonicsGroup: r.phonicsGroup,
+      wasStruggle: !r.correct || r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
+    }));
 
     if (isAnonymous) {
-      updateAnonymousStats(allResults.length, newLevel, struggleWordsToAdd);
+      // Pass ALL word results so graduation logic can increment consecutiveCorrect
+      updateAnonymousStats(allResults.length, newLevel, wordResultsForBucket);
     } else if (currentUser) {
-      const wordResultsForBucket = allResults.map((r) => ({
-        word: r.word,
-        phonicsGroup: r.phonicsGroup,
-        wasStruggle: r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
-      }));
-
       await Promise.all([
         batchProcessWordResults({
           userId: currentUser._id,

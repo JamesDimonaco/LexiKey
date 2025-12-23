@@ -94,11 +94,12 @@ export function SentenceModeView({
             <div
               key={word.id}
               className={`
-                text-2xl font-mono tracking-wider px-2 py-1 rounded transition-colors
+                relative text-2xl font-mono tracking-wider px-2 py-1 rounded transition-colors
                 ${isCurrentWord ? "bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 underline decoration-blue-500 decoration-2 underline-offset-4" : ""}
                 ${isCompleted && result?.correct ? "text-green-600 dark:text-green-400" : ""}
                 ${isCompleted && !result?.correct ? "text-red-500 dark:text-red-400 line-through" : ""}
                 ${!isCurrentWord && !isCompleted ? "text-gray-400 dark:text-gray-600" : ""}
+                ${word.isStruggle && !isCompleted ? "border-b-2 border-orange-400 dark:border-orange-500" : ""}
               `}
             >
               {isCurrentWord ? (

@@ -91,6 +91,13 @@ export function SingleWordView({
           ${!showFeedback ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700" : ""}
         `}
       >
+        {/* Struggle word indicator */}
+        {currentWord.isStruggle && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400">
+            <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+            <span>Review</span>
+          </div>
+        )}
         <div className="text-6xl font-bold text-center tracking-wider font-mono">
           {currentWord.text.split("").map((char, charIdx) => {
             const typedChar = userInput[charIdx];

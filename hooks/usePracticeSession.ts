@@ -10,8 +10,14 @@ import { LetterState } from "@/app/practice/types";
 import wordsData from "@/app/practice/words.json";
 
 // Struggle word threshold constants
-const HESITATION_THRESHOLD = 1.5; // seconds
-const BACKSPACE_THRESHOLD = 3;
+const HESITATION_BASE_TIME = 0.5; // base seconds to read/process the word
+const HESITATION_PER_CHAR = 0.3; // seconds per character (reasonable typing speed)
+const BACKSPACE_THRESHOLD = 4;
+
+// Calculate hesitation threshold based on word length
+function getHesitationThreshold(wordLength: number): number {
+  return HESITATION_BASE_TIME + (wordLength * HESITATION_PER_CHAR);
+}
 
 // Load words from JSON and transform to Word[] format
 const WORD_POOL: Word[] = wordsData.map(
@@ -163,6 +169,7 @@ export function usePracticeSession({
         word: "",
         phonicsGroup: "",
         correct: false,
+        userInput: "",
         timeSpent: 0,
         backspaceCount: 0,
         hesitationDetected: false,
@@ -177,9 +184,10 @@ export function usePracticeSession({
       word: currentWord.text,
       phonicsGroup: currentWord.phonicsGroup,
       correct: isCorrect,
+      userInput,
       timeSpent,
       backspaceCount,
-      hesitationDetected: timeSpent > HESITATION_THRESHOLD,
+      hesitationDetected: timeSpent > getHesitationThreshold(currentWord.text.length),
     };
   }, [currentWord, userInput, startTime, backspaceCount]);
 

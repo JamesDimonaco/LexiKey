@@ -63,6 +63,7 @@ export interface Word {
   difficulty: number; // 1 (Easy) to 10 (Hard)
   phonicsGroup: PhonicsGroup;
   sentenceContext?: string;
+  isStruggle?: boolean; // True if this word is from the struggle bucket
 }
 
 // Struggle word from DB bucket
@@ -78,9 +79,10 @@ export interface WordResult {
   word: string;
   phonicsGroup: string;
   correct: boolean;
+  userInput: string; // what the user actually typed
   timeSpent: number; // in seconds
   backspaceCount: number;
-  hesitationDetected: boolean; // >1.5s to type the word
+  hesitationDetected: boolean; // time exceeded per-character threshold
 }
 
 // User's adaptive learning progress

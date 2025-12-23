@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { PracticeSession } from "./practice/PracticeSession";
@@ -18,6 +19,15 @@ export default function Home() {
 
 function HomeContent() {
   const { isAnonymous, isLoading, currentUser } = useUserProgress();
+  const [hasCompletedPlacementTest, setHasCompletedPlacementTest] = useState(false);
+
+  // Check if anonymous user has completed placement test
+  useEffect(() => {
+    if (isAnonymous) {
+      const placementResult = localStorage.getItem("lexikey_placement_result");
+      setHasCompletedPlacementTest(!!placementResult);
+    }
+  }, [isAnonymous]);
 
   // Loading state
   if (isLoading) {
@@ -64,8 +74,8 @@ function HomeContent() {
   // Show practice session for everyone (anonymous and authenticated)
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto">
-      {/* Subtle placement test banner for anonymous users */}
-      {isAnonymous && (
+      {/* Subtle placement test banner for anonymous users who haven't taken it */}
+      {isAnonymous && !hasCompletedPlacementTest && (
         <div className="w-full mb-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <p className="text-sm text-blue-800 dark:text-blue-200">
             Take a quick placement test to find your level

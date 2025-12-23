@@ -385,10 +385,21 @@ export default function PlacementTest() {
       // User not signed in - save to localStorage for later sync
       console.log("📦 Saving placement results to localStorage (user not signed in)");
       try {
+        // Save placement result for later sync when they sign in
         localStorage.setItem("lexikey_placement_result", JSON.stringify({
           ...result,
           completedAt: Date.now(),
         }));
+
+        // Also update the anonymous user's level so practice uses the new level
+        const anonUserData = localStorage.getItem("lexikey-anonymous-user");
+        if (anonUserData) {
+          const anonUser = JSON.parse(anonUserData);
+          anonUser.currentLevel = result.determinedLevel;
+          localStorage.setItem("lexikey-anonymous-user", JSON.stringify(anonUser));
+          console.log("✅ Anonymous user level updated to:", result.determinedLevel);
+        }
+
         console.log("✅ Placement results saved locally");
       } catch (error) {
         console.error("Failed to save to localStorage:", error);
@@ -505,20 +516,20 @@ export default function PlacementTest() {
                 <div className="space-y-4">
                   <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
                     <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
-                      💾 Your results are saved locally. Sign in to save your progress and practice!
+                      💾 Your results are saved locally. Sign in to sync across devices!
                     </p>
                   </div>
-                  <SignInButton mode="modal">
-                    <button className="w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors">
-                      Sign In to Start Practice →
-                    </button>
-                  </SignInButton>
                   <Link
                     href="/"
-                    className="block w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    className="block w-full py-4 bg-blue-600 text-white text-center text-xl font-bold rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Back to Home
+                    Start Practice →
                   </Link>
+                  <SignInButton mode="modal">
+                    <button className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors cursor-pointer">
+                      Sign In to Save Progress
+                    </button>
+                  </SignInButton>
                 </div>
               </SignedOut>
             </div>

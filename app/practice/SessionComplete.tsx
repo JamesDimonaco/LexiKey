@@ -6,7 +6,7 @@ import { SignUpButton } from "@clerk/nextjs";
 import { WordResult } from "@/lib/types";
 
 // Thresholds for determining struggle words (match practice page)
-const BACKSPACE_THRESHOLD = 3;
+const BACKSPACE_THRESHOLD = 4;
 
 type SessionCompleteProps = {
   results: WordResult[];
@@ -47,9 +47,9 @@ export function SessionComplete({
   const totalCharacters = results.reduce((sum, r) => sum + r.word.length, 0);
   const wpm = totalTimeMinutes > 0 ? Math.round((totalCharacters / 5) / totalTimeMinutes) : 0;
 
-  // Struggle words: hesitation OR too many backspaces
+  // Struggle words: incorrect OR hesitation OR too many backspaces
   const struggleWords = results.filter(
-    (r) => r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
+    (r) => !r.correct || r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
   );
   const totalBackspaces = results.reduce(
     (sum, r) => sum + r.backspaceCount,
@@ -296,20 +296,33 @@ function StruggleWordsDisplay({
       <h2 className="text-xl font-bold mb-3 text-black dark:text-white">
         Words to Review
       </h2>
-      <div className="flex flex-wrap gap-2">
-        {struggleWords.map((r) => (
-          <span
-            key={r.wordId}
-            className="px-3 py-1 bg-yellow-200 dark:bg-yellow-600/30 border border-yellow-300 dark:border-yellow-700 rounded-full text-sm font-mono text-yellow-900 dark:text-yellow-200"
-          >
-            {r.word}
-            {r.backspaceCount > BACKSPACE_THRESHOLD && (
-              <span className="ml-1 text-xs text-yellow-600 dark:text-yellow-400">
-                ({r.backspaceCount} backspaces)
+      <div className="space-y-2">
+        {struggleWords.map((r) => {
+          const reasons: string[] = [];
+          if (!r.correct) reasons.push("incorrect");
+          if (r.hesitationDetected) reasons.push("slow");
+          if (r.backspaceCount > BACKSPACE_THRESHOLD) reasons.push(`${r.backspaceCount} backspaces`);
+
+          return (
+            <div
+              key={r.wordId}
+              className="flex items-center gap-3 px-3 py-2 bg-yellow-200 dark:bg-yellow-600/30 border border-yellow-300 dark:border-yellow-700 rounded-lg"
+            >
+              <span className="font-mono font-semibold text-yellow-900 dark:text-yellow-200">
+                {r.word}
               </span>
-            )}
-          </span>
-        ))}
+              {!r.correct && r.userInput && (
+                <span className="text-sm text-red-600 dark:text-red-400">
+                  <span className="text-gray-500 dark:text-gray-400">typed: </span>
+                  <span className="font-mono line-through">{r.userInput || "(empty)"}</span>
+                </span>
+              )}
+              <span className="ml-auto text-xs text-yellow-600 dark:text-yellow-400">
+                {reasons.join(" · ")}
+              </span>
+            </div>
+          );
+        })}
       </div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
         These words have been added to your review bucket for extra practice

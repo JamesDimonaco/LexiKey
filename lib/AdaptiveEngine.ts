@@ -90,6 +90,7 @@ export class AdaptiveSessionGenerator {
     const usedWords = new Set<string>(); // Track words to prevent duplicates
 
     // 1. FILL STRUGGLE BUCKET (30%)
+    // Note: getStruggleWords marks only actual bucket words with isStruggle: true
     const struggleWords = this.getStruggleWords(user, struggleCount, usedWords);
     sessionWords.push(...struggleWords);
     struggleWords.forEach(w => usedWords.add(w.text));
@@ -183,6 +184,7 @@ export class AdaptiveSessionGenerator {
 
   /**
    * Find struggle words from the user's bucket first, then from struggle groups
+   * Only marks words from the actual bucket as isStruggle (not group words)
    */
   private getStruggleWords(
     user: UserProgress,
@@ -204,9 +206,12 @@ export class AdaptiveSessionGenerator {
       return aProgress - bProgress; // Lower progress = higher priority
     });
 
-    result.push(...bucketWords.slice(0, count));
+    // Mark bucket words with isStruggle flag
+    const markedBucketWords = bucketWords.slice(0, count).map(w => ({ ...w, isStruggle: true }));
+    result.push(...markedBucketWords);
 
     // Priority 2: If we need more, get words from struggle phonics groups
+    // These are NOT marked as isStruggle since they're just from struggle categories
     if (result.length < count && user.struggleGroups.length > 0) {
       const groupWords = this.allWords.filter(
         (w) =>
