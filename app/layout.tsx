@@ -7,6 +7,7 @@ import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AccessibilityStyler } from "@/components/AccessibilityStyler";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import { Footer } from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -126,7 +127,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black text-black dark:text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black text-black dark:text-white flex flex-col min-h-screen`}
       >
         <PostHogProvider>
           <ClerkProvider dynamic>
@@ -139,7 +140,10 @@ export default function RootLayout({
               >
                 <AccessibilityProvider>
                   <AccessibilityStyler />
-                  {children}
+                  <div className="flex-1">
+                    {children}
+                  </div>
+                  <Footer />
                 </AccessibilityProvider>
               </ThemeProvider>
             </ConvexClientProvider>
