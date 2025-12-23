@@ -15,7 +15,7 @@ export function Footer() {
               LexiKey
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Kinesthetic literacy intervention tool for learners of all ages.
+              Spelling and typing practice through repetition. Helping dyslexic learners make it stick.
             </p>
           </div>
 

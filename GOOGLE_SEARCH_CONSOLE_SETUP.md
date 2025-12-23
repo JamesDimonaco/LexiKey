@@ -13,7 +13,7 @@ Follow these steps to set up Google Search Console for LexiKey and improve your 
 1. Go to [Google Search Console](https://search.google.com/search-console)
 2. Click "Add Property"
 3. Choose "URL prefix" method (recommended for Next.js apps)
-4. Enter your site URL: `https://lexikey.app` (or your actual domain)
+4. Enter your site URL: `https://lexikey.org` (or your actual domain)
 5. Click "Continue"
 
 ## Step 2: Verify Ownership
@@ -48,14 +48,14 @@ You have several verification options:
 ## Step 3: Submit Your Sitemap
 
 1. Once verified, go to "Sitemaps" in the left sidebar
-2. Enter: `https://lexikey.app/sitemap.xml`
+2. Enter: `https://lexikey.org/sitemap.xml`
 3. Click "Submit"
 4. Wait a few minutes, then refresh to see if it was successfully submitted
 
 ## Step 4: Request Indexing (Optional)
 
 1. Go to "URL Inspection" tool
-2. Enter your homepage URL: `https://lexikey.app`
+2. Enter your homepage URL: `https://lexikey.org`
 3. Click "Request Indexing"
 4. Repeat for important pages:
    - `/practice`
