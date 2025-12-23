@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
@@ -14,17 +15,17 @@ export function ModeToggle() {
 
   if (!mounted) {
     return (
-      <button className="px-4 py-2 bg-gray-700 text-white rounded-lg">
-        <span className="sr-only">Toggle theme</span>
+      <Button variant="ghost" size="icon" aria-label="Toggle theme">
         <span className="text-lg">●</span>
-      </button>
+      </Button>
     );
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="px-4 py-2 bg-gray-700 dark:bg-gray-800 text-white rounded-lg hover:bg-gray-600 dark:hover:bg-gray-700 transition-colors"
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (
@@ -32,6 +33,6 @@ export function ModeToggle() {
       ) : (
         <span className="text-lg">🌙</span>
       )}
-    </button>
+    </Button>
   );
 }

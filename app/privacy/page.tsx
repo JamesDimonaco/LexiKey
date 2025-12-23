@@ -3,7 +3,8 @@ import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "LexiKey Privacy Policy - How we collect, use, and protect your data",
+  description:
+    "LexiKey Privacy Policy - How we collect, use, and protect your data",
 };
 
 export default function PrivacyPolicy() {
@@ -16,7 +17,7 @@ export default function PrivacyPolicy() {
             Privacy Policy
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+            Last updated: December 23, 2025
           </p>
 
           <div className="prose prose-gray dark:prose-invert max-w-none">
@@ -25,7 +26,10 @@ export default function PrivacyPolicy() {
                 1. Introduction
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                LexiKey ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our literacy intervention application.
+                LexiKey ("we," "our," or "us") is committed to protecting your
+                privacy. This Privacy Policy explains how we collect, use,
+                disclose, and safeguard your information when you use our
+                literacy intervention application.
               </p>
             </section>
 
@@ -52,7 +56,9 @@ export default function PrivacyPolicy() {
                 We automatically collect information about how you use LexiKey:
               </p>
               <ul className="list-disc list-inside mb-4 text-gray-700 dark:text-gray-300 space-y-2">
-                <li>Practice session data (words typed, accuracy, time spent)</li>
+                <li>
+                  Practice session data (words typed, accuracy, time spent)
+                </li>
                 <li>Placement test results</li>
                 <li>Progress and learning statistics</li>
                 <li>Settings preferences</li>
@@ -63,7 +69,9 @@ export default function PrivacyPolicy() {
                 2.3 Analytics Data
               </h3>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                We use PostHog analytics to understand how users interact with our application. This includes page views, feature usage, and performance metrics. This data is anonymized and aggregated.
+                We use PostHog analytics to understand how users interact with
+                our application. This includes page views, feature usage, and
+                performance metrics. This data is anonymized and aggregated.
               </p>
             </section>
 
@@ -92,13 +100,25 @@ export default function PrivacyPolicy() {
                 Your data is stored securely using:
               </p>
               <ul className="list-disc list-inside mb-4 text-gray-700 dark:text-gray-300 space-y-2">
-                <li><strong>Convex</strong> - For user progress and learning data</li>
-                <li><strong>Clerk</strong> - For authentication and user account information</li>
-                <li><strong>PostHog</strong> - For analytics data</li>
-                <li><strong>Local Storage</strong> - For anonymous users' temporary data</li>
+                <li>
+                  <strong>Convex</strong> - For user progress and learning data
+                </li>
+                <li>
+                  <strong>Clerk</strong> - For authentication and user account
+                  information
+                </li>
+                <li>
+                  <strong>PostHog</strong> - For analytics data
+                </li>
+                <li>
+                  <strong>Local Storage</strong> - For anonymous users'
+                  temporary data
+                </li>
               </ul>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                We implement appropriate technical and organizational measures to protect your personal information. However, no method of transmission over the Internet is 100% secure.
+                We implement appropriate technical and organizational measures
+                to protect your personal information. However, no method of
+                transmission over the Internet is 100% secure.
               </p>
             </section>
 
@@ -107,10 +127,14 @@ export default function PrivacyPolicy() {
                 5. Data Sharing
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                We do not sell, trade, or rent your personal information to third parties. We may share your information only:
+                We do not sell, trade, or rent your personal information to
+                third parties. We may share your information only:
               </p>
               <ul className="list-disc list-inside mb-4 text-gray-700 dark:text-gray-300 space-y-2">
-                <li>With service providers who assist us in operating our application (Convex, Clerk, PostHog)</li>
+                <li>
+                  With service providers who assist us in operating our
+                  application (Convex, Clerk, PostHog)
+                </li>
                 <li>When required by law or to protect our rights</li>
                 <li>With your explicit consent</li>
               </ul>
@@ -127,11 +151,14 @@ export default function PrivacyPolicy() {
                 <li>Access your personal data</li>
                 <li>Correct inaccurate data</li>
                 <li>Delete your account and associated data</li>
-                <li>Opt-out of analytics tracking (contact us for instructions)</li>
+                <li>
+                  Opt-out of analytics tracking (contact us for instructions)
+                </li>
                 <li>Export your data</li>
               </ul>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                To exercise these rights, please contact us or delete your account through the settings page.
+                To exercise these rights, please contact us or delete your
+                account through the settings page.
               </p>
             </section>
 
@@ -140,7 +167,11 @@ export default function PrivacyPolicy() {
                 7. Children's Privacy
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                LexiKey is designed to support learners of all ages, including children. We comply with applicable privacy laws including COPPA. If you are a parent or guardian and believe your child has provided us with personal information, please contact us to have it removed.
+                LexiKey is designed to support learners of all ages, including
+                children. We comply with applicable privacy laws including
+                COPPA. If you are a parent or guardian and believe your child
+                has provided us with personal information, please contact us to
+                have it removed.
               </p>
             </section>
 
@@ -158,7 +189,8 @@ export default function PrivacyPolicy() {
                 <li>Track analytics (anonymized)</li>
               </ul>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                You can control cookies through your browser settings, though this may affect functionality.
+                You can control cookies through your browser settings, though
+                this may affect functionality.
               </p>
             </section>
 
@@ -167,7 +199,9 @@ export default function PrivacyPolicy() {
                 9. Changes to This Policy
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
+                We may update this Privacy Policy from time to time. We will
+                notify you of any changes by posting the new Privacy Policy on
+                this page and updating the "Last updated" date.
               </p>
             </section>
 
@@ -176,7 +210,8 @@ export default function PrivacyPolicy() {
                 10. Contact Us
               </h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                If you have questions about this Privacy Policy, please contact us through your preferred method or visit our GitHub repository.
+                If you have questions about this Privacy Policy, please contact
+                us through your preferred method or visit our GitHub repository.
               </p>
             </section>
           </div>
