@@ -245,6 +245,19 @@ function CurrentWordDisplay({
           </span>
         );
       })}
+      {/* Overflow characters - show extra typed characters beyond word length */}
+      {userInput.length > word.text.length && !blindMode && (
+        <>
+          {userInput.slice(word.text.length).split("").map((char, idx) => (
+            <span
+              key={`overflow-${idx}`}
+              className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30 rounded px-0.5 animate-pulse"
+            >
+              {char}
+            </span>
+          ))}
+        </>
+      )}
     </span>
   );
 }
