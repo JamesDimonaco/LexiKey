@@ -9,6 +9,7 @@ import { Word, PhonicsGroup, PlacementTestResult } from "@/lib/types";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
+import { usePostHogPageView, trackEvent } from "@/hooks/usePostHog";
 
 // Adaptive Placement Test Word Pool
 // Multiple words per difficulty level and phonics group
@@ -223,6 +224,7 @@ function selectNextWord(
 const TOTAL_PLACEMENT_WORDS = 20;
 
 export default function PlacementTest() {
+  usePostHogPageView();
   // Sync placement data from localStorage when user signs in
   useSyncPlacementData();
 
@@ -294,6 +296,18 @@ export default function PlacementTest() {
 
     const updatedResults = [...results, wordResult];
     setResults(updatedResults);
+
+    // Track placement test word completion
+    trackEvent("placement_test_word_completed", {
+      word: currentWord.text,
+      difficulty: currentWord.difficulty,
+      phonicsGroup: currentWord.phonicsGroup,
+      correct,
+      timeSpent,
+      backspaceCount,
+      wordIndex: currentWordIndex + 1,
+      totalWords: TOTAL_PLACEMENT_WORDS,
+    });
 
     // Move to next word or finish
     if (currentWordIndex < TOTAL_PLACEMENT_WORDS - 1) {
@@ -374,6 +388,18 @@ export default function PlacementTest() {
 
     setCalculatedResult(result);
     setIsComplete(true);
+
+    // Track placement test completion
+    const accuracy = Math.round(
+      (result.wordResults.filter((r) => r.correct).length / result.wordResults.length) * 100
+    );
+    trackEvent("placement_test_completed", {
+      determinedLevel: result.determinedLevel,
+      accuracy,
+      totalWords: result.wordResults.length,
+      struggleGroups: result.identifiedStruggleGroups,
+      isAnonymous: !currentUser,
+    });
 
     // Save to Convex
     console.log("Placement Test Result:", result);

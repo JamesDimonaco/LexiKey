@@ -2,8 +2,10 @@
 
 import { Header } from "@/components/Header";
 import { PracticeSession } from "./PracticeSession";
+import { usePostHogPageView } from "@/hooks/usePostHog";
 
 export default function PracticePage() {
+  usePostHogPageView();
   return (
     <>
       <Header />

@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AccessibilitySettings as SettingsType } from "@/lib/types";
+import { usePostHogPageView, trackEvent } from "@/hooks/usePostHog";
 
 export default function SettingsPage() {
+  usePostHogPageView();
   const { settings, updateSettings, resetSettings } = useAccessibility();
   const [tempSettings, setTempSettings] = useState<SettingsType>(settings);
   const [savedMessage, setSavedMessage] = useState(false);
@@ -31,12 +33,31 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
+    // Track settings changes
+    const changedSettings: Record<string, any> = {};
+    Object.keys(tempSettings).forEach((key) => {
+      if (tempSettings[key as keyof SettingsType] !== settings[key as keyof SettingsType]) {
+        changedSettings[key] = {
+          old: settings[key as keyof SettingsType],
+          new: tempSettings[key as keyof SettingsType],
+        };
+      }
+    });
+
+    if (Object.keys(changedSettings).length > 0) {
+      trackEvent("settings_changed", {
+        changedSettings,
+        totalChanges: Object.keys(changedSettings).length,
+      });
+    }
+
     updateSettings(tempSettings);
     setSavedMessage(true);
     setTimeout(() => setSavedMessage(false), 2000);
   };
 
   const handleReset = () => {
+    trackEvent("settings_reset");
     const defaults: SettingsType = {
       sessionWordCount: 20,
       capitalFrequency: "never",

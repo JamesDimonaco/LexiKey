@@ -7,6 +7,7 @@ import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePracticeSession, BACKSPACE_THRESHOLD } from "@/hooks/usePracticeSession";
 import { StruggleWord, WordResult } from "@/lib/types";
+import { trackEvent } from "@/hooks/usePostHog";
 
 import { SentenceModeView } from "./SentenceModeView";
 import { SingleWordView } from "./SingleWordView";
@@ -159,7 +160,13 @@ export function PracticeSession() {
             </Label>
             <Switch
               checked={sentenceMode}
-              onCheckedChange={setSentenceMode}
+              onCheckedChange={(enabled) => {
+                trackEvent("practice_mode_toggled", {
+                  mode: enabled ? "sentence" : "word",
+                  wordIndex: currentWordIndex,
+                });
+                setSentenceMode(enabled);
+              }}
               id="mode-toggle"
             />
             <Label
