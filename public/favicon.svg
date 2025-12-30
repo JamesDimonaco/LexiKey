@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Outer border/shadow -->
+  <rect x="24" y="24" width="464" height="464" rx="64" ry="64" fill="#2563eb"/>
+  <!-- Key face -->
+  <rect x="24" y="16" width="464" height="464" rx="64" ry="64" fill="#3b82f6"/>
+  <!-- Letter L -->
+  <path d="M168 128 L168 336 L344 336 L344 384 L168 384 L120 384 L120 128 Z" fill="white"/>
+</svg>
