@@ -8,18 +8,51 @@ export function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <h3 className="text-lg font-bold mb-4 text-black dark:text-white">
               LexiKey
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Spelling and typing practice through repetition. Helping dyslexic learners make it stick.
+              Free spelling practice through typing. Helping kids learn to spell through repetition.
             </p>
           </div>
 
-          {/* Links */}
+          {/* Resources */}
+          <div>
+            <h4 className="text-sm font-semibold mb-4 text-black dark:text-white uppercase tracking-wide">
+              Resources
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/for-parents"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  For Parents
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/for-teachers"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  For Teachers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/placement-test"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  Placement Test
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
           <div>
             <h4 className="text-sm font-semibold mb-4 text-black dark:text-white uppercase tracking-wide">
               Legal
