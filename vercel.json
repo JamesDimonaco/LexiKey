@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.lexikey.org"
+        }
+      ],
+      "destination": "https://lexikey.org/:path*",
+      "permanent": true
+    }
+  ]
+}

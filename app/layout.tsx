@@ -23,6 +23,9 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lexikey.org';
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
+  alternates: {
+    canonical: '/',
+  },
   title: {
     default: "LexiKey - Free Spelling Practice & Typing Games for Kids",
     template: "%s | LexiKey",
