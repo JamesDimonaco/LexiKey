@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { PracticeSession } from "./practice/PracticeSession";
 import { MergeDialog } from "@/components/MergeDialog";
+import { ProgressView } from "@/components/ProgressView";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePostHogPageView } from "@/hooks/usePostHog";
 
@@ -119,6 +120,7 @@ function HomeContent() {
           </Link>
         </div>
       )}
+      <ProgressView />
       <PracticeSession />
     </div>
   );
