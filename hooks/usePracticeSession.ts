@@ -18,7 +18,7 @@ import { useTTS } from "./useTTS";
 import { useReveal } from "./useReveal";
 import { LetterState } from "@/app/practice/types";
 import wordsData from "@/app/practice/words.json";
-import { trackEvent } from "./usePostHog";
+import { trackEvent, trackPracticeStarted, trackWordStruggle } from "./usePostHog";
 
 // Struggle word threshold constants
 const HESITATION_BASE_TIME = 0.6; // base seconds to read/process the word
@@ -160,7 +160,13 @@ export function usePracticeSession({
     );
     setSessionWords(generatedWords);
 
-    // Track session started
+    // Track session started using semantic analytics
+    trackPracticeStarted({
+      mode: "practice",
+      currentLevel: effectiveLevel,
+    });
+
+    // Also track detailed session info
     trackEvent("practice_session_started", {
       wordCount: generatedWords.length,
       userLevel: effectiveLevel,
@@ -384,6 +390,27 @@ export function usePracticeSession({
       dictationMode: settings.dictationMode,
     });
 
+    // Track struggle words for analytics
+    if (!isCorrect) {
+      trackWordStruggle({
+        word: currentWord.text,
+        phonicsGroup: currentWord.phonicsGroup,
+        reason: "error",
+      });
+    } else if (result.hesitationDetected) {
+      trackWordStruggle({
+        word: currentWord.text,
+        phonicsGroup: currentWord.phonicsGroup,
+        reason: "hesitation",
+      });
+    } else if (result.backspaceCount > BACKSPACE_THRESHOLD) {
+      trackWordStruggle({
+        word: currentWord.text,
+        phonicsGroup: currentWord.phonicsGroup,
+        reason: "backspaces",
+      });
+    }
+
     setShowFeedback(isCorrect ? "correct" : "incorrect");
 
     const newResults = [...results, result];
@@ -443,6 +470,27 @@ export function usePracticeSession({
             sentenceMode: true,
             dictationMode: settings.dictationMode,
           });
+
+          // Track struggle words for analytics (sentence mode)
+          if (!isCorrect) {
+            trackWordStruggle({
+              word: currentWord.text,
+              phonicsGroup: currentWord.phonicsGroup,
+              reason: "error",
+            });
+          } else if (result.hesitationDetected) {
+            trackWordStruggle({
+              word: currentWord.text,
+              phonicsGroup: currentWord.phonicsGroup,
+              reason: "hesitation",
+            });
+          } else if (result.backspaceCount > BACKSPACE_THRESHOLD) {
+            trackWordStruggle({
+              word: currentWord.text,
+              phonicsGroup: currentWord.phonicsGroup,
+              reason: "backspaces",
+            });
+          }
         }
 
         advanceToNextWord(isCorrect);

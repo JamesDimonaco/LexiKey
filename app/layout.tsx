@@ -7,6 +7,7 @@ import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AccessibilityStyler } from "@/components/AccessibilityStyler";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Footer } from "@/components/Footer";
 
 const geistSans = Geist({
@@ -153,9 +154,11 @@ export default function RootLayout({
               >
                 <AccessibilityProvider>
                   <AccessibilityStyler />
-                  <div className="flex-1">
-                    {children}
-                  </div>
+                  <ErrorBoundary>
+                    <div className="flex-1">
+                      {children}
+                    </div>
+                  </ErrorBoundary>
                   <Footer />
                 </AccessibilityProvider>
               </ThemeProvider>

@@ -9,7 +9,13 @@ import { Word, PhonicsGroup, PlacementTestResult } from "@/lib/types";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
-import { usePostHogPageView, trackEvent } from "@/hooks/usePostHog";
+import {
+  usePostHogPageView,
+  trackEvent,
+  trackPlacementTestCompleted,
+  updateUserProperties,
+  trackFunnelStep,
+} from "@/hooks/usePostHog";
 
 // Adaptive Placement Test Word Pool
 // Multiple words per difficulty level and phonics group
@@ -393,6 +399,31 @@ export default function PlacementTest() {
     const accuracy = Math.round(
       (result.wordResults.filter((r) => r.correct).length / result.wordResults.length) * 100
     );
+    const totalTime = Math.round(
+      result.wordResults.reduce((sum, r) => sum + r.timeSpent, 0) / 1000
+    );
+
+    // Use the new tracking utility
+    trackPlacementTestCompleted({
+      determinedLevel: result.determinedLevel,
+      accuracy,
+      wordsAttempted: result.wordResults.length,
+      durationSeconds: totalTime,
+    });
+
+    // Update user properties for segmentation
+    updateUserProperties({
+      currentLevel: result.determinedLevel,
+      hasCompletedPlacementTest: true,
+    });
+
+    // Track funnel progression
+    trackFunnelStep("onboarding", "placement_test_completed", {
+      determinedLevel: result.determinedLevel,
+      accuracy,
+    });
+
+    // Legacy event for backwards compatibility
     trackEvent("placement_test_completed", {
       determinedLevel: result.determinedLevel,
       accuracy,

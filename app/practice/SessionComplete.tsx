@@ -3,7 +3,13 @@
 import { useEffect, useRef } from "react";
 import { SignUpButton } from "@clerk/nextjs";
 import { WordResult } from "@/lib/types";
-import { trackEvent } from "@/hooks/usePostHog";
+import {
+  trackEvent,
+  trackSessionCompleted,
+  updateUserProperties,
+  incrementUserProperty,
+  triggerSurveyEligibility,
+} from "@/hooks/usePostHog";
 
 // Thresholds for determining struggle words (match practice page)
 const BACKSPACE_THRESHOLD = 4;
@@ -69,11 +75,31 @@ export function SessionComplete({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onRestart]);
 
-  // Focus container for keyboard events
+  // Focus container for keyboard events and track analytics
   useEffect(() => {
     containerRef.current?.focus();
-    
-    // Track session complete view
+
+    // Track comprehensive session completion
+    trackSessionCompleted({
+      wordsAttempted: results.length,
+      wordsCompleted: results.filter((r) => r.correct).length,
+      accuracy,
+      durationSeconds: totalTime,
+      struggleWordsAdded: struggleWords.length,
+      mode: "practice",
+    });
+
+    // Update user properties for segmentation
+    updateUserProperties({
+      currentLevel,
+      struggleWordsCount: struggleWords.length,
+    });
+
+    // Increment lifetime stats
+    incrementUserProperty("totalWords", results.length);
+    incrementUserProperty("totalSessions", 1);
+
+    // Track session complete view (existing)
     trackEvent("session_complete_viewed", {
       accuracy,
       wordCount: results.length,
@@ -83,6 +109,12 @@ export function SessionComplete({
       isAnonymous,
       inputMode,
       displayMode,
+    });
+
+    // Trigger survey eligibility after 5 sessions (check in PostHog)
+    triggerSurveyEligibility("after_5_sessions", {
+      accuracy,
+      currentLevel,
     });
   }, []);
 
