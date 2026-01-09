@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -9,10 +8,8 @@ export const metadata: Metadata = {
 
 export default function TermsOfService() {
   return (
-    <>
-      <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
-        <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
+    <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
+      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
           <h1 className="text-3xl font-bold mb-6 text-black dark:text-white">
             Terms of Service
           </h1>
@@ -221,8 +218,7 @@ export default function TermsOfService() {
               </p>
             </section>
           </div>
-        </div>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }

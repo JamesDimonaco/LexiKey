@@ -1,14 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { Header } from "@/components/Header";
 
 export default function HowItWorks() {
   return (
-    <>
-      <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
-        <article className="max-w-3xl mx-auto">
+    <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
+      <article className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-black dark:text-white mb-6">
             How LexiKey Works
           </h1>
@@ -192,8 +187,7 @@ export default function HowItWorks() {
               </Link>
             </div>
           </section>
-        </article>
-      </main>
-    </>
+      </article>
+    </main>
   );
 }

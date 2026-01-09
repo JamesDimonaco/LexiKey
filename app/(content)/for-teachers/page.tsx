@@ -1,14 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { Header } from "@/components/Header";
 
 export default function ForTeachers() {
   return (
-    <>
-      <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
-        <div className="max-w-3xl mx-auto">
+    <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
+      <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-black dark:text-white mb-6">
             Spelling Intervention Tool for Classrooms
           </h1>
@@ -80,8 +75,7 @@ export default function ForTeachers() {
               View Placement Test
             </Link>
           </div>
-        </div>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }
