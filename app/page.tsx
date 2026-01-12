@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { PracticeSession } from "./practice/PracticeSession";
 import { MergeDialog } from "@/components/MergeDialog";
 import { ProgressView } from "@/components/ProgressView";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePostHogPageView } from "@/hooks/usePostHog";
 
@@ -31,6 +32,7 @@ function HomeContent() {
     handleDiscard,
   } = useUserProgress();
   const [hasCompletedPlacementTest, setHasCompletedPlacementTest] = useState(false);
+  const [skippedPlacementTest, setSkippedPlacementTest] = useState(false);
 
   // Check if anonymous user has completed placement test
   useEffect(() => {
@@ -76,7 +78,7 @@ function HomeContent() {
   }
 
   // For authenticated users who haven't taken the placement test, show the prompt
-  if (!isAnonymous && currentUser && !currentUser.stats.hasCompletedPlacementTest) {
+  if (!isAnonymous && currentUser && !currentUser.stats.hasCompletedPlacementTest && !skippedPlacementTest) {
     return (
       <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
         <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 text-center">
@@ -93,10 +95,10 @@ function HomeContent() {
             Take Placement Test
           </Link>
           <button
-            onClick={() => {/* Skip for now - they can start practicing */}}
+            onClick={() => setSkippedPlacementTest(true)}
             className="mt-4 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
           >
-            <Link href="/practice">Skip for now</Link>
+            Skip for now
           </button>
         </div>
       </div>
@@ -105,23 +107,29 @@ function HomeContent() {
 
   // Show practice session for everyone (anonymous and authenticated)
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto">
-      {/* Subtle placement test banner for anonymous users who haven't taken it */}
-      {isAnonymous && !hasCompletedPlacementTest && (
-        <div className="w-full mb-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <p className="text-sm text-blue-800 dark:text-blue-200">
-            Take a quick placement test to find your level
-          </p>
-          <Link
-            href="/placement-test"
-            className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 whitespace-nowrap"
-          >
-            Take Test →
-          </Link>
-        </div>
-      )}
-      <ProgressView />
-      <PracticeSession />
-    </div>
+    <>
+      <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto">
+        {/* Subtle placement test banner for anonymous users who haven't taken it */}
+        {isAnonymous && !hasCompletedPlacementTest && (
+          <div className="w-full mb-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Take a quick placement test to find your level
+            </p>
+            <Link
+              href="/placement-test"
+              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 whitespace-nowrap"
+            >
+              Take Test →
+            </Link>
+          </div>
+        )}
+        <ProgressView />
+        <PracticeSession />
+      </div>
+      <OnboardingTour
+        userId={currentUser?._id}
+        hasCompletedTourInDb={currentUser?.stats.hasCompletedTour}
+      />
+    </>
   );
 }

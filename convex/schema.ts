@@ -58,6 +58,7 @@ export default defineSchema({
       // Adaptive learning
       currentLevel: v.number(), // 1-10 difficulty rating
       hasCompletedPlacementTest: v.boolean(),
+      hasCompletedTour: v.optional(v.boolean()), // Onboarding tour completed
       struggleGroups: v.array(v.string()), // Phonics groups user struggles with
     }),
 

@@ -62,6 +62,7 @@ export function SentenceModeView({
         }
       `}
       onClick={handleContainerClick}
+      data-tour="typing-area"
     >
       {/* Unfocused overlay */}
       {!isFocused && (

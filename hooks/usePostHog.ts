@@ -240,6 +240,8 @@ export function updateUserProperties(properties: {
 
 /**
  * Increment a user property (e.g., totalWords, totalSessions)
+ * Note: PostHog JS SDK doesn't support increment directly, so we track via events
+ * The actual incrementing should be done server-side or via PostHog's backend
  */
 export function incrementUserProperty(
   property: string,
@@ -252,9 +254,11 @@ export function incrementUserProperty(
     return;
   }
 
-  posthog.people.set_once({ [property]: 0 }); // Initialize if not set
-  // Note: increment is available at runtime but not in TypeScript types
-  (posthog.people as any).increment(property, value);
+  // Track as an event instead - PostHog can aggregate these server-side
+  posthog.capture("user_property_increment", {
+    property,
+    incrementBy: value,
+  });
 }
 
 // ============================================

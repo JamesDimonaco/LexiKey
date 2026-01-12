@@ -9,12 +9,15 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AccessibilitySettings as SettingsType } from "@/lib/types";
 import { usePostHogPageView, trackEvent } from "@/hooks/usePostHog";
+import { useResetTour } from "@/components/OnboardingTour";
 
 export default function SettingsPage() {
   usePostHogPageView();
   const { settings, updateSettings, resetSettings } = useAccessibility();
   const [tempSettings, setTempSettings] = useState<SettingsType>(settings);
   const [savedMessage, setSavedMessage] = useState(false);
+  const [tourResetMessage, setTourResetMessage] = useState(false);
+  const resetTour = useResetTour();
 
   // Track which sections are expanded
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -575,6 +578,29 @@ export default function SettingsPage() {
                     checked={tempSettings.blindMode}
                     onCheckedChange={(checked) => updateTempSettings({ blindMode: checked })}
                   />
+                </div>
+
+                {/* Replay Tour */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Onboarding Tour
+                    </Label>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      See the quick tour again next time you practice
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      resetTour();
+                      setTourResetMessage(true);
+                      setTimeout(() => setTourResetMessage(false), 2000);
+                    }}
+                  >
+                    {tourResetMessage ? "Tour Reset!" : "Replay Tour"}
+                  </Button>
                 </div>
               </div>
             </SettingsSection>

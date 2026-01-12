@@ -123,14 +123,14 @@ export function PracticeSession() {
     <div className="max-w-4xl w-full mx-auto">
       {/* Header with level and mode toggles */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-600 dark:text-gray-400" data-tour="level-display">
           <span className="font-semibold">
             Level {effectiveLevel.toFixed(1)}
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           {/* Dictation Mode Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-tour="dictation-toggle">
             <Label
               htmlFor="dictation-toggle"
               className={`text-sm ${!settings.dictationMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
@@ -151,7 +151,7 @@ export function PracticeSession() {
           </div>
 
           {/* Word/Sentence Mode Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-tour="mode-toggle">
             <Label
               htmlFor="mode-toggle"
               className={`text-sm ${!sentenceMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}

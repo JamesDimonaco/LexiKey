@@ -263,6 +263,7 @@ export const updateUserStats = mutation({
       averageAccuracy: v.optional(v.number()),
       currentLevel: v.optional(v.number()),
       hasCompletedPlacementTest: v.optional(v.boolean()),
+      hasCompletedTour: v.optional(v.boolean()),
       struggleGroups: v.optional(v.array(v.string())),
     }),
   },
