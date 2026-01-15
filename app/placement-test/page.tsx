@@ -485,7 +485,7 @@ export default function PlacementTest() {
   };
 
   const handleStartPractice = () => {
-    router.push("/practice");
+    router.push("/");
   };
 
   if (isComplete && calculatedResult) {

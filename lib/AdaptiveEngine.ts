@@ -372,7 +372,8 @@ export function calculateNewUserLevel(
 
   const newLevel = currentLevel + levelAdjustment;
 
-  // Clamp between 1 and 10
-  return Math.min(Math.max(newLevel, 1), 10);
+  // Clamp between 1 and 10, round to 2 decimal places to avoid floating-point precision issues
+  const clampedLevel = Math.min(Math.max(newLevel, 1), 10);
+  return Math.round(clampedLevel * 100) / 100;
 }
 

@@ -126,7 +126,7 @@ export function useAnonymousUser() {
 
     const updated: AnonymousUserData = {
       ...anonymousUser,
-      currentLevel: newLevel,
+      currentLevel: Math.round(newLevel * 100) / 100, // Round to 2 decimal places
       totalWords: anonymousUser.totalWords + wordsCompleted,
       totalSessions: anonymousUser.totalSessions + 1,
       struggleWords: filteredStruggleWords,

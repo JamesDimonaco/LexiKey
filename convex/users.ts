@@ -383,7 +383,7 @@ export const migrateAnonymousData = mutation({
       ...user.stats,
       totalWords: user.stats.totalWords + anonymousData.totalWords,
       totalSessions: user.stats.totalSessions + anonymousData.totalSessions,
-      currentLevel: anonymousData.currentLevel, // Use the level chosen by user
+      currentLevel: Math.round(anonymousData.currentLevel * 100) / 100, // Round to avoid floating-point issues
       lastPracticeDate: anonymousData.lastPracticeDate ?? user.stats.lastPracticeDate,
     };
 
