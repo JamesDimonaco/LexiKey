@@ -1,9 +1,22 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher(["/server"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) await auth.protect();
+  const url = req.nextUrl;
+
+  // Redirect www to non-www (canonical domain)
+  if (url.hostname === "www.lexikey.org") {
+    const newUrl = new URL(url.toString());
+    newUrl.hostname = "lexikey.org";
+    return NextResponse.redirect(newUrl, 308);
+  }
+
+  // Protect routes that require authentication
+  if (isProtectedRoute(req)) {
+    await auth.protect();
+  }
 });
 
 export const config = {

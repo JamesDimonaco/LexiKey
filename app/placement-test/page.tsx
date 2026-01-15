@@ -485,23 +485,22 @@ export default function PlacementTest() {
     }
 
     try {
-      // Update both stats and threshold params concurrently
-      await Promise.all([
-        updateUserStats({
-          userId: currentUser._id,
-          stats: {
-            currentLevel: result.determinedLevel,
-            hasCompletedPlacementTest: true,
-            struggleGroups: result.identifiedStruggleGroups,
-          },
-        }),
-        updateThresholdParams({
-          userId: currentUser._id,
-          thresholdParams,
-        }),
-      ]);
+      // Update sequentially to avoid race condition (both read/merge/write user.stats)
+      await updateUserStats({
+        userId: currentUser._id,
+        stats: {
+          currentLevel: result.determinedLevel,
+          hasCompletedPlacementTest: true,
+          struggleGroups: result.identifiedStruggleGroups,
+        },
+      });
 
-      console.log("✅ Placement test results and threshold params saved to Convex");
+      await updateThresholdParams({
+        userId: currentUser._id,
+        thresholdParams,
+      });
+
+      console.log("✅ Placement test results saved to Convex");
 
       // Clear localStorage if we successfully saved to Convex
       localStorage.removeItem("lexikey_placement_result");
