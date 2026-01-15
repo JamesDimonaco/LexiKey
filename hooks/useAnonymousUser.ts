@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { AnonymousUserData, StruggleWord } from '@/lib/types';
+import { ThresholdParams } from '@/lib/thresholdCalculator';
 
 const STORAGE_KEY = 'lexikey-anonymous-user';
 const DEFAULT_LEVEL = 5;
@@ -147,11 +148,37 @@ export function useAnonymousUser() {
     setAnonymousUser(null);
   }, []);
 
+  // Set threshold params (initial calibration from placement test)
+  const setThresholdParams = useCallback((params: ThresholdParams) => {
+    if (!anonymousUser) return;
+
+    const updated: AnonymousUserData = {
+      ...anonymousUser,
+      thresholdParams: params,
+    };
+
+    saveData(updated);
+  }, [anonymousUser, saveData]);
+
+  // Update threshold params (gradual adjustment from practice session)
+  const updateThreshold = useCallback((params: ThresholdParams) => {
+    if (!anonymousUser) return;
+
+    const updated: AnonymousUserData = {
+      ...anonymousUser,
+      thresholdParams: params,
+    };
+
+    saveData(updated);
+  }, [anonymousUser, saveData]);
+
   return {
     anonymousUser,
     isLoading,
     updateStats,
     getDataForMigration,
     clearData,
+    setThresholdParams,
+    updateThreshold,
   };
 }

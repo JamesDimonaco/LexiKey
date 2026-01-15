@@ -316,6 +316,39 @@ export const updateUserStats = mutation({
 });
 
 /**
+ * Update user's adaptive hesitation threshold parameters.
+ * Called after placement test (initial calibration) and after practice sessions (gradual adjustment).
+ */
+export const updateThresholdParams = mutation({
+  args: {
+    userId: v.id("users"),
+    thresholdParams: v.object({
+      baseTime: v.number(),
+      secondsPerChar: v.number(),
+      safetyMultiplier: v.number(),
+      wordCount: v.number(),
+      lastUpdated: v.string(),
+    }),
+  },
+  handler: async (ctx, { userId, thresholdParams }) => {
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await ctx.db.patch(userId, {
+      stats: {
+        ...user.stats,
+        thresholdParams,
+      },
+      updatedAt: Date.now(),
+    });
+
+    return userId;
+  },
+});
+
+/**
  * Update user subscription
  */
 export const updateUserSubscription = mutation({
@@ -363,6 +396,16 @@ export const migrateAnonymousData = mutation({
         consecutiveCorrect: v.number(),
       })),
       lastPracticeDate: v.union(v.string(), v.null()),
+      // Optional threshold params for adaptive hesitation detection
+      thresholdParams: v.optional(
+        v.object({
+          baseTime: v.number(),
+          secondsPerChar: v.number(),
+          safetyMultiplier: v.number(),
+          wordCount: v.number(),
+          lastUpdated: v.string(),
+        })
+      ),
     }),
   },
   handler: async (ctx, { clerkId, anonymousData }) => {
@@ -385,6 +428,8 @@ export const migrateAnonymousData = mutation({
       totalSessions: user.stats.totalSessions + anonymousData.totalSessions,
       currentLevel: Math.round(anonymousData.currentLevel * 100) / 100, // Round to avoid floating-point issues
       lastPracticeDate: anonymousData.lastPracticeDate ?? user.stats.lastPracticeDate,
+      // Include threshold params if provided (from placement test calibration)
+      ...(anonymousData.thresholdParams && { thresholdParams: anonymousData.thresholdParams }),
     };
 
     // Update user with merged stats

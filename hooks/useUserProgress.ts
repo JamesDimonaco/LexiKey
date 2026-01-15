@@ -6,6 +6,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAnonymousUser } from "./useAnonymousUser";
 import { StruggleWord, AnonymousUserData } from "@/lib/types";
+import { ThresholdParams } from "@/lib/thresholdCalculator";
 
 /**
  * Manages user progress data - handles both authenticated and anonymous users
@@ -21,6 +22,8 @@ export function useUserProgress() {
     updateStats: updateAnonymousStats,
     getDataForMigration,
     clearData: clearAnonymousData,
+    setThresholdParams: setAnonymousThreshold,
+    updateThreshold: updateAnonymousThreshold,
   } = useAnonymousUser();
 
   // Authenticated user queries (skip if not signed in)
@@ -31,6 +34,7 @@ export function useUserProgress() {
   const createUser = useMutation(api.users.createUser);
   const migrateAnonymousData = useMutation(api.users.migrateAnonymousData);
   const updateUserStats = useMutation(api.users.updateUserStats);
+  const updateThresholdParams = useMutation(api.users.updateThresholdParams);
   const batchProcessWordResults = useMutation(api.struggleWords.batchProcessWordResults);
 
   // Fetch struggle words from DB (only for authenticated users)
@@ -58,6 +62,11 @@ export function useUserProgress() {
         phonicsGroup: sw.phonicsGroup,
         consecutiveCorrect: sw.consecutiveCorrect,
       }));
+
+  // Get effective threshold params (from DB or localStorage, undefined if not set)
+  const effectiveThresholdParams: ThresholdParams | undefined = isAnonymous
+    ? anonymousUser?.thresholdParams
+    : currentUser?.stats.thresholdParams;
 
   // Simple effect: show merge dialog when conditions are met
   // Don't reset pendingMigration once set - user must take action
@@ -88,6 +97,7 @@ export function useUserProgress() {
           totalSessions: anonData.totalSessions,
           struggleWords: anonData.struggleWords,
           lastPracticeDate: anonData.lastPracticeDate,
+          thresholdParams: anonData.thresholdParams,
         },
       }).then(() => {
         clearAnonymousData();
@@ -143,6 +153,7 @@ export function useUserProgress() {
           totalSessions: pendingMigration.totalSessions,
           struggleWords: pendingMigration.struggleWords,
           lastPracticeDate: pendingMigration.lastPracticeDate,
+          thresholdParams: pendingMigration.thresholdParams,
         },
       });
       clearAnonymousData();
@@ -174,12 +185,16 @@ export function useUserProgress() {
     isLoading,
     effectiveLevel,
     effectiveStruggleWords,
+    effectiveThresholdParams,
     currentUser,
     anonymousUser,
     // For saving results
     updateAnonymousStats,
     updateUserStats,
     batchProcessWordResults,
+    // For threshold adjustment
+    updateAnonymousThreshold,
+    updateThresholdParams,
     // For merge dialog
     pendingMigration,
     handleMerge,
