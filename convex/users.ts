@@ -330,6 +330,7 @@ export const updateThresholdParams = mutation({
       lastUpdated: v.string(),
     }),
   },
+  returns: v.id("users"),
   handler: async (ctx, { userId, thresholdParams }) => {
     const user = await ctx.db.get(userId);
     if (!user) {
