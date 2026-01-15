@@ -409,6 +409,10 @@ export const migrateAnonymousData = mutation({
       ),
     }),
   },
+  returns: v.object({
+    success: v.boolean(),
+    userId: v.id("users"),
+  }),
   handler: async (ctx, { clerkId, anonymousData }) => {
     // Find user by clerkId
     const user = await ctx.db

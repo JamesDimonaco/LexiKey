@@ -34,8 +34,9 @@ export interface AccessibilitySettings {
   showTypingSpeed: boolean; // Show WPM on session complete
 }
 
-// Re-export ThresholdParams for convenience
-export type { ThresholdParams } from "./thresholdCalculator";
+// Import and re-export ThresholdParams for convenience
+import type { ThresholdParams } from "./thresholdCalculator";
+export type { ThresholdParams };
 
 // Anonymous user data stored in localStorage
 export interface AnonymousUserData {
@@ -47,7 +48,7 @@ export interface AnonymousUserData {
   lastPracticeDate: string | null;
   createdAt: string;
   // Adaptive hesitation threshold (set after placement test, adjusted gradually)
-  thresholdParams?: import("./thresholdCalculator").ThresholdParams;
+  thresholdParams?: ThresholdParams;
 }
 
 // Adaptive Learning Types

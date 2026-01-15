@@ -462,14 +462,19 @@ export default function PlacementTest() {
         }));
 
         // Also update the anonymous user's level and threshold so practice uses them
-        const anonUserData = localStorage.getItem("lexikey-anonymous-user");
-        if (anonUserData) {
-          const anonUser = JSON.parse(anonUserData);
-          anonUser.currentLevel = result.determinedLevel;
-          anonUser.thresholdParams = thresholdParams;
-          localStorage.setItem("lexikey-anonymous-user", JSON.stringify(anonUser));
-          console.log("✅ Anonymous user level updated to:", result.determinedLevel);
-          console.log("✅ Anonymous user threshold params set");
+        // Use separate try-catch to ensure placement result is saved even if this fails
+        try {
+          const anonUserData = localStorage.getItem("lexikey-anonymous-user");
+          if (anonUserData) {
+            const anonUser = JSON.parse(anonUserData);
+            anonUser.currentLevel = result.determinedLevel;
+            anonUser.thresholdParams = thresholdParams;
+            localStorage.setItem("lexikey-anonymous-user", JSON.stringify(anonUser));
+            console.log("✅ Anonymous user level updated to:", result.determinedLevel);
+            console.log("✅ Anonymous user threshold params set");
+          }
+        } catch (anonError) {
+          console.error("Failed to update anonymous user data:", anonError);
         }
 
         console.log("✅ Placement results saved locally");
@@ -480,24 +485,23 @@ export default function PlacementTest() {
     }
 
     try {
-      // Update user stats with placement test results
-      await updateUserStats({
-        userId: currentUser._id,
-        stats: {
-          currentLevel: result.determinedLevel,
-          hasCompletedPlacementTest: true,
-          struggleGroups: result.identifiedStruggleGroups,
-        },
-      });
+      // Update both stats and threshold params concurrently
+      await Promise.all([
+        updateUserStats({
+          userId: currentUser._id,
+          stats: {
+            currentLevel: result.determinedLevel,
+            hasCompletedPlacementTest: true,
+            struggleGroups: result.identifiedStruggleGroups,
+          },
+        }),
+        updateThresholdParams({
+          userId: currentUser._id,
+          thresholdParams,
+        }),
+      ]);
 
-      // Update threshold params separately
-      await updateThresholdParams({
-        userId: currentUser._id,
-        thresholdParams,
-      });
-
-      console.log("✅ Placement test results saved to Convex");
-      console.log("✅ Threshold params saved to Convex");
+      console.log("✅ Placement test results and threshold params saved to Convex");
 
       // Clear localStorage if we successfully saved to Convex
       localStorage.removeItem("lexikey_placement_result");
