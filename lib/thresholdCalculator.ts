@@ -157,11 +157,12 @@ export function adjustThresholdFromSession(
     current.baseTime * (1 - adjustmentRate) +
     Math.max(0.4, Math.min(1.0, clampedSessionSecs * 0.5)) * adjustmentRate;
 
-  // Final clamp to ensure we stay in bounds
+  // Final clamp to ensure we stay in bounds (handles floating-point drift)
   const finalSecsPerChar = Math.max(0.1, Math.min(2.0, newSecondsPerChar));
+  const finalBaseTime = Math.max(0.4, Math.min(1.0, newBaseTime));
 
   return {
-    baseTime: Math.round(newBaseTime * 1000) / 1000, // Round to 3 decimals
+    baseTime: Math.round(finalBaseTime * 1000) / 1000, // Round to 3 decimals
     secondsPerChar: Math.round(finalSecsPerChar * 1000) / 1000,
     safetyMultiplier: current.safetyMultiplier, // Keep multiplier constant
     wordCount: current.wordCount + validTimings.length,

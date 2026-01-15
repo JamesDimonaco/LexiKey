@@ -108,7 +108,7 @@ export interface PlacementTestResult {
     phonicsGroup: PhonicsGroup;
     difficulty: number;
     correct: boolean;
-    timeSpent: number;
+    timeSpent: number; // in milliseconds (differs from WordResult which uses seconds)
     backspaceCount: number;
   }>;
 }
