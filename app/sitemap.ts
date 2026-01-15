@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lexikey.org'
-  
+
   return [
     {
       url: baseUrl,
@@ -34,12 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
-    {
-      url: `${baseUrl}/settings`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
+    // Note: /settings removed - it's a user-specific page not useful for SEO
     {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),
