@@ -13,6 +13,11 @@ import {
   calculateNewUserLevel,
   SessionOptions,
 } from "@/lib/AdaptiveEngine";
+import {
+  ThresholdParams,
+  DEFAULT_THRESHOLD_PARAMS,
+  getHesitationThreshold,
+} from "@/lib/thresholdCalculator";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useTTS } from "./useTTS";
 import { useReveal } from "./useReveal";
@@ -20,15 +25,8 @@ import { LetterState } from "@/app/practice/types";
 import wordsData from "@/app/practice/words.json";
 import { trackEvent, trackPracticeStarted, trackWordStruggle } from "./usePostHog";
 
-// Struggle word threshold constants
-const HESITATION_BASE_TIME = 0.6; // base seconds to read/process the word
-const HESITATION_PER_CHAR = 0.3; // seconds per character (reasonable typing speed)
+// Struggle word threshold constant (backspaces only - hesitation now uses adaptive threshold)
 const BACKSPACE_THRESHOLD = 4;
-
-// Calculate hesitation threshold based on word length
-function getHesitationThreshold(wordLength: number): number {
-  return HESITATION_BASE_TIME + wordLength * HESITATION_PER_CHAR;
-}
 
 // Load words from JSON and transform to Word[] format
 const WORD_POOL: Word[] = wordsData.map(
@@ -52,6 +50,7 @@ interface UsePracticeSessionProps {
   isUserLoading: boolean;
   effectiveLevel: number;
   effectiveStruggleWords: StruggleWord[];
+  thresholdParams?: ThresholdParams; // Personalized hesitation threshold
   currentUser:
     | {
         _id: string;
@@ -71,10 +70,13 @@ export function usePracticeSession({
   isUserLoading,
   effectiveLevel,
   effectiveStruggleWords,
+  thresholdParams,
   currentUser,
   anonymousUser,
   onFinishSession,
 }: UsePracticeSessionProps) {
+  // Use personalized threshold or default
+  const effectiveThreshold = thresholdParams ?? DEFAULT_THRESHOLD_PARAMS;
   const { settings, updateSettings } = useAccessibility();
   const { speakWord } = useTTS(settings.voiceSpeed, settings.ttsEnabled);
 
@@ -244,9 +246,9 @@ export function usePracticeSession({
       timeSpent,
       backspaceCount,
       hesitationDetected:
-        timeSpent > getHesitationThreshold(currentWord.text.length),
+        timeSpent > getHesitationThreshold(currentWord.text.length, effectiveThreshold),
     };
-  }, [currentWord, userInput, startTime, backspaceCount]);
+  }, [currentWord, userInput, startTime, backspaceCount, effectiveThreshold]);
 
   // Finish session handler
   const finishSession = useCallback(
@@ -520,6 +522,9 @@ export function usePracticeSession({
 
   // Restart session (generates new words)
   const restartSession = useCallback(() => {
+    // Scroll to top instantly before restarting
+    window.scrollTo({ top: 0, behavior: "instant" });
+
     trackEvent("practice_session_restarted", {
       previousWordCount: sessionWords.length,
       previousResultsCount: results.length,

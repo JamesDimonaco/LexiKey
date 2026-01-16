@@ -60,6 +60,17 @@ export default defineSchema({
       hasCompletedPlacementTest: v.boolean(),
       hasCompletedTour: v.optional(v.boolean()), // Onboarding tour completed
       struggleGroups: v.array(v.string()), // Phonics groups user struggles with
+
+      // Adaptive hesitation threshold (personalized to user's typing speed)
+      thresholdParams: v.optional(
+        v.object({
+          baseTime: v.number(), // Processing overhead in seconds
+          secondsPerChar: v.number(), // Typing speed per character
+          safetyMultiplier: v.number(), // Buffer above normal (e.g., 1.3)
+          wordCount: v.number(), // Words used to calculate this
+          lastUpdated: v.string(), // ISO timestamp
+        })
+      ),
     }),
 
     // Subscription info (Premium)

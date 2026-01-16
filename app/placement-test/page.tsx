@@ -16,6 +16,7 @@ import {
   updateUserProperties,
   trackFunnelStep,
 } from "@/hooks/usePostHog";
+import { calculateThresholdFromPlacementTest } from "@/lib/thresholdCalculator";
 
 // Adaptive Placement Test Word Pool
 // Multiple words per difficulty level and phonics group
@@ -255,6 +256,7 @@ export default function PlacementTest() {
     user?.id ? { clerkId: user.id } : "skip",
   );
   const updateUserStats = useMutation(api.users.updateUserStats);
+  const updateThresholdParams = useMutation(api.users.updateThresholdParams);
 
   // Initialize first word on mount
   useEffect(() => {
@@ -438,6 +440,16 @@ export default function PlacementTest() {
   };
 
   const saveResultsToConvex = async (result: PlacementTestResult) => {
+    // Calculate personalized hesitation threshold from placement test timing
+    const thresholdParams = calculateThresholdFromPlacementTest(
+      result.wordResults.map((r) => ({
+        word: r.word,
+        timeSpent: r.timeSpent, // Already in milliseconds
+        correct: r.correct,
+      }))
+    );
+    console.log("📊 Calculated threshold params:", thresholdParams);
+
     if (!currentUser) {
       // User not signed in - save to localStorage for later sync
       console.log("📦 Saving placement results to localStorage (user not signed in)");
@@ -446,15 +458,23 @@ export default function PlacementTest() {
         localStorage.setItem("lexikey_placement_result", JSON.stringify({
           ...result,
           completedAt: Date.now(),
+          thresholdParams, // Include threshold params for migration
         }));
 
-        // Also update the anonymous user's level so practice uses the new level
-        const anonUserData = localStorage.getItem("lexikey-anonymous-user");
-        if (anonUserData) {
-          const anonUser = JSON.parse(anonUserData);
-          anonUser.currentLevel = result.determinedLevel;
-          localStorage.setItem("lexikey-anonymous-user", JSON.stringify(anonUser));
-          console.log("✅ Anonymous user level updated to:", result.determinedLevel);
+        // Also update the anonymous user's level and threshold so practice uses them
+        // Use separate try-catch to ensure placement result is saved even if this fails
+        try {
+          const anonUserData = localStorage.getItem("lexikey-anonymous-user");
+          if (anonUserData) {
+            const anonUser = JSON.parse(anonUserData);
+            anonUser.currentLevel = result.determinedLevel;
+            anonUser.thresholdParams = thresholdParams;
+            localStorage.setItem("lexikey-anonymous-user", JSON.stringify(anonUser));
+            console.log("✅ Anonymous user level updated to:", result.determinedLevel);
+            console.log("✅ Anonymous user threshold params set");
+          }
+        } catch (anonError) {
+          console.error("Failed to update anonymous user data:", anonError);
         }
 
         console.log("✅ Placement results saved locally");
@@ -465,7 +485,7 @@ export default function PlacementTest() {
     }
 
     try {
-      // Update user stats with placement test results
+      // Update sequentially to avoid race condition (both read/merge/write user.stats)
       await updateUserStats({
         userId: currentUser._id,
         stats: {
@@ -473,6 +493,11 @@ export default function PlacementTest() {
           hasCompletedPlacementTest: true,
           struggleGroups: result.identifiedStruggleGroups,
         },
+      });
+
+      await updateThresholdParams({
+        userId: currentUser._id,
+        thresholdParams,
       });
 
       console.log("✅ Placement test results saved to Convex");

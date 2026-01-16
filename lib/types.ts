@@ -34,6 +34,10 @@ export interface AccessibilitySettings {
   showTypingSpeed: boolean; // Show WPM on session complete
 }
 
+// Import and re-export ThresholdParams for convenience
+import type { ThresholdParams } from "./thresholdCalculator";
+export type { ThresholdParams };
+
 // Anonymous user data stored in localStorage
 export interface AnonymousUserData {
   deviceId: string;
@@ -43,6 +47,8 @@ export interface AnonymousUserData {
   struggleWords: StruggleWord[];
   lastPracticeDate: string | null;
   createdAt: string;
+  // Adaptive hesitation threshold (set after placement test, adjusted gradually)
+  thresholdParams?: ThresholdParams;
 }
 
 // Adaptive Learning Types
@@ -103,7 +109,7 @@ export interface PlacementTestResult {
     phonicsGroup: PhonicsGroup;
     difficulty: number;
     correct: boolean;
-    timeSpent: number;
+    timeSpent: number; // in milliseconds (differs from WordResult which uses seconds)
     backspaceCount: number;
   }>;
 }

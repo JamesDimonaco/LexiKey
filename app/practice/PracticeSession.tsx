@@ -8,6 +8,7 @@ import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePracticeSession, BACKSPACE_THRESHOLD } from "@/hooks/usePracticeSession";
 import { StruggleWord, WordResult } from "@/lib/types";
 import { trackEvent } from "@/hooks/usePostHog";
+import { adjustThresholdFromSession, DEFAULT_THRESHOLD_PARAMS } from "@/lib/thresholdCalculator";
 
 import { SentenceModeView } from "./SentenceModeView";
 import { SingleWordView } from "./SingleWordView";
@@ -22,11 +23,14 @@ export function PracticeSession() {
     isLoading: isUserLoading,
     effectiveLevel,
     effectiveStruggleWords,
+    effectiveThresholdParams,
     currentUser,
     anonymousUser,
     updateAnonymousStats,
     updateUserStats,
     batchProcessWordResults,
+    updateAnonymousThreshold,
+    updateThresholdParams,
   } = useUserProgress();
 
   // Handle finishing session - save results to appropriate storage
@@ -39,9 +43,20 @@ export function PracticeSession() {
       wasStruggle: !r.correct || r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
     }));
 
+    // Extract timing data for threshold adjustment (only correct words)
+    const sessionTimings = allResults
+      .filter((r) => r.correct)
+      .map((r) => ({ wordLen: r.word.length, time: r.timeSpent }));
+
+    // Gradually adjust threshold based on this session's timing
+    const currentThreshold = effectiveThresholdParams ?? DEFAULT_THRESHOLD_PARAMS;
+    const adjustedThreshold = adjustThresholdFromSession(currentThreshold, sessionTimings);
+
     if (isAnonymous) {
       // Pass ALL word results so graduation logic can increment consecutiveCorrect
       updateAnonymousStats(allResults.length, newLevel, wordResultsForBucket);
+      // Update threshold (gradual adjustment)
+      updateAnonymousThreshold(adjustedThreshold);
     } else if (currentUser) {
       await Promise.all([
         batchProcessWordResults({
@@ -52,9 +67,13 @@ export function PracticeSession() {
           userId: currentUser._id,
           stats: { currentLevel: newLevel },
         }),
+        updateThresholdParams({
+          userId: currentUser._id,
+          thresholdParams: adjustedThreshold,
+        }),
       ]);
     }
-  }, [isAnonymous, currentUser, updateAnonymousStats, updateUserStats, batchProcessWordResults]);
+  }, [isAnonymous, currentUser, updateAnonymousStats, updateUserStats, batchProcessWordResults, effectiveThresholdParams, updateAnonymousThreshold, updateThresholdParams]);
 
   // Session state and handlers
   const {
@@ -83,6 +102,7 @@ export function PracticeSession() {
     isUserLoading,
     effectiveLevel,
     effectiveStruggleWords,
+    thresholdParams: effectiveThresholdParams,
     currentUser,
     anonymousUser,
     onFinishSession: handleFinishSession,
