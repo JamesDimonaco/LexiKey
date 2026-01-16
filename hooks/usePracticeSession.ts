@@ -522,6 +522,9 @@ export function usePracticeSession({
 
   // Restart session (generates new words)
   const restartSession = useCallback(() => {
+    // Scroll to top instantly before restarting
+    window.scrollTo({ top: 0, behavior: "instant" });
+
     trackEvent("practice_session_restarted", {
       previousWordCount: sessionWords.length,
       previousResultsCount: results.length,

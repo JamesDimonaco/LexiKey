@@ -4,6 +4,7 @@ import "./globals.css";
 import ConvexClientProvider from "@/components/ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { AnonymousUserProvider } from "@/contexts/AnonymousUserContext";
 import { AccessibilityStyler } from "@/components/AccessibilityStyler";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/components/PostHogProvider";
@@ -153,13 +154,15 @@ export default function RootLayout({
                 disableTransitionOnChange
               >
                 <AccessibilityProvider>
-                  <AccessibilityStyler />
-                  <ErrorBoundary>
-                    <div className="flex-1">
-                      {children}
-                    </div>
-                  </ErrorBoundary>
-                  <Footer />
+                  <AnonymousUserProvider>
+                    <AccessibilityStyler />
+                    <ErrorBoundary>
+                      <div className="flex-1">
+                        {children}
+                      </div>
+                    </ErrorBoundary>
+                    <Footer />
+                  </AnonymousUserProvider>
                 </AccessibilityProvider>
               </ThemeProvider>
             </ConvexClientProvider>
