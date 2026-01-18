@@ -183,7 +183,7 @@ export function trackWordMastered(data: {
 export function trackWordStruggle(data: {
   word: string;
   phonicsGroup: string;
-  reason: "hesitation" | "backspaces" | "error";
+  reason: "hesitation" | "backspaces" | "error" | "timeout";
 }) {
   trackEvent("word_struggle", data);
 }
