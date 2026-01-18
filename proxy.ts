@@ -6,11 +6,9 @@ const isProtectedRoute = createRouteMatcher(["/server"]);
 export default clerkMiddleware(async (auth, req) => {
   const url = req.nextUrl;
 
-  // Redirect www to non-www (canonical domain)
-  if (url.hostname === "www.lexikey.org") {
-    const newUrl = new URL(url.toString());
-    newUrl.hostname = "lexikey.org";
-    return NextResponse.redirect(newUrl, 308);
+  // Redirect /practice to / (practice is on the home page)
+  if (url.pathname === "/practice") {
+    return NextResponse.redirect(new URL("/", url), 308);
   }
 
   // Protect routes that require authentication
