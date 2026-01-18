@@ -81,6 +81,7 @@ export default function SettingsPage() {
       showTimerPressure: false,
       blindMode: false,
       showTypingSpeed: true,
+      hardcoreMode: false,
     };
     resetSettings();
     setTempSettings(defaults);
@@ -577,6 +578,22 @@ export default function SettingsPage() {
                   <Switch
                     checked={tempSettings.blindMode}
                     onCheckedChange={(checked) => updateTempSettings({ blindMode: checked })}
+                  />
+                </div>
+
+                {/* Hardcore Mode */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-sm font-medium text-red-500 dark:text-red-400">
+                      Hardcore Mode
+                    </Label>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      No backspace allowed. Auto-advance on timeout.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={tempSettings.hardcoreMode}
+                    onCheckedChange={(checked) => updateTempSettings({ hardcoreMode: checked })}
                   />
                 </div>
 

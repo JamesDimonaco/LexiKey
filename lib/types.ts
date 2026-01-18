@@ -32,6 +32,9 @@ export interface AccessibilitySettings {
   showTimerPressure: boolean; // Show time/backspace stats on session complete
   blindMode: boolean; // Hide text to force muscle memory
   showTypingSpeed: boolean; // Show WPM on session complete
+
+  // Challenge mode
+  hardcoreMode: boolean; // No backspace, auto-advance on timeout
 }
 
 // Import and re-export ThresholdParams for convenience

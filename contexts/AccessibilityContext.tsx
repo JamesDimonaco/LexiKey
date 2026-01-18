@@ -30,6 +30,8 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   showTimerPressure: false, // Changed from noTimerPressure
   blindMode: false,
   showTypingSpeed: true,
+  // Challenge mode
+  hardcoreMode: false,
 };
 
 interface AccessibilityContextType {
