@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function ForParents() {
   return (
-    <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
+    <main className="bg-gray-100 dark:bg-black min-h-screen p-8">
       <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-black dark:text-white mb-6">
             Help Your Child Learn to Spell

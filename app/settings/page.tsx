@@ -91,7 +91,7 @@ export default function SettingsPage() {
   return (
     <>
       <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-4 md:p-8">
+      <main className="bg-gray-100 dark:bg-black min-h-screen p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
           {/* Page Header */}
           <div className="flex items-center justify-between mb-6">
@@ -646,7 +646,7 @@ function SettingsSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"

@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="bg-gray-50 dark:bg-black min-h-screen p-8">
+      <main className="bg-gray-100 dark:bg-black min-h-screen p-8">
         <HomeContent />
       </main>
     </>
@@ -81,7 +81,7 @@ function HomeContent() {
   if (!isAnonymous && currentUser && !currentUser.stats.hasCompletedPlacementTest && !skippedPlacementTest) {
     return (
       <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 text-center">
+        <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-gray-800 text-center">
           <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
             Welcome to LexiKey!
           </h2>

@@ -122,7 +122,7 @@ export function SessionComplete({
     <div
       ref={containerRef}
       tabIndex={-1}
-      className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800 outline-none"
+      className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-gray-800 outline-none"
     >
       <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
         Session Complete!

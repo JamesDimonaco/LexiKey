@@ -142,7 +142,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black text-black dark:text-white flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 dark:bg-black text-gray-900 dark:text-white flex flex-col min-h-screen`}
       >
         <PostHogProvider>
           <ClerkProvider dynamic>

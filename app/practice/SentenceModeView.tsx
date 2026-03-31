@@ -55,7 +55,7 @@ export function SentenceModeView({
   return (
     <div
       className={`
-        relative bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border transition-all cursor-text
+        relative bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border transition-all cursor-text
         ${isFocused
           ? "border-gray-200 dark:border-gray-800"
           : "border-gray-300 dark:border-gray-700"

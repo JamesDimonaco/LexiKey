@@ -29,7 +29,7 @@ export function MergeDialog({
   const mergedWords = anonymousData.totalWords + accountData.totalWords;
 
   return (
-    <div className="max-w-lg w-full mx-auto bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800">
+    <div className="max-w-lg w-full mx-auto bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg dark:shadow-none border border-gray-200 dark:border-gray-800">
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
         We found practice data on this device
       </h2>

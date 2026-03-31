@@ -8,7 +8,7 @@ import { trackEvent } from "@/hooks/usePostHog";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b-2 border-gray-200 dark:border-gray-800 flex flex-row justify-between items-center">
+    <header className="sticky top-0 z-10 bg-white dark:bg-gray-950 p-4 border-b border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none flex flex-row justify-between items-center">
       <Link
         href="/"
         className="text-xl font-bold text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"

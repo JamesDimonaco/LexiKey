@@ -63,7 +63,7 @@ export function ProgressView() {
     <Collapsible
       open={isOpen}
       onOpenChange={handleOpenChange}
-      className="w-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 mb-6"
+      className="w-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none mb-6"
     >
       <div className="flex items-center justify-between p-4">
         <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
