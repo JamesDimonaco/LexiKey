@@ -63,6 +63,7 @@ export function AccessibilitySettings({ onClose }: AccessibilitySettingsProps) {
       showTimerPressure: false,
       blindMode: false,
       showTypingSpeed: true,
+      hardcoreMode: false,
     });
   };
 
@@ -254,6 +255,23 @@ export function AccessibilitySettings({ onClose }: AccessibilitySettingsProps) {
               Blind Mode (hide text to force muscle memory)
             </span>
           </label>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={tempSettings.hardcoreMode}
+              onChange={(e) => updateTempSettings({ hardcoreMode: e.target.checked })}
+              className="w-4 h-4 accent-red-500"
+            />
+            <span className="text-sm text-gray-300">
+              Hardcore Mode (no backspace, auto-advance on timeout)
+            </span>
+          </label>
+          {tempSettings.hardcoreMode && (
+            <p className="text-xs text-red-400 mt-1 ml-6">
+              Warning: In hardcore mode, you cannot delete mistakes. Words will auto-advance if not completed in time.
+            </p>
+          )}
         </div>
 
         {/* Action Buttons */}

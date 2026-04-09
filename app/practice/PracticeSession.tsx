@@ -97,6 +97,7 @@ export function PracticeSession() {
     handleDictationToggle,
     handleRepeat,
     setSentenceMode,
+    wordTimeRemaining,
   } = usePracticeSession({
     isAnonymous,
     isUserLoading,
@@ -143,10 +144,17 @@ export function PracticeSession() {
     <div className="max-w-4xl w-full mx-auto">
       {/* Header with level and mode toggles */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="text-sm text-gray-600 dark:text-gray-400" data-tour="level-display">
-          <span className="font-semibold">
-            Level {effectiveLevel.toFixed(1)}
-          </span>
+        <div className="flex items-center gap-3" data-tour="level-display">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold">
+              Level {effectiveLevel.toFixed(1)}
+            </span>
+          </div>
+          {settings.hardcoreMode && (
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider">
+              Hardcore
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-4">
           {/* Dictation Mode Toggle */}
@@ -225,6 +233,25 @@ export function PracticeSession() {
           }}
         />
       </div>
+
+      {/* Hardcore mode countdown timer */}
+      {settings.hardcoreMode && wordTimeRemaining !== null && (
+        <div className="flex justify-center mb-4">
+          <div
+            className={`
+              px-4 py-2 rounded-lg font-mono text-lg
+              ${wordTimeRemaining < 2
+                ? 'bg-red-500/20 text-red-400 animate-pulse'
+                : wordTimeRemaining < 4
+                  ? 'bg-yellow-500/20 text-yellow-400'
+                  : 'bg-gray-700/50 text-gray-300'
+              }
+            `}
+          >
+            {wordTimeRemaining.toFixed(1)}s
+          </div>
+        </div>
+      )}
 
       {/* Mode-specific view */}
       {sentenceMode ? (

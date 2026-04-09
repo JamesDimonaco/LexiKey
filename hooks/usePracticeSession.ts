@@ -28,6 +28,15 @@ import { trackEvent, trackPracticeStarted, trackWordStruggle } from "./usePostHo
 // Struggle word threshold constant (backspaces only - hesitation now uses adaptive threshold)
 const BACKSPACE_THRESHOLD = 4;
 
+// Hardcore mode timeout constants
+const SECONDS_PER_CHAR = 1.0;
+const MIN_WORD_TIME = 2.0;
+
+// Calculate timeout for a word based on length
+function getWordTimeout(word: string): number {
+  return Math.max(MIN_WORD_TIME, word.length * SECONDS_PER_CHAR);
+}
+
 // Load words from JSON and transform to Word[] format
 const WORD_POOL: Word[] = wordsData.map(
   (w: {
@@ -101,6 +110,10 @@ export function usePracticeSession({
   const [showFeedback, setShowFeedback] = useState<
     "correct" | "incorrect" | null
   >(null);
+
+  // Hardcore mode state
+  const [wordTimeRemaining, setWordTimeRemaining] = useState<number | null>(null);
+  const wordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const lastSpokenWordIdRef = useRef<string>("");
@@ -216,6 +229,56 @@ export function usePracticeSession({
       setWasLastKeyBackspace(false);
     }
   }, [currentWord, currentWordIndex]);
+
+  // Hardcore mode timer - starts when word changes
+  // We use a ref to track if we've already triggered timeout to prevent double-firing
+  const timeoutTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    // Clear any existing timer
+    if (wordTimerRef.current) {
+      clearInterval(wordTimerRef.current);
+      wordTimerRef.current = null;
+    }
+    timeoutTriggeredRef.current = false;
+
+    // Only run timer in hardcore mode with a valid word
+    if (!settings.hardcoreMode || !currentWord || isComplete) {
+      setWordTimeRemaining(null);
+      return;
+    }
+
+    // Set initial time
+    const totalTime = getWordTimeout(currentWord.text);
+    setWordTimeRemaining(totalTime);
+
+    // Start countdown
+    const startedAt = Date.now();
+    wordTimerRef.current = setInterval(() => {
+      const elapsed = (Date.now() - startedAt) / 1000;
+      const remaining = totalTime - elapsed;
+
+      if (remaining <= 0) {
+        // Time's up
+        setWordTimeRemaining(0);
+        if (wordTimerRef.current) {
+          clearInterval(wordTimerRef.current);
+          wordTimerRef.current = null;
+        }
+        // Mark that timeout was triggered (actual handling done in separate effect)
+        timeoutTriggeredRef.current = true;
+      } else {
+        setWordTimeRemaining(remaining);
+      }
+    }, 100);
+
+    return () => {
+      if (wordTimerRef.current) {
+        clearInterval(wordTimerRef.current);
+        wordTimerRef.current = null;
+      }
+    };
+  }, [currentWord?.id, settings.hardcoreMode, isComplete]);
 
   // Calculate result for current word
   const calculateWordResult = useCallback((): WordResult => {
@@ -369,6 +432,42 @@ export function usePracticeSession({
     ],
   );
 
+  // Handle hardcore mode timeout
+  const handleWordTimeout = useCallback(() => {
+    if (!currentWord) return;
+
+    // Clear the timer
+    if (wordTimerRef.current) {
+      clearInterval(wordTimerRef.current);
+      wordTimerRef.current = null;
+    }
+    setWordTimeRemaining(null);
+
+    // Track the timeout
+    trackEvent("practice_word_timeout", {
+      word: currentWord.text,
+      phonicsGroup: currentWord.phonicsGroup,
+      wordIndex: currentWordIndex + 1,
+      totalWords: sessionWords.length,
+    });
+
+    trackWordStruggle({
+      word: currentWord.text,
+      phonicsGroup: currentWord.phonicsGroup,
+      reason: "timeout",
+    });
+
+    // Mark as incorrect and advance
+    advanceToNextWord(false);
+  }, [currentWord, currentWordIndex, sessionWords.length, advanceToNextWord]);
+
+  // Handle timeout when time reaches 0
+  useEffect(() => {
+    if (wordTimeRemaining === 0 && settings.hardcoreMode && currentWord && !isComplete) {
+      handleWordTimeout();
+    }
+  }, [wordTimeRemaining, settings.hardcoreMode, currentWord, isComplete, handleWordTimeout]);
+
   // Submit word (single word mode)
   const handleSubmitWord = useCallback(() => {
     if (!currentWord) return;
@@ -439,7 +538,12 @@ export function usePracticeSession({
   // Key down handler
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // Block backspace in hardcore mode
       if (e.key === "Backspace") {
+        if (settings.hardcoreMode) {
+          e.preventDefault();
+          return;
+        }
         setBackspaceCount((prev) => prev + 1);
       }
 
@@ -504,11 +608,19 @@ export function usePracticeSession({
       handleSubmitWord,
       advanceToNextWord,
       currentWord?.text,
+      settings.hardcoreMode,
     ],
   );
 
   // Reset session state (keeps same words)
   const resetSessionState = useCallback(() => {
+    // Clear hardcore mode timer
+    if (wordTimerRef.current) {
+      clearInterval(wordTimerRef.current);
+      wordTimerRef.current = null;
+    }
+    setWordTimeRemaining(null);
+
     setCurrentWordIndex(0);
     setUserInput("");
     setResults([]);
@@ -593,6 +705,7 @@ export function usePracticeSession({
     showFeedback,
     reveal, // Reveal state object from useReveal hook
     inputRef,
+    wordTimeRemaining, // Hardcore mode countdown (null when not in hardcore mode)
     // Handlers
     handleInputChange,
     handleKeyDown,
