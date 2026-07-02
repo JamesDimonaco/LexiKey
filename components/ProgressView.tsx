@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useQuery } from "convex/react";
 import { Flame, Snowflake } from "lucide-react";
 import { api } from "@/convex/_generated/api";
@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 const PROGRESS_COLLAPSED_KEY = "lexikey_progress_collapsed";
+
+const emptySubscribe = () => () => {};
 
 /**
  * A streak the backend would reset on the next session (missed more days than
@@ -52,17 +54,21 @@ export function ProgressView() {
     streak.currentStreak > 0 &&
     isStreakAlive(streak.lastActiveDate, streak.freezesAvailable);
 
-  const [isOpen, setIsOpen] = useState(true);
-  const [mounted, setMounted] = useState(false);
+  // Hydration guard: false during SSR/hydration, true after — replaces the
+  // old mounted-flag effect without calling setState inside an effect.
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
-  // Load collapsed state from localStorage
-  useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem(PROGRESS_COLLAPSED_KEY);
-    if (saved !== null) {
-      setIsOpen(saved !== "true");
-    }
-  }, []);
+  // Collapsed state, read from localStorage on first client render. Safe
+  // because the component renders nothing until `mounted` is true.
+  const [isOpen, setIsOpen] = useState(
+    () =>
+      typeof window === "undefined" ||
+      localStorage.getItem(PROGRESS_COLLAPSED_KEY) !== "true",
+  );
 
   // Save collapsed state to localStorage
   const handleOpenChange = (open: boolean) => {

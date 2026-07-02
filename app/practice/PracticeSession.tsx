@@ -7,10 +7,16 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
-import { usePracticeSession, BACKSPACE_THRESHOLD } from "@/hooks/usePracticeSession";
-import { StruggleWord, WordResult, StreakResult } from "@/lib/types";
+import {
+  usePracticeSession,
+  BACKSPACE_THRESHOLD,
+} from "@/hooks/usePracticeSession";
+import { WordResult, StreakResult } from "@/lib/types";
 import { trackEvent } from "@/hooks/usePostHog";
-import { adjustThresholdFromSession, DEFAULT_THRESHOLD_PARAMS } from "@/lib/thresholdCalculator";
+import {
+  adjustThresholdFromSession,
+  DEFAULT_THRESHOLD_PARAMS,
+} from "@/lib/thresholdCalculator";
 
 import { SentenceModeView } from "./SentenceModeView";
 import { SingleWordView } from "./SingleWordView";
@@ -35,81 +41,103 @@ export function PracticeSession() {
     updateThresholdParams,
   } = useUserProgress();
 
-  const recordSessionCompleted = useMutation(api.streaks.recordSessionCompleted);
+  const recordSessionCompleted = useMutation(
+    api.streaks.recordSessionCompleted,
+  );
   const [streakResult, setStreakResult] = useState<StreakResult | null>(null);
 
   // Handle finishing session - save results to appropriate storage
-  const handleFinishSession = useCallback(async (allResults: WordResult[], newLevel: number) => {
-    // Build word results with wasStruggle flag for bucket processing
-    // A word is a struggle if: incorrect, took too long, or required many corrections
-    const wordResultsForBucket = allResults.map((r) => ({
-      word: r.word,
-      phonicsGroup: r.phonicsGroup,
-      wasStruggle: !r.correct || r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD,
-    }));
+  const handleFinishSession = useCallback(
+    async (allResults: WordResult[], newLevel: number) => {
+      // Build word results with wasStruggle flag for bucket processing
+      // A word is a struggle if: incorrect, took too long, or required many corrections
+      const wordResultsForBucket = allResults.map((r) => ({
+        word: r.word,
+        phonicsGroup: r.phonicsGroup,
+        wasStruggle:
+          !r.correct ||
+          r.hesitationDetected ||
+          r.backspaceCount > BACKSPACE_THRESHOLD,
+      }));
 
-    // Extract timing data for threshold adjustment (only correct words)
-    const sessionTimings = allResults
-      .filter((r) => r.correct)
-      .map((r) => ({ wordLen: r.word.length, time: r.timeSpent }));
+      // Extract timing data for threshold adjustment (only correct words)
+      const sessionTimings = allResults
+        .filter((r) => r.correct)
+        .map((r) => ({ wordLen: r.word.length, time: r.timeSpent }));
 
-    // Gradually adjust threshold based on this session's timing
-    const currentThreshold = effectiveThresholdParams ?? DEFAULT_THRESHOLD_PARAMS;
-    const adjustedThreshold = adjustThresholdFromSession(currentThreshold, sessionTimings);
+      // Gradually adjust threshold based on this session's timing
+      const currentThreshold =
+        effectiveThresholdParams ?? DEFAULT_THRESHOLD_PARAMS;
+      const adjustedThreshold = adjustThresholdFromSession(
+        currentThreshold,
+        sessionTimings,
+      );
 
-    if (isAnonymous) {
-      // Pass ALL word results so graduation logic can increment consecutiveCorrect
-      updateAnonymousStats(allResults.length, newLevel, wordResultsForBucket);
-      // Update threshold (gradual adjustment)
-      updateAnonymousThreshold(adjustedThreshold);
-    } else if (currentUser) {
-      await Promise.all([
-        batchProcessWordResults({
-          userId: currentUser._id,
-          results: wordResultsForBucket,
-        }),
-        updateUserStats({
-          userId: currentUser._id,
-          stats: { currentLevel: newLevel },
-        }),
-        updateThresholdParams({
-          userId: currentUser._id,
-          thresholdParams: adjustedThreshold,
-        }),
-      ]);
+      if (isAnonymous) {
+        // Pass ALL word results so graduation logic can increment consecutiveCorrect
+        updateAnonymousStats(allResults.length, newLevel, wordResultsForBucket);
+        // Update threshold (gradual adjustment)
+        updateAnonymousThreshold(adjustedThreshold);
+      } else if (currentUser) {
+        await Promise.all([
+          batchProcessWordResults({
+            userId: currentUser._id,
+            results: wordResultsForBucket,
+          }),
+          updateUserStats({
+            userId: currentUser._id,
+            stats: { currentLevel: newLevel },
+          }),
+          updateThresholdParams({
+            userId: currentUser._id,
+            thresholdParams: adjustedThreshold,
+          }),
+        ]);
 
-      // Streak tracking is best-effort - never let it block session saving.
-      try {
-        const result = await recordSessionCompleted({
-          userId: currentUser._id,
-          timezoneOffsetMinutes: new Date().getTimezoneOffset(),
-        });
-        setStreakResult(result);
-
-        if (result.status === "started" || result.status === "incremented") {
-          trackEvent("streak_incremented", {
-            currentStreak: result.currentStreak,
-            longestStreak: result.longestStreak,
-            freezesAvailable: result.freezesAvailable,
-            milestone: result.milestone,
+        // Streak tracking is best-effort - never let it block session saving.
+        try {
+          const result = await recordSessionCompleted({
+            userId: currentUser._id,
+            timezoneOffsetMinutes: new Date().getTimezoneOffset(),
           });
-        } else if (result.status === "freeze_used") {
-          trackEvent("streak_freeze_used", {
-            currentStreak: result.currentStreak,
-            longestStreak: result.longestStreak,
-            freezesAvailable: result.freezesAvailable,
-            milestone: result.milestone,
-          });
-        } else if (result.status === "reset") {
-          trackEvent("streak_reset", {
-            previousLongest: result.longestStreak,
-          });
+          setStreakResult(result);
+
+          if (result.status === "started" || result.status === "incremented") {
+            trackEvent("streak_incremented", {
+              currentStreak: result.currentStreak,
+              longestStreak: result.longestStreak,
+              freezesAvailable: result.freezesAvailable,
+              milestone: result.milestone,
+            });
+          } else if (result.status === "freeze_used") {
+            trackEvent("streak_freeze_used", {
+              currentStreak: result.currentStreak,
+              longestStreak: result.longestStreak,
+              freezesAvailable: result.freezesAvailable,
+              milestone: result.milestone,
+            });
+          } else if (result.status === "reset") {
+            trackEvent("streak_reset", {
+              previousLongest: result.longestStreak,
+            });
+          }
+        } catch (error) {
+          console.error("[Streak] Failed to record session:", error);
         }
-      } catch (error) {
-        console.error("[Streak] Failed to record session:", error);
       }
-    }
-  }, [isAnonymous, currentUser, updateAnonymousStats, updateUserStats, batchProcessWordResults, effectiveThresholdParams, updateAnonymousThreshold, updateThresholdParams, recordSessionCompleted]);
+    },
+    [
+      isAnonymous,
+      currentUser,
+      updateAnonymousStats,
+      updateUserStats,
+      batchProcessWordResults,
+      effectiveThresholdParams,
+      updateAnonymousThreshold,
+      updateThresholdParams,
+      recordSessionCompleted,
+    ],
+  );
 
   // Session state and handlers
   const {
@@ -180,7 +208,10 @@ export function PracticeSession() {
     <div className="max-w-4xl w-full mx-auto">
       {/* Header with level and mode toggles */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="text-sm text-gray-600 dark:text-gray-400" data-tour="level-display">
+        <div
+          className="text-sm text-gray-600 dark:text-gray-400"
+          data-tour="level-display"
+        >
           <span className="font-semibold">
             Level {effectiveLevel.toFixed(1)}
           </span>
@@ -190,7 +221,7 @@ export function PracticeSession() {
           <div className="flex items-center gap-2" data-tour="dictation-toggle">
             <Label
               htmlFor="dictation-toggle"
-              className={`text-sm ${!settings.dictationMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+              className={`text-sm ${!settings.dictationMode ? "text-gray-900 dark:text-white font-medium" : "text-gray-500 dark:text-gray-400"}`}
             >
               Visible
             </Label>
@@ -201,7 +232,7 @@ export function PracticeSession() {
             />
             <Label
               htmlFor="dictation-toggle"
-              className={`text-sm ${settings.dictationMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+              className={`text-sm ${settings.dictationMode ? "text-gray-900 dark:text-white font-medium" : "text-gray-500 dark:text-gray-400"}`}
             >
               Listen
             </Label>
@@ -211,7 +242,7 @@ export function PracticeSession() {
           <div className="flex items-center gap-2" data-tour="mode-toggle">
             <Label
               htmlFor="mode-toggle"
-              className={`text-sm ${!sentenceMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+              className={`text-sm ${!sentenceMode ? "text-gray-900 dark:text-white font-medium" : "text-gray-500 dark:text-gray-400"}`}
             >
               Word
             </Label>
@@ -228,7 +259,7 @@ export function PracticeSession() {
             />
             <Label
               htmlFor="mode-toggle"
-              className={`text-sm ${sentenceMode ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400'}`}
+              className={`text-sm ${sentenceMode ? "text-gray-900 dark:text-white font-medium" : "text-gray-500 dark:text-gray-400"}`}
             >
               Sentence
             </Label>
@@ -242,11 +273,21 @@ export function PracticeSession() {
               className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
               title="Get new words"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                <path d="M3 3v5h5"/>
-                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-                <path d="M16 21h5v-5"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                <path d="M16 21h5v-5" />
               </svg>
             </button>
           </div>

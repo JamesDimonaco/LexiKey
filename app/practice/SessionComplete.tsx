@@ -123,6 +123,9 @@ export function SessionComplete({
       accuracy,
       currentLevel,
     });
+    // Analytics must fire exactly once when the completion screen mounts,
+    // not again on re-renders — the values are frozen for this session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
