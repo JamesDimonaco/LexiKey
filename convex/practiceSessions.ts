@@ -263,37 +263,13 @@ export const createPracticeSession = mutation({
             (oldWeight + newWeight)
           : args.accuracy;
 
-      // Update streak
-      const today = new Date().toISOString().split("T")[0];
-      let currentStreak = user.stats.currentStreak;
-      let longestStreak = user.stats.longestStreak;
-
-      if (user.stats.lastPracticeDate) {
-        const lastDate = new Date(user.stats.lastPracticeDate);
-        const todayDate = new Date(today);
-        const diffDays = Math.floor(
-          (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
-        );
-
-        if (diffDays === 1) {
-          currentStreak += 1;
-          longestStreak = Math.max(currentStreak, longestStreak);
-        } else if (diffDays > 1) {
-          currentStreak = 1;
-        }
-      } else {
-        currentStreak = 1;
-        longestStreak = 1;
-      }
-
+      // Streaks are owned by streaks.recordSessionCompleted (timezone-aware,
+      // freeze-forgiving) — this mutation only updates aggregate stats.
       await ctx.db.patch(args.userId, {
         stats: {
           ...user.stats, // Keep all existing stats fields
           totalWords: newTotalWords,
           totalSessions: newTotalSessions,
-          currentStreak,
-          longestStreak,
-          lastPracticeDate: today,
           totalMinutesPracticed: newTotalMinutes,
           averageAccuracy: newAverageAccuracy,
         },

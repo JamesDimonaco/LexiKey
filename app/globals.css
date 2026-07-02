@@ -164,4 +164,22 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
+
+  /* Confetti particles for the streak milestone celebration */
+  @keyframes confetti-fall {
+    0% { transform: translateY(-8px) rotate(0deg); opacity: 0; }
+    15% { opacity: 1; }
+    100% { transform: translateY(48px) rotate(180deg); opacity: 0; }
+  }
+
+  .confetti-particle {
+    animation: confetti-fall 900ms ease-out forwards;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .confetti-particle {
+      animation: none;
+      opacity: 0;
+    }
+  }
 }

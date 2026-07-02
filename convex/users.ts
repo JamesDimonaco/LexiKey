@@ -273,41 +273,10 @@ export const updateUserStats = mutation({
       throw new Error("User not found");
     }
 
-    // Calculate streak if lastPracticeDate is being updated
-    let updatedStats = { ...user.stats, ...stats };
-
-    if (stats.lastPracticeDate) {
-      const today = new Date().toISOString().split("T")[0];
-      const lastPractice = user.stats.lastPracticeDate;
-
-      if (lastPractice) {
-        const lastDate = new Date(lastPractice);
-        const todayDate = new Date(today);
-        const diffDays = Math.floor(
-          (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24),
-        );
-
-        if (diffDays === 1) {
-          // Consecutive day - increment streak
-          updatedStats.currentStreak = user.stats.currentStreak + 1;
-          updatedStats.longestStreak = Math.max(
-            updatedStats.currentStreak,
-            user.stats.longestStreak,
-          );
-        } else if (diffDays > 1) {
-          // Streak broken - reset to 1
-          updatedStats.currentStreak = 1;
-        }
-        // diffDays === 0 means same day, keep streak as is
-      } else {
-        // First practice ever
-        updatedStats.currentStreak = 1;
-        updatedStats.longestStreak = 1;
-      }
-    }
-
+    // NOTE: streaks are owned by streaks.recordSessionCompleted (timezone-aware,
+    // freeze-forgiving) — this mutation only merges the fields it's given.
     await ctx.db.patch(userId, {
-      stats: updatedStats,
+      stats: { ...user.stats, ...stats },
       updatedAt: Date.now(),
     });
 

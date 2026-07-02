@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePracticeSession, BACKSPACE_THRESHOLD } from "@/hooks/usePracticeSession";
-import { StruggleWord, WordResult } from "@/lib/types";
+import { StruggleWord, WordResult, StreakResult } from "@/lib/types";
 import { trackEvent } from "@/hooks/usePostHog";
 import { adjustThresholdFromSession, DEFAULT_THRESHOLD_PARAMS } from "@/lib/thresholdCalculator";
 
@@ -32,6 +34,9 @@ export function PracticeSession() {
     updateAnonymousThreshold,
     updateThresholdParams,
   } = useUserProgress();
+
+  const recordSessionCompleted = useMutation(api.streaks.recordSessionCompleted);
+  const [streakResult, setStreakResult] = useState<StreakResult | null>(null);
 
   // Handle finishing session - save results to appropriate storage
   const handleFinishSession = useCallback(async (allResults: WordResult[], newLevel: number) => {
@@ -72,8 +77,39 @@ export function PracticeSession() {
           thresholdParams: adjustedThreshold,
         }),
       ]);
+
+      // Streak tracking is best-effort - never let it block session saving.
+      try {
+        const result = await recordSessionCompleted({
+          userId: currentUser._id,
+          timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+        });
+        setStreakResult(result);
+
+        if (result.status === "started" || result.status === "incremented") {
+          trackEvent("streak_incremented", {
+            currentStreak: result.currentStreak,
+            longestStreak: result.longestStreak,
+            freezesAvailable: result.freezesAvailable,
+            milestone: result.milestone,
+          });
+        } else if (result.status === "freeze_used") {
+          trackEvent("streak_freeze_used", {
+            currentStreak: result.currentStreak,
+            longestStreak: result.longestStreak,
+            freezesAvailable: result.freezesAvailable,
+            milestone: result.milestone,
+          });
+        } else if (result.status === "reset") {
+          trackEvent("streak_reset", {
+            previousLongest: result.longestStreak,
+          });
+        }
+      } catch (error) {
+        console.error("[Streak] Failed to record session:", error);
+      }
     }
-  }, [isAnonymous, currentUser, updateAnonymousStats, updateUserStats, batchProcessWordResults, effectiveThresholdParams, updateAnonymousThreshold, updateThresholdParams]);
+  }, [isAnonymous, currentUser, updateAnonymousStats, updateUserStats, batchProcessWordResults, effectiveThresholdParams, updateAnonymousThreshold, updateThresholdParams, recordSessionCompleted]);
 
   // Session state and handlers
   const {
@@ -134,6 +170,7 @@ export function PracticeSession() {
         showTypingSpeed={settings.showTypingSpeed}
         inputMode={settings.dictationMode ? "voice" : "visible"}
         displayMode={sentenceMode ? "sentence" : "word"}
+        streakResult={streakResult}
       />
     );
   }

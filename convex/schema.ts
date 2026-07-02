@@ -51,7 +51,12 @@ export default defineSchema({
       totalSessions: v.number(),
       currentStreak: v.number(), // Days in a row
       longestStreak: v.number(),
-      lastPracticeDate: v.optional(v.string()), // ISO date
+      lastPracticeDate: v.optional(v.string()), // ISO date (legacy, kept in sync by streaks.ts)
+
+      // Forgiving daily streak (canonical logic lives in convex/streaks.ts)
+      lastActiveDate: v.optional(v.string()), // YYYY-MM-DD in the USER's timezone
+      freezesAvailable: v.optional(v.number()), // 0-1; one freeze covers one missed day
+      freezeWeekStart: v.optional(v.string()), // YYYY-MM-DD Monday of the week the freeze was last refilled
       totalMinutesPracticed: v.number(),
       averageAccuracy: v.number(), // 0-100
 

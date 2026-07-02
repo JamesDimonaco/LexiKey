@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useQuery } from "convex/react";
+import { Flame, Snowflake } from "lucide-react";
+import { api } from "@/convex/_generated/api";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import {
   Collapsible,
@@ -11,6 +14,24 @@ import { Button } from "@/components/ui/button";
 
 const PROGRESS_COLLAPSED_KEY = "lexikey_progress_collapsed";
 
+/**
+ * A streak the backend would reset on the next session (missed more days than
+ * a freeze can cover) has already lapsed — showing it would only set up a
+ * disappointing reset, so we quietly hide it instead. Uses the browser's
+ * local date, matching how the backend counts days.
+ */
+function isStreakAlive(
+  lastActiveDate: string | null,
+  freezesAvailable: number,
+): boolean {
+  if (!lastActiveDate) return false;
+  const [y, m, d] = lastActiveDate.split("-").map(Number);
+  const now = new Date();
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const gap = Math.round((todayUTC - Date.UTC(y, m - 1, d)) / 86_400_000);
+  return gap <= 1 || (gap === 2 && freezesAvailable > 0);
+}
+
 export function ProgressView() {
   const {
     isLoading,
@@ -20,6 +41,16 @@ export function ProgressView() {
     effectiveStruggleWords,
     effectiveLevel,
   } = useUserProgress();
+
+  const streak = useQuery(
+    api.streaks.getStreak,
+    !isAnonymous && currentUser?._id ? { userId: currentUser._id } : "skip",
+  );
+  const streakAlive =
+    streak !== undefined &&
+    streak !== null &&
+    streak.currentStreak > 0 &&
+    isStreakAlive(streak.lastActiveDate, streak.freezesAvailable);
 
   const [isOpen, setIsOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -69,25 +100,42 @@ export function ProgressView() {
         <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
           Your Progress
         </h3>
-        <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-            <span className="sr-only">Toggle progress</span>
-          </Button>
-        </CollapsibleTrigger>
+        <div className="flex items-center gap-3">
+          {/* Streak lives in the header so it stays visible when the panel is collapsed */}
+          {streak && streakAlive && (
+            <span className="inline-flex items-baseline gap-1.5">
+              <Flame
+                className="h-4 w-4 self-center text-orange-600 dark:text-orange-400"
+                aria-hidden="true"
+              />
+              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
+                {streak.currentStreak}
+              </span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                day streak
+              </span>
+            </span>
+          )}
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+              <span className="sr-only">Toggle progress</span>
+            </Button>
+          </CollapsibleTrigger>
+        </div>
       </div>
 
       <CollapsibleContent>
@@ -133,6 +181,19 @@ export function ProgressView() {
               </div>
             </div>
           </div>
+
+          {/* Freeze reassurance — only once there's a streak worth protecting */}
+          {streak &&
+            streakAlive &&
+            streak.currentStreak >= 2 &&
+            streak.freezesAvailable > 0 && (
+              <div className="flex justify-center mt-3">
+                <span className="inline-flex items-center gap-1.5 text-xs text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-full px-3 py-1">
+                  <Snowflake className="h-3.5 w-3.5" aria-hidden="true" />
+                  Freeze ready — you&apos;re covered if you miss a day
+                </span>
+              </div>
+            )}
 
           {/* Sign up prompt for anonymous users */}
           {isAnonymous && totalWords > 0 && (

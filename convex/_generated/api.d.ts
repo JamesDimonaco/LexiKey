@@ -9,6 +9,7 @@
  */
 
 import type * as practiceSessions from "../practiceSessions.js";
+import type * as streaks from "../streaks.js";
 import type * as struggleWords from "../struggleWords.js";
 import type * as users from "../users.js";
 
@@ -20,6 +21,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   practiceSessions: typeof practiceSessions;
+  streaks: typeof streaks;
   struggleWords: typeof struggleWords;
   users: typeof users;
 }>;
