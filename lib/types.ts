@@ -38,17 +38,35 @@ export interface AccessibilitySettings {
 import type { ThresholdParams } from "./thresholdCalculator";
 export type { ThresholdParams };
 
+// What a practice session focuses on (chosen on the setup screen)
+export type PracticeFocus =
+  | { type: "recommended" } // adaptive mix at the user's level
+  | { type: "review" } // only words from the user's struggle bucket
+  | { type: "pattern"; patternId: string }; // a single phonics pattern
+
+// Session configuration chosen on the setup screen.
+// Local state only — never persisted to Convex (summaries are).
+export interface SessionConfig {
+  focus: PracticeFocus;
+  flow: "word" | "sentence";
+}
+
 // Anonymous user data stored in localStorage
 export interface AnonymousUserData {
   deviceId: string;
-  currentLevel: number;
+  currentLevel: number; // Reading level (words shown on screen)
+  listenLevel?: number; // Dictation level; falls back to currentLevel
   totalWords: number;
   totalSessions: number;
   struggleWords: StruggleWord[];
   lastPracticeDate: string | null;
   createdAt: string;
-  // Adaptive hesitation threshold (set after placement test, adjusted gradually)
+  // Adaptive hesitation threshold (set after placement test, adjusted
+  // gradually). One per input mode — listening is far slower on long words.
   thresholdParams?: ThresholdParams;
+  listenThresholdParams?: ThresholdParams;
+  // Words the voice mangled — kept out of this device's listening sessions
+  inaudibleWords?: string[];
 }
 
 // Adaptive Learning Types
@@ -70,6 +88,8 @@ export interface Word {
   phonicsGroup: PhonicsGroup;
   sentenceContext?: string;
   isStruggle?: boolean; // True if this word is from the struggle bucket
+  /** Text before capitals/punctuation were applied; what gets persisted */
+  baseText?: string;
 }
 
 // Struggle word from DB bucket
@@ -77,6 +97,10 @@ export interface StruggleWord {
   word: string;
   phonicsGroup: string;
   consecutiveCorrect: number; // 0-3, graduates at 3
+  // Where the misses happened. Listening and reading are different skills —
+  // a word only ever missed on dictation isn't a spelling problem.
+  listenMisses?: number;
+  seeMisses?: number;
 }
 
 // Result for a single word in a practice session

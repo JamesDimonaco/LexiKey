@@ -11,6 +11,14 @@ export interface ThresholdParams {
   safetyMultiplier: number; // Buffer above normal speed (1.3 = 30% buffer)
   wordCount: number; // Number of words used to calculate this
   lastUpdated: string; // ISO timestamp
+  /**
+   * Cost that grows with the SQUARE of word length. Zero when reading — a
+   * visible word costs the same per letter however long it is. Non-zero when
+   * listening, where you hold the word in memory and re-listen while spelling
+   * it, so each extra letter costs more than the last. See
+   * DEFAULT_LISTEN_THRESHOLD_PARAMS for the measured fit.
+   */
+  secondsPerCharSquared?: number;
 }
 
 /**
@@ -29,6 +37,31 @@ export const DEFAULT_THRESHOLD_PARAMS: ThresholdParams = {
 };
 
 /**
+ * Default threshold for LISTENING (dictation) practice.
+ *
+ * Typing a word you can see is linear in its length. Typing a word you only
+ * heard is not: measured 75th-percentile times for correct words were 1.1s at
+ * 3 letters but 18.2s at 10 — roughly 0.16 * length^2. Short words cost about
+ * what reading costs; long ones cost several times more, because you have to
+ * hold the whole word and re-listen while chunking it.
+ *
+ * Reusing the reading threshold here flagged 58% of listened words as
+ * hesitation, which filled the review bucket with words nobody struggled on.
+ * These numbers put the flag rate back in the 5-12% range across all lengths.
+ *
+ * Example: "picnic" (6 chars) = (0.5 + 6*0.2 + 36*0.16) * 1.35 = 10.1 seconds
+ * vs the reading threshold for the same word: 4.0 seconds.
+ */
+export const DEFAULT_LISTEN_THRESHOLD_PARAMS: ThresholdParams = {
+  baseTime: 0.5,
+  secondsPerChar: 0.2,
+  secondsPerCharSquared: 0.16,
+  safetyMultiplier: 1.35,
+  wordCount: 0,
+  lastUpdated: new Date().toISOString(),
+};
+
+/**
  * Calculate the hesitation threshold for a specific word.
  *
  * @param wordLength - Number of characters in the word
@@ -39,7 +72,10 @@ export function getHesitationThreshold(
   wordLength: number,
   params: ThresholdParams = DEFAULT_THRESHOLD_PARAMS
 ): number {
-  return (params.baseTime + wordLength * params.secondsPerChar) * params.safetyMultiplier;
+  const lengthCost =
+    wordLength * params.secondsPerChar +
+    wordLength * wordLength * (params.secondsPerCharSquared ?? 0);
+  return (params.baseTime + lengthCost) * params.safetyMultiplier;
 }
 
 /**
@@ -121,6 +157,16 @@ export function adjustThresholdFromSession(
   sessionTimings: Array<{ wordLen: number; time: number }>,
   adjustmentRate: number = 0.05
 ): ThresholdParams {
+  // Thresholds carrying a quadratic term (listening) are left alone. This
+  // estimator fits a per-character rate, and against a dominant length-squared
+  // cost that fit is ill-posed: subtract the quadratic and most words go
+  // negative and get dropped; don't subtract and it gets counted twice. The
+  // listening defaults are fitted from measured data and generous; personalise
+  // them only once there is enough listening data to fit the curve properly.
+  if (current.secondsPerCharSquared) {
+    return current;
+  }
+
   // Filter to only valid timings (positive word length and time)
   const validTimings = sessionTimings.filter(
     (t) => t.wordLen > 0 && t.time > 0 && isFinite(t.time)

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SignUpButton } from "@clerk/nextjs";
-import { Flame, Snowflake } from "lucide-react";
-import { WordResult, StreakResult } from "@/lib/types";
+import { Flame, Snowflake, Trophy, VolumeX } from "lucide-react";
+import { WordResult, StreakResult, StruggleWord } from "@/lib/types";
 import {
   trackEvent,
   trackSessionCompleted,
@@ -17,26 +17,35 @@ const BACKSPACE_THRESHOLD = 4;
 
 type SessionCompleteProps = {
   results: WordResult[];
+  /** Struggle bucket as it stood when the session's words were generated */
+  struggleWordsAtStart?: StruggleWord[];
   currentLevel: number;
   onRestart: () => void;
+  /** Return to the session setup screen */
+  onChangeFocus?: () => void;
   showTimerPressure?: boolean;
   isAnonymous?: boolean;
   showTypingSpeed?: boolean;
   // Mode tracking
   inputMode: "visible" | "voice";
   displayMode: "sentence" | "word";
+  /** Report that the voice mangled a word (dictation sessions only) */
+  onReportInaudible?: (word: string) => void;
   streakResult?: StreakResult | null;
 };
 
 export function SessionComplete({
   results,
+  struggleWordsAtStart,
   currentLevel,
   onRestart,
+  onChangeFocus,
   showTimerPressure = false,
   isAnonymous = false,
   showTypingSpeed = true,
   inputMode,
   displayMode,
+  onReportInaudible,
   streakResult,
 }: SessionCompleteProps) {
   // Only show WPM in sentence mode with visible words (not voice/dictation)
@@ -68,6 +77,46 @@ export function SessionComplete({
       r.backspaceCount > BACKSPACE_THRESHOLD,
   );
   const totalBackspaces = results.reduce((sum, r) => sum + r.backspaceCount, 0);
+
+  // Words that graduated out of the review bucket this session. Mirrors the
+  // server's rule exactly: 3 consecutive clean attempts deletes the word, a
+  // struggle resets the counter (and re-adds it if it had just graduated).
+  const masteredWords = useMemo(() => {
+    if (!struggleWordsAtStart?.length) return [];
+
+    const counters = new Map(
+      struggleWordsAtStart.map((w) => [
+        w.word.toLowerCase(),
+        w.consecutiveCorrect,
+      ]),
+    );
+    const mastered = new Set<string>();
+
+    for (const r of results) {
+      const key = r.word.toLowerCase();
+      if (!counters.has(key)) continue;
+
+      const wasStruggle =
+        !r.correct ||
+        r.hesitationDetected ||
+        r.backspaceCount > BACKSPACE_THRESHOLD;
+
+      if (wasStruggle) {
+        counters.set(key, 0);
+        mastered.delete(key); // back in the bucket
+      } else {
+        const next = (counters.get(key) ?? 0) + 1;
+        counters.set(key, next);
+        if (next >= 3) mastered.add(key);
+      }
+    }
+
+    // Return in original-casing, session order
+    return results
+      .filter((r, i, arr) => arr.findIndex((x) => x.word === r.word) === i)
+      .map((r) => r.word)
+      .filter((word) => mastered.has(word.toLowerCase()));
+  }, [results, struggleWordsAtStart]);
 
   // Handle Enter key to restart
   useEffect(() => {
@@ -132,7 +181,7 @@ export function SessionComplete({
     <div
       ref={containerRef}
       tabIndex={-1}
-      className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-gray-800 outline-none"
+      className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-gray-800 outline-none animate-in fade-in duration-300 motion-reduce:animate-none"
     >
       <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
         Session Complete!
@@ -174,9 +223,19 @@ export function SessionComplete({
           wpm={wpm}
         />
 
+        {/* Words mastered this session */}
+        {masteredWords.length > 0 && (
+          <MasteredWordsDisplay masteredWords={masteredWords} />
+        )}
+
         {/* Struggle words */}
         {struggleWords.length > 0 && (
-          <StruggleWordsDisplay struggleWords={struggleWords} />
+          <StruggleWordsDisplay
+            struggleWords={struggleWords}
+            onReportInaudible={
+              inputMode === "voice" ? onReportInaudible : undefined
+            }
+          />
         )}
 
         {/* Actions */}
@@ -189,6 +248,14 @@ export function SessionComplete({
             Press Enter
           </span>
         </button>
+        {onChangeFocus && (
+          <button
+            onClick={onChangeFocus}
+            className="w-full py-3 text-gray-600 dark:text-gray-400 font-medium rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            Change what you practice
+          </button>
+        )}
       </div>
     </div>
   );
@@ -312,11 +379,52 @@ function StatCard({
   );
 }
 
+function MasteredWordsDisplay({ masteredWords }: { masteredWords: string[] }) {
+  return (
+    <div className="bg-emerald-50 dark:bg-emerald-900/20 p-6 rounded-lg border border-emerald-200 dark:border-emerald-800">
+      <h2 className="text-xl font-bold mb-3 text-black dark:text-white flex items-center gap-2">
+        <Trophy
+          className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0"
+          aria-hidden="true"
+        />
+        Words Mastered
+      </h2>
+      <div className="flex flex-wrap gap-2">
+        {masteredWords.map((word) => (
+          <span
+            key={word}
+            className="px-3 py-1.5 bg-emerald-100 dark:bg-emerald-600/30 border border-emerald-300 dark:border-emerald-700 rounded-lg font-mono font-semibold text-emerald-900 dark:text-emerald-200"
+          >
+            {word}
+          </span>
+        ))}
+      </div>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+        Typed correctly 3 times in a row — these are out of your review list.
+        Nice work.
+      </p>
+    </div>
+  );
+}
+
 function StruggleWordsDisplay({
   struggleWords,
+  onReportInaudible,
 }: {
   struggleWords: WordResult[];
+  /** Only passed for dictation sessions — a shown word can't be inaudible */
+  onReportInaudible?: (word: string) => void;
 }) {
+  const [reported, setReported] = useState<string[]>([]);
+
+  const report = useCallback(
+    (word: string) => {
+      setReported((prev) => (prev.includes(word) ? prev : [...prev, word]));
+      onReportInaudible?.(word);
+    },
+    [onReportInaudible],
+  );
+
   return (
     <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
       <h2 className="text-xl font-bold mb-3 text-black dark:text-white">
@@ -351,12 +459,29 @@ function StruggleWordsDisplay({
               <span className="ml-auto text-xs text-yellow-600 dark:text-yellow-400">
                 {reasons.join(" · ")}
               </span>
+              {onReportInaudible &&
+                (reported.includes(r.word) ? (
+                  <span className="text-xs text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                    Won&apos;t be spoken again
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => report(r.word)}
+                    className="flex items-center gap-1 text-xs font-medium text-yellow-900 dark:text-yellow-200 underline underline-offset-2 hover:no-underline whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                  >
+                    <VolumeX className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                    Couldn&apos;t hear it
+                  </button>
+                ))}
             </div>
           );
         })}
       </div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
-        These words have been added to your review bucket for extra practice
+        {onReportInaudible
+          ? "These words have been added to your review bucket. If the voice mangled one, say so and it won't be spoken to you again."
+          : "These words have been added to your review bucket for extra practice"}
       </p>
     </div>
   );

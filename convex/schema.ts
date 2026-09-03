@@ -60,20 +60,36 @@ export default defineSchema({
       totalMinutesPracticed: v.number(),
       averageAccuracy: v.number(), // 0-100
 
-      // Adaptive learning
+      // Adaptive learning. currentLevel is the READING level (words on screen);
+      // listening is scored separately because it's a different skill —
+      // measured accuracy is 93% reading vs 65% listening.
       currentLevel: v.number(), // 1-10 difficulty rating
+      listenLevel: v.optional(v.number()), // 1-10; falls back to currentLevel
       hasCompletedPlacementTest: v.boolean(),
       hasCompletedTour: v.optional(v.boolean()), // Onboarding tour completed
       struggleGroups: v.array(v.string()), // Phonics groups user struggles with
 
-      // Adaptive hesitation threshold (personalized to user's typing speed)
+      // Adaptive hesitation threshold (personalized to user's typing speed).
+      // One set per input mode — a slow listening session must not drag the
+      // reading threshold up, or vice versa.
       thresholdParams: v.optional(
         v.object({
           baseTime: v.number(), // Processing overhead in seconds
           secondsPerChar: v.number(), // Typing speed per character
+          secondsPerCharSquared: v.optional(v.number()), // Length penalty (listening only)
           safetyMultiplier: v.number(), // Buffer above normal (e.g., 1.3)
           wordCount: v.number(), // Words used to calculate this
           lastUpdated: v.string(), // ISO timestamp
+        })
+      ),
+      listenThresholdParams: v.optional(
+        v.object({
+          baseTime: v.number(),
+          secondsPerChar: v.number(),
+          secondsPerCharSquared: v.optional(v.number()),
+          safetyMultiplier: v.number(),
+          wordCount: v.number(),
+          lastUpdated: v.string(),
         })
       ),
     }),
@@ -161,9 +177,33 @@ export default defineSchema({
     consecutiveCorrect: v.number(), // 0-3, graduates (deleted) at 3
     totalAttempts: v.number(),
 
+    // Which input mode the misses happened in. Listening and reading are
+    // different skills — a word only ever missed on dictation isn't a
+    // spelling problem. Optional: rows written before this existed have neither.
+    listenMisses: v.optional(v.number()),
+    seeMisses: v.optional(v.number()),
+
     lastSeenAt: v.number(), // Timestamp
     createdAt: v.number(),
   })
     .index("by_userId", ["userId"])
     .index("by_userId_word", ["userId", "word"]),
+
+  // ====================
+  // INAUDIBLE WORD REPORTS
+  // ====================
+
+  /**
+   * Words a user could not make out in dictation mode. Two jobs: keep the word
+   * out of that user's listening sessions, and — counted across users — show
+   * which words the text-to-speech voice mangles for everyone.
+   */
+  inaudibleWordReports: defineTable({
+    userId: v.id("users"),
+    word: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_word", ["userId", "word"])
+    .index("by_word", ["word"]),
 });

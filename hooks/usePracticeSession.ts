@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Word,
-  UserProgress,
   PhonicsGroup,
+  SessionConfig,
   StruggleWord,
+  UserProgress,
+  Word,
   WordResult,
 } from "@/lib/types";
 import {
@@ -22,34 +23,20 @@ import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useTTS } from "./useTTS";
 import { useReveal } from "./useReveal";
 import { LetterState } from "@/app/practice/types";
-import wordsData from "@/app/practice/words.json";
+import { WORD_POOL } from "@/lib/wordPool";
+import { getPattern } from "@/lib/phonicsPatterns";
 import { trackEvent, trackPracticeStarted, trackWordStruggle } from "./usePostHog";
 
 // Struggle word threshold constant (backspaces only - hesitation now uses adaptive threshold)
 const BACKSPACE_THRESHOLD = 4;
-
-// Load words from JSON and transform to Word[] format
-const WORD_POOL: Word[] = wordsData.map(
-  (w: {
-    id: string;
-    word: string;
-    difficultyLevel: number;
-    phonicsGroup: string;
-    sentenceContext?: string;
-  }) => ({
-    id: w.id,
-    text: w.word,
-    difficulty: w.difficultyLevel,
-    phonicsGroup: w.phonicsGroup as PhonicsGroup,
-    sentenceContext: w.sentenceContext,
-  }),
-);
 
 interface UsePracticeSessionProps {
   isAnonymous: boolean;
   isUserLoading: boolean;
   effectiveLevel: number;
   effectiveStruggleWords: StruggleWord[];
+  /** Words this user reported as inaudible — skipped in listening sessions */
+  inaudibleWords: string[];
   thresholdParams?: ThresholdParams; // Personalized hesitation threshold
   currentUser:
     | {
@@ -62,6 +49,8 @@ interface UsePracticeSessionProps {
     | null
     | undefined;
   anonymousUser: { deviceId: string } | null;
+  /** Session configuration chosen on the setup screen */
+  config: SessionConfig;
   onFinishSession: (results: WordResult[], newLevel: number) => Promise<void>;
 }
 
@@ -70,32 +59,103 @@ export function usePracticeSession({
   isUserLoading,
   effectiveLevel,
   effectiveStruggleWords,
+  inaudibleWords,
   thresholdParams,
   currentUser,
   anonymousUser,
+  config,
   onFinishSession,
 }: UsePracticeSessionProps) {
   // Use personalized threshold or default
   const effectiveThreshold = thresholdParams ?? DEFAULT_THRESHOLD_PARAMS;
-  const { settings, updateSettings } = useAccessibility();
+  const { settings } = useAccessibility();
   const { speakWord } = useTTS(settings.voiceSpeed, settings.ttsEnabled);
 
-  // Core state
-  const [sessionWords, setSessionWords] = useState<Word[]>([]);
+  // Display flow is fixed per session (chosen at setup)
+  const sentenceMode = config.flow === "sentence";
+
+  // Build a session from the current props/settings. Synchronous local work
+  // (~1k words) — running it during the initial render means the session is
+  // ready on first paint, with no loading flash between setup and typing.
+  const buildSession = useCallback((): Word[] => {
+    const userProgress: UserProgress = {
+      userId: isAnonymous
+        ? (anonymousUser?.deviceId ?? "anon")
+        : currentUser!._id,
+      currentLevel: effectiveLevel,
+      hasCompletedPlacementTest: isAnonymous
+        ? false
+        : (currentUser?.stats.hasCompletedPlacementTest ?? false),
+      struggleGroups: isAnonymous
+        ? []
+        : ((currentUser?.stats.struggleGroups || []) as PhonicsGroup[]),
+      struggleWords: effectiveStruggleWords,
+    };
+
+    // Map the setup-screen focus onto engine options
+    const focusOption: SessionOptions["focus"] =
+      config.focus.type === "review"
+        ? { type: "review" }
+        : config.focus.type === "pattern"
+          ? {
+              type: "pattern",
+              prefixes: getPattern(config.focus.patternId)?.prefixes ?? [],
+            }
+          : undefined;
+
+    const sessionOptions: SessionOptions = {
+      wordCount: settings.sessionWordCount,
+      capitalFrequency: settings.capitalFrequency,
+      punctuationFrequency: settings.punctuationFrequency,
+      strugglePercent: settings.strugglePercent,
+      newPercent: settings.newPercent,
+      confidencePercent: settings.confidencePercent,
+      startingBoosters: settings.startingBoosters,
+      focus: focusOption,
+      // Only listening sessions skip these — the word is perfectly readable
+      excludeWords: settings.dictationMode ? inaudibleWords : undefined,
+    };
+
+    const generator = new AdaptiveSessionGenerator(
+      WORD_POOL,
+      effectiveStruggleWords,
+    );
+    return generator.generateSession(userProgress, sessionOptions);
+  }, [
+    isAnonymous,
+    anonymousUser,
+    currentUser,
+    effectiveLevel,
+    effectiveStruggleWords,
+    inaudibleWords,
+    config,
+    settings.dictationMode,
+    settings.sessionWordCount,
+    settings.capitalFrequency,
+    settings.punctuationFrequency,
+    settings.strugglePercent,
+    settings.newPercent,
+    settings.confidencePercent,
+    settings.startingBoosters,
+  ]);
+
+  // Core state (lazy init: words exist from the very first render)
+  const [sessionWords, setSessionWords] = useState<Word[]>(buildSession);
+  // Snapshot of the struggle bucket when this session's words were generated.
+  // Convex updates the bucket reactively after a session saves, so the live
+  // list can't tell the results screen which words graduated — this can.
+  const [sessionStruggleWords, setSessionStruggleWords] = useState<
+    StruggleWord[]
+  >(() => effectiveStruggleWords);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [results, setResults] = useState<WordResult[]>([]);
   const [isComplete, setIsComplete] = useState(false);
 
-  // Mode state
-  const [sentenceMode, setSentenceMode] = useState(true);
-
   // Tracking state
   const [startTime, setStartTime] = useState<number | null>(null);
   const [backspaceCount, setBackspaceCount] = useState(0);
-  const [correctionsMade, setCorrectionsMade] = useState(0);
   const [letterStates, setLetterStates] = useState<LetterState[]>([]);
-  const [wasLastKeyBackspace, setWasLastKeyBackspace] = useState(false);
 
   // Feedback state
   const [showFeedback, setShowFeedback] = useState<
@@ -104,6 +164,13 @@ export function usePracticeSession({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const lastSpokenWordIdRef = useRef<string>("");
+  // One submit per word index. Submitting waits 300ms before the index moves,
+  // and in that window a habitual space/enter would run the whole submit again
+  // — duplicate result, duplicate analytics event, index jumping by two, and
+  // on the last word a second finishSession (double streak, double bucket
+  // write). Keyed by index, not word id: the same word can appear twice in a
+  // session and the second occurrence still needs its own submit.
+  const submittedIndexRef = useRef<number | null>(null);
 
   const currentWord = sessionWords[currentWordIndex];
 
@@ -123,80 +190,37 @@ export function usePracticeSession({
     return () => clearTimeout(timer);
   }, [currentWord?.id, settings.dictationMode, settings.ttsEnabled, speakWord]);
 
-  // Generate adaptive session when user data loads
+  // Track session start — once per mount. Only startSession bumps the
+  // session key; restart/refresh rebuild in place and fire their own events.
   useEffect(() => {
-    if (sessionWords.length > 0) return;
-    if (isUserLoading) return;
-
-    const userProgress: UserProgress = {
-      userId: isAnonymous
-        ? (anonymousUser?.deviceId ?? "anon")
-        : currentUser!._id,
-      currentLevel: effectiveLevel,
-      hasCompletedPlacementTest: isAnonymous
-        ? false
-        : (currentUser?.stats.hasCompletedPlacementTest ?? false),
-      struggleGroups: isAnonymous
-        ? []
-        : ((currentUser?.stats.struggleGroups || []) as PhonicsGroup[]),
-      struggleWords: effectiveStruggleWords,
-    };
-
-    const sessionOptions: SessionOptions = {
-      wordCount: settings.sessionWordCount,
-      capitalFrequency: settings.capitalFrequency,
-      punctuationFrequency: settings.punctuationFrequency,
-      strugglePercent: settings.strugglePercent,
-      newPercent: settings.newPercent,
-      confidencePercent: settings.confidencePercent,
-      startingBoosters: settings.startingBoosters,
-    };
-
-    const generator = new AdaptiveSessionGenerator(
-      WORD_POOL,
-      effectiveStruggleWords,
-    );
-    const generatedWords = generator.generateSession(
-      userProgress,
-      sessionOptions,
-    );
-    setSessionWords(generatedWords);
-
-    // Track session started using semantic analytics
     trackPracticeStarted({
       mode: "practice",
       currentLevel: effectiveLevel,
     });
 
-    // Also track detailed session info
     trackEvent("practice_session_started", {
-      wordCount: generatedWords.length,
+      wordCount: sessionWords.length,
       userLevel: effectiveLevel,
       isAnonymous,
-      hasCompletedPlacementTest: userProgress.hasCompletedPlacementTest,
+      hasCompletedPlacementTest: isAnonymous
+        ? false
+        : (currentUser?.stats.hasCompletedPlacementTest ?? false),
       struggleWordsCount: effectiveStruggleWords.length,
+      focus: config.focus.type,
+      focusPattern:
+        config.focus.type === "pattern" ? config.focus.patternId : null,
+      flow: config.flow,
+      dictationMode: settings.dictationMode,
       sessionOptions: {
-        strugglePercent: sessionOptions.strugglePercent,
-        newPercent: sessionOptions.newPercent,
-        confidencePercent: sessionOptions.confidencePercent,
+        strugglePercent: settings.strugglePercent,
+        newPercent: settings.newPercent,
+        confidencePercent: settings.confidencePercent,
       },
     });
-  }, [
-    isAnonymous,
-    isUserLoading,
-    anonymousUser,
-    currentUser,
-    sessionWords.length,
-    effectiveLevel,
-    effectiveStruggleWords,
-    settings.sessionWordCount,
-    settings.capitalFrequency,
-    settings.punctuationFrequency,
-    settings.strugglePercent,
-    settings.newPercent,
-    settings.confidencePercent,
-    settings.startingBoosters,
-  ]);
+    // Analytics must fire exactly once per started session, with the values
+    // frozen at mount — not again on re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Initialize letter states when word changes
   useEffect(() => {
@@ -211,9 +235,7 @@ export function usePracticeSession({
       );
       setStartTime(null); // Timer starts on first keystroke, not when word appears
       setBackspaceCount(0);
-      setCorrectionsMade(0);
       setShowFeedback(null);
-      setWasLastKeyBackspace(false);
     }
   }, [currentWord, currentWordIndex]);
 
@@ -239,7 +261,10 @@ export function usePracticeSession({
 
     return {
       wordId: currentWord.id,
-      word: currentWord.text,
+      // The base word, not the transformed one: capitals and punctuation are
+      // typing practice, but "Cat." must not become its own review-bucket
+      // entry separate from "cat".
+      word: currentWord.baseText ?? currentWord.text,
       phonicsGroup: currentWord.phonicsGroup,
       correct: isCorrect,
       userInput,
@@ -302,11 +327,6 @@ export function usePracticeSession({
       }
 
       if (newLength < oldLength) {
-        if (!wasLastKeyBackspace && oldLength > 0) {
-          setCorrectionsMade((prev) => prev + 1);
-        }
-        setWasLastKeyBackspace(true);
-
         setLetterStates((prev) =>
           prev.map((state, i) => {
             if (i >= newLength) {
@@ -316,8 +336,6 @@ export function usePracticeSession({
           }),
         );
       } else {
-        setWasLastKeyBackspace(false);
-
         const newCharIndex = newLength - 1;
         const newChar = newValue[newCharIndex];
 
@@ -342,7 +360,7 @@ export function usePracticeSession({
 
       setUserInput(newValue);
     },
-    [userInput.length, wasLastKeyBackspace, letterStates.length, startTime],
+    [userInput.length, letterStates.length, startTime],
   );
 
   // Advance to next word
@@ -372,6 +390,8 @@ export function usePracticeSession({
   // Submit word (single word mode)
   const handleSubmitWord = useCallback(() => {
     if (!currentWord) return;
+    if (submittedIndexRef.current === currentWordIndex) return;
+    submittedIndexRef.current = currentWordIndex;
 
     const result = calculateWordResult();
     const isCorrect =
@@ -398,18 +418,21 @@ export function usePracticeSession({
         word: currentWord.text,
         phonicsGroup: currentWord.phonicsGroup,
         reason: "error",
+        dictationMode: settings.dictationMode,
       });
     } else if (result.hesitationDetected) {
       trackWordStruggle({
         word: currentWord.text,
         phonicsGroup: currentWord.phonicsGroup,
         reason: "hesitation",
+        dictationMode: settings.dictationMode,
       });
     } else if (result.backspaceCount > BACKSPACE_THRESHOLD) {
       trackWordStruggle({
         word: currentWord.text,
         phonicsGroup: currentWord.phonicsGroup,
         reason: "backspaces",
+        dictationMode: settings.dictationMode,
       });
     }
 
@@ -433,7 +456,68 @@ export function usePracticeSession({
     results,
     currentWordIndex,
     sessionWords.length,
+    sentenceMode,
+    settings.dictationMode,
     finishSession,
+  ]);
+
+  // Submit word (sentence mode) — shared by the spacebar handler and the
+  // final-word auto-complete
+  const submitSentenceWord = useCallback(() => {
+    if (!currentWord) return;
+    if (submittedIndexRef.current === currentWordIndex) return;
+    submittedIndexRef.current = currentWordIndex;
+
+    const isCorrect = userInput.toLowerCase() === currentWord.text.toLowerCase();
+    const result = calculateWordResult();
+
+    trackEvent("practice_word_completed", {
+      word: currentWord.text,
+      correct: isCorrect,
+      timeSpent: Math.round(result.timeSpent * 100) / 100,
+      backspaceCount: result.backspaceCount,
+      hesitationDetected: result.hesitationDetected,
+      wordIndex: currentWordIndex + 1,
+      totalWords: sessionWords.length,
+      difficulty: currentWord.difficulty,
+      phonicsGroup: currentWord.phonicsGroup,
+      sentenceMode: true,
+      dictationMode: settings.dictationMode,
+    });
+
+    // Track struggle words for analytics (sentence mode)
+    if (!isCorrect) {
+      trackWordStruggle({
+        word: currentWord.text,
+        phonicsGroup: currentWord.phonicsGroup,
+        reason: "error",
+        dictationMode: settings.dictationMode,
+      });
+    } else if (result.hesitationDetected) {
+      trackWordStruggle({
+        word: currentWord.text,
+        phonicsGroup: currentWord.phonicsGroup,
+        reason: "hesitation",
+        dictationMode: settings.dictationMode,
+      });
+    } else if (result.backspaceCount > BACKSPACE_THRESHOLD) {
+      trackWordStruggle({
+        word: currentWord.text,
+        phonicsGroup: currentWord.phonicsGroup,
+        reason: "backspaces",
+        dictationMode: settings.dictationMode,
+      });
+    }
+
+    advanceToNextWord(isCorrect);
+  }, [
+    currentWord,
+    userInput,
+    calculateWordResult,
+    currentWordIndex,
+    sessionWords.length,
+    settings.dictationMode,
+    advanceToNextWord,
   ]);
 
   // Key down handler
@@ -454,58 +538,41 @@ export function usePracticeSession({
 
       if (sentenceMode && e.key === " " && userInput.length > 0) {
         e.preventDefault();
-        const isCorrect = userInput.toLowerCase() === currentWord?.text.toLowerCase();
-
-        // Track word completion in sentence mode
-        if (currentWord) {
-          const result = calculateWordResult();
-          trackEvent("practice_word_completed", {
-            word: currentWord.text,
-            correct: isCorrect,
-            timeSpent: Math.round(result.timeSpent * 100) / 100,
-            backspaceCount: result.backspaceCount,
-            hesitationDetected: result.hesitationDetected,
-            wordIndex: currentWordIndex + 1,
-            totalWords: sessionWords.length,
-            difficulty: currentWord.difficulty,
-            phonicsGroup: currentWord.phonicsGroup,
-            sentenceMode: true,
-            dictationMode: settings.dictationMode,
-          });
-
-          // Track struggle words for analytics (sentence mode)
-          if (!isCorrect) {
-            trackWordStruggle({
-              word: currentWord.text,
-              phonicsGroup: currentWord.phonicsGroup,
-              reason: "error",
-            });
-          } else if (result.hesitationDetected) {
-            trackWordStruggle({
-              word: currentWord.text,
-              phonicsGroup: currentWord.phonicsGroup,
-              reason: "hesitation",
-            });
-          } else if (result.backspaceCount > BACKSPACE_THRESHOLD) {
-            trackWordStruggle({
-              word: currentWord.text,
-              phonicsGroup: currentWord.phonicsGroup,
-              reason: "backspaces",
-            });
-          }
-        }
-
-        advanceToNextWord(isCorrect);
+        submitSentenceWord();
       }
     },
-    [
-      sentenceMode,
-      userInput,
-      handleSubmitWord,
-      advanceToNextWord,
-      currentWord?.text,
-    ],
+    [sentenceMode, userInput, handleSubmitWord, submitSentenceWord],
   );
+
+  // Auto-advance correctly typed words. In single-word mode every correct
+  // word moves on by itself — analytics showed users typing a word, waiting,
+  // and leaving because nothing told them to press space. In sentence mode
+  // the spacebar IS the typing rhythm, so only the final word (which has no
+  // next word to space into) auto-completes.
+  // Double submits are prevented by submittedIndexRef inside the handlers, so
+  // this effect can fire freely.
+  useEffect(() => {
+    if (!currentWord || isComplete) return;
+    if (userInput.toLowerCase() !== currentWord.text.toLowerCase()) return;
+
+    const isLastWord = currentWordIndex === sessionWords.length - 1;
+    if (sentenceMode && !isLastWord) return;
+
+    if (sentenceMode) {
+      submitSentenceWord();
+    } else {
+      handleSubmitWord();
+    }
+  }, [
+    userInput,
+    currentWord,
+    currentWordIndex,
+    sessionWords.length,
+    isComplete,
+    sentenceMode,
+    submitSentenceWord,
+    handleSubmitWord,
+  ]);
 
   // Reset session state (keeps same words)
   const resetSessionState = useCallback(() => {
@@ -515,8 +582,8 @@ export function usePracticeSession({
     setIsComplete(false);
     setStartTime(null); // Timer starts on first keystroke
     setBackspaceCount(0);
-    setCorrectionsMade(0);
     setShowFeedback(null);
+    submittedIndexRef.current = null;
     reveal.reset();
   }, [reveal]);
 
@@ -529,9 +596,16 @@ export function usePracticeSession({
       previousWordCount: sessionWords.length,
       previousResultsCount: results.length,
     });
-    setSessionWords([]); // This triggers regeneration
+    setSessionWords(buildSession()); // New words, synchronously — no loading flash
+    setSessionStruggleWords(effectiveStruggleWords); // Fresh snapshot for the new session
     resetSessionState();
-  }, [resetSessionState, sessionWords.length, results.length]);
+  }, [
+    resetSessionState,
+    buildSession,
+    sessionWords.length,
+    results.length,
+    effectiveStruggleWords,
+  ]);
 
   // Refresh session with new words
   const refreshSession = useCallback(() => {
@@ -539,49 +613,34 @@ export function usePracticeSession({
       previousWordCount: sessionWords.length,
       currentWordIndex,
     });
-    setSessionWords([]); // Clear to trigger regeneration
+    setSessionWords(buildSession()); // New words, synchronously — no loading flash
+    setSessionStruggleWords(effectiveStruggleWords); // Fresh snapshot for the new session
     resetSessionState();
     setTimeout(() => inputRef.current?.focus(), 100);
-  }, [resetSessionState, sessionWords.length, currentWordIndex]);
-
-  // Dictation mode toggle - regenerates new words to prevent cheating
-  const handleDictationToggle = useCallback(
-    (enabled: boolean) => {
-      trackEvent("dictation_mode_toggled", {
-        enabled,
-        previousMode: settings.dictationMode,
-        wordIndex: currentWordIndex,
-      });
-
-      updateSettings({
-        dictationMode: enabled,
-        ttsEnabled: enabled ? true : settings.ttsEnabled,
-      });
-
-      // Generate new words to prevent cheating
-      setSessionWords([]);
-      resetSessionState();
-
-      setTimeout(() => inputRef.current?.focus(), 100);
-    },
-    [settings.ttsEnabled, settings.dictationMode, updateSettings, resetSessionState, currentWordIndex],
-  );
+  }, [
+    resetSessionState,
+    buildSession,
+    sessionWords.length,
+    currentWordIndex,
+    effectiveStruggleWords,
+  ]);
 
   // Dictation handlers
   const handleRepeat = useCallback(() => {
     if (currentWord) speakWord(currentWord.text);
   }, [currentWord, speakWord]);
 
-  // Focus input when mode changes
+  // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
-  }, [sentenceMode]);
+  }, []);
 
   const isLoading = isUserLoading || sessionWords.length === 0;
 
   return {
     // State
     sessionWords,
+    sessionStruggleWords,
     currentWordIndex,
     currentWord,
     userInput,
@@ -599,9 +658,7 @@ export function usePracticeSession({
     handleSubmitWord,
     restartSession,
     refreshSession,
-    handleDictationToggle,
     handleRepeat,
-    setSentenceMode,
   };
 }
 

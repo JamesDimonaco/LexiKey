@@ -12,16 +12,23 @@ interface WordResultForBucket {
   word: string;
   phonicsGroup: string;
   wasStruggle: boolean;
+  inputMode: "see" | "listen";
 }
 
 interface AnonymousUserContextType {
   anonymousUser: AnonymousUserData | null;
   isLoading: boolean;
-  updateStats: (wordsCompleted: number, newLevel: number, wordResults: WordResultForBucket[]) => void;
+  updateStats: (
+    wordsCompleted: number,
+    newLevel: number,
+    wordResults: WordResultForBucket[],
+    inputMode: "see" | "listen",
+  ) => void;
   getDataForMigration: () => AnonymousUserData | null;
   clearData: () => void;
   setThresholdParams: (params: ThresholdParams) => void;
-  updateThreshold: (params: ThresholdParams) => void;
+  updateThreshold: (params: ThresholdParams, inputMode: "see" | "listen") => void;
+  reportInaudible: (word: string) => void;
 }
 
 const AnonymousUserContext = createContext<AnonymousUserContextType | null>(null);
@@ -89,7 +96,8 @@ export function AnonymousUserProvider({ children }: { children: ReactNode }) {
   const updateStats = useCallback((
     wordsCompleted: number,
     newLevel: number,
-    wordResults: WordResultForBucket[]
+    wordResults: WordResultForBucket[],
+    inputMode: "see" | "listen"
   ) => {
     // ALWAYS read fresh from localStorage to avoid race conditions
     let currentUser: AnonymousUserData | null = null;
@@ -112,16 +120,26 @@ export function AnonymousUserProvider({ children }: { children: ReactNode }) {
       const existingIndex = updatedStruggleWords.findIndex(w => w.word === result.word);
 
       if (result.wasStruggle) {
-        if (existingIndex >= 0) {
+        const existing = existingIndex >= 0 ? updatedStruggleWords[existingIndex] : null;
+        // Same per-mode split as convex/struggleWords.ts — listening misses and
+        // reading misses are counted separately.
+        const misses =
+          result.inputMode === "listen"
+            ? { listenMisses: (existing?.listenMisses ?? 0) + 1 }
+            : { seeMisses: (existing?.seeMisses ?? 0) + 1 };
+
+        if (existing) {
           updatedStruggleWords[existingIndex] = {
-            ...updatedStruggleWords[existingIndex],
+            ...existing,
             consecutiveCorrect: 0,
+            ...misses,
           };
         } else {
           updatedStruggleWords.push({
             word: result.word,
             phonicsGroup: result.phonicsGroup,
             consecutiveCorrect: 0,
+            ...misses,
           });
         }
       } else {
@@ -140,9 +158,14 @@ export function AnonymousUserProvider({ children }: { children: ReactNode }) {
       sw => sw.consecutiveCorrect < 3
     );
 
+    const roundedLevel = Math.round(newLevel * 100) / 100;
+
     const updated: AnonymousUserData = {
       ...currentUser,
-      currentLevel: Math.round(newLevel * 100) / 100,
+      // Only the level for the mode just practised moves
+      ...(inputMode === "listen"
+        ? { listenLevel: roundedLevel }
+        : { currentLevel: roundedLevel }),
       totalWords: currentUser.totalWords + wordsCompleted,
       totalSessions: currentUser.totalSessions + 1,
       struggleWords: filteredStruggleWords,
@@ -190,7 +213,7 @@ export function AnonymousUserProvider({ children }: { children: ReactNode }) {
   }, [saveData]);
 
   // Update threshold params (gradual adjustment from practice session)
-  const updateThreshold = useCallback((params: ThresholdParams) => {
+  const updateThreshold = useCallback((params: ThresholdParams, inputMode: "see" | "listen") => {
     let currentUser: AnonymousUserData | null = null;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -202,10 +225,45 @@ export function AnonymousUserProvider({ children }: { children: ReactNode }) {
 
     const updated: AnonymousUserData = {
       ...currentUser,
-      thresholdParams: params,
+      ...(inputMode === "listen"
+        ? { listenThresholdParams: params }
+        : { thresholdParams: params }),
     };
 
     saveData(updated);
+  }, [saveData]);
+
+  // Mirror of convex/inaudibleWords.reportInaudible for signed-out users
+  const reportInaudible = useCallback((word: string) => {
+    let currentUser: AnonymousUserData | null = null;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) currentUser = JSON.parse(saved);
+    } catch (e) {
+      console.error("[reportInaudible] Failed to read localStorage:", e);
+    }
+    if (!currentUser) return;
+
+    const already = currentUser.inaudibleWords ?? [];
+    if (already.includes(word)) return;
+
+    // A word only ever missed while listening was never a spelling problem —
+    // take it back out of the review bucket. Same rule as the server: entries
+    // saved before the counters existed have no miss history, so they stay.
+    const struggle = currentUser.struggleWords.find((w) => w.word === word);
+    const listenOnly =
+      !!struggle && (struggle.listenMisses ?? 0) > 0 && (struggle.seeMisses ?? 0) === 0;
+    const struggleWords = listenOnly
+      ? currentUser.struggleWords.filter((w) => w.word !== word)
+      : currentUser.struggleWords.map((w) =>
+          w.word === word ? { ...w, listenMisses: 0 } : w,
+        );
+
+    saveData({
+      ...currentUser,
+      inaudibleWords: [...already, word],
+      struggleWords,
+    });
   }, [saveData]);
 
   return (
@@ -217,6 +275,7 @@ export function AnonymousUserProvider({ children }: { children: ReactNode }) {
       clearData,
       setThresholdParams,
       updateThreshold,
+      reportInaudible,
     }}>
       {children}
     </AnonymousUserContext.Provider>

@@ -7,7 +7,21 @@ import { mutation, query } from "./_generated/server";
  * Words are added when user struggles (hesitation >1.5s OR backspaces >3)
  * Words graduate (get removed) after 3 consecutive correct attempts
  * Any mistake resets the consecutive counter to 0
+ *
+ * Each miss also records the input mode it happened in. Listening and reading
+ * are different skills — a word only ever missed on dictation is a listening
+ * problem, not a spelling one, and the split is what tells them apart.
  */
+
+/** Increment the miss counter for the mode this struggle happened in */
+function missCounter(
+  existing: { listenMisses?: number; seeMisses?: number } | null,
+  inputMode: "see" | "listen"
+) {
+  return inputMode === "listen"
+    ? { listenMisses: (existing?.listenMisses ?? 0) + 1 }
+    : { seeMisses: (existing?.seeMisses ?? 0) + 1 };
+}
 
 // ====================
 // QUERIES
@@ -105,8 +119,12 @@ export const processWordResult = mutation({
     word: v.string(),
     phonicsGroup: v.string(),
     wasStruggle: v.boolean(), // hesitation >1.5s OR backspaces >3
+    // Optional so a client deployed either side of this change keeps working —
+    // a browser with the old bundle open sends no mode. Reading is the safe
+    // assumption: it was the only mode the old client tracked.
+    inputMode: v.optional(v.union(v.literal("see"), v.literal("listen"))),
   },
-  handler: async (ctx, { userId, word, phonicsGroup, wasStruggle }) => {
+  handler: async (ctx, { userId, word, phonicsGroup, wasStruggle, inputMode = "see" }) => {
     const now = Date.now();
 
     // Check if word already in bucket
@@ -124,6 +142,7 @@ export const processWordResult = mutation({
         await ctx.db.patch(existing._id, {
           consecutiveCorrect: 0,
           totalAttempts: existing.totalAttempts + 1,
+          ...missCounter(existing, inputMode),
           lastSeenAt: now,
         });
       } else {
@@ -134,6 +153,7 @@ export const processWordResult = mutation({
           phonicsGroup,
           consecutiveCorrect: 0,
           totalAttempts: 1,
+          ...missCounter(null, inputMode),
           lastSeenAt: now,
           createdAt: now,
         });
@@ -170,13 +190,14 @@ export const batchProcessWordResults = mutation({
       word: v.string(),
       phonicsGroup: v.string(),
       wasStruggle: v.boolean(),
+      inputMode: v.optional(v.union(v.literal("see"), v.literal("listen"))),
     })),
   },
   handler: async (ctx, { userId, results }) => {
     const now = Date.now();
 
     for (const result of results) {
-      const { word, phonicsGroup, wasStruggle } = result;
+      const { word, phonicsGroup, wasStruggle, inputMode = "see" } = result;
 
       // Check if word already in bucket
       const existing = await ctx.db
@@ -191,6 +212,7 @@ export const batchProcessWordResults = mutation({
           await ctx.db.patch(existing._id, {
             consecutiveCorrect: 0,
             totalAttempts: existing.totalAttempts + 1,
+            ...missCounter(existing, inputMode),
             lastSeenAt: now,
           });
         } else {
@@ -200,6 +222,7 @@ export const batchProcessWordResults = mutation({
             phonicsGroup,
             consecutiveCorrect: 0,
             totalAttempts: 1,
+            ...missCounter(null, inputMode),
             lastSeenAt: now,
             createdAt: now,
           });

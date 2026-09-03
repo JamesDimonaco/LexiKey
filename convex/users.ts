@@ -123,8 +123,32 @@ export const createUser = mutation({
         word: v.string(),
         phonicsGroup: v.string(),
         consecutiveCorrect: v.number(),
+        listenMisses: v.optional(v.number()),
+        seeMisses: v.optional(v.number()),
       })),
       lastPracticeDate: v.union(v.string(), v.null()),
+      listenLevel: v.optional(v.number()),
+      inaudibleWords: v.optional(v.array(v.string())),
+      thresholdParams: v.optional(
+        v.object({
+          baseTime: v.number(),
+          secondsPerChar: v.number(),
+          secondsPerCharSquared: v.optional(v.number()),
+          safetyMultiplier: v.number(),
+          wordCount: v.number(),
+          lastUpdated: v.string(),
+        })
+      ),
+      listenThresholdParams: v.optional(
+        v.object({
+          baseTime: v.number(),
+          secondsPerChar: v.number(),
+          secondsPerCharSquared: v.optional(v.number()),
+          safetyMultiplier: v.number(),
+          wordCount: v.number(),
+          lastUpdated: v.string(),
+        })
+      ),
     })),
   },
   handler: async (ctx, { clerkId, name, email, role, anonymousData }) => {
@@ -150,8 +174,11 @@ export const createUser = mutation({
       totalMinutesPracticed: 0,
       averageAccuracy: 0,
       currentLevel: anonymousData?.currentLevel ?? 1,
+      listenLevel: anonymousData?.listenLevel,
       hasCompletedPlacementTest: false,
       struggleGroups: [],
+      thresholdParams: anonymousData?.thresholdParams,
+      listenThresholdParams: anonymousData?.listenThresholdParams,
     };
 
     // Create user with default settings and potentially migrated stats
@@ -191,10 +218,22 @@ export const createUser = mutation({
           phonicsGroup: sw.phonicsGroup,
           consecutiveCorrect: sw.consecutiveCorrect,
           totalAttempts: 1,
+          listenMisses: sw.listenMisses,
+          seeMisses: sw.seeMisses,
           lastSeenAt: now,
           createdAt: now,
         });
       }
+    }
+
+    // Carry over words the voice mangled, so they aren't spoken again the
+    // moment someone signs up
+    for (const word of anonymousData?.inaudibleWords ?? []) {
+      await ctx.db.insert("inaudibleWordReports", {
+        userId,
+        word,
+        createdAt: now,
+      });
     }
 
     return userId;
@@ -262,6 +301,7 @@ export const updateUserStats = mutation({
       totalMinutesPracticed: v.optional(v.number()),
       averageAccuracy: v.optional(v.number()),
       currentLevel: v.optional(v.number()),
+      listenLevel: v.optional(v.number()),
       hasCompletedPlacementTest: v.optional(v.boolean()),
       hasCompletedTour: v.optional(v.boolean()),
       struggleGroups: v.optional(v.array(v.string())),
@@ -294,13 +334,17 @@ export const updateThresholdParams = mutation({
     thresholdParams: v.object({
       baseTime: v.number(),
       secondsPerChar: v.number(),
+      secondsPerCharSquared: v.optional(v.number()),
       safetyMultiplier: v.number(),
       wordCount: v.number(),
       lastUpdated: v.string(),
     }),
+    /** Which mode the session ran in — each has its own calibration.
+     *  Optional for the same cross-deploy reason as struggleWords. */
+    inputMode: v.optional(v.union(v.literal("see"), v.literal("listen"))),
   },
   returns: v.id("users"),
-  handler: async (ctx, { userId, thresholdParams }) => {
+  handler: async (ctx, { userId, thresholdParams, inputMode = "see" }) => {
     const user = await ctx.db.get(userId);
     if (!user) {
       throw new Error("User not found");
@@ -309,7 +353,9 @@ export const updateThresholdParams = mutation({
     await ctx.db.patch(userId, {
       stats: {
         ...user.stats,
-        thresholdParams,
+        ...(inputMode === "listen"
+          ? { listenThresholdParams: thresholdParams }
+          : { thresholdParams }),
       },
       updatedAt: Date.now(),
     });
@@ -364,13 +410,28 @@ export const migrateAnonymousData = mutation({
         word: v.string(),
         phonicsGroup: v.string(),
         consecutiveCorrect: v.number(),
+        listenMisses: v.optional(v.number()),
+        seeMisses: v.optional(v.number()),
       })),
       lastPracticeDate: v.union(v.string(), v.null()),
       // Optional threshold params for adaptive hesitation detection
+      listenLevel: v.optional(v.number()),
+      inaudibleWords: v.optional(v.array(v.string())),
+      listenThresholdParams: v.optional(
+        v.object({
+          baseTime: v.number(),
+          secondsPerChar: v.number(),
+          secondsPerCharSquared: v.optional(v.number()),
+          safetyMultiplier: v.number(),
+          wordCount: v.number(),
+          lastUpdated: v.string(),
+        })
+      ),
       thresholdParams: v.optional(
         v.object({
           baseTime: v.number(),
           secondsPerChar: v.number(),
+          secondsPerCharSquared: v.optional(v.number()),
           safetyMultiplier: v.number(),
           wordCount: v.number(),
           lastUpdated: v.string(),
@@ -404,6 +465,10 @@ export const migrateAnonymousData = mutation({
       lastPracticeDate: anonymousData.lastPracticeDate ?? user.stats.lastPracticeDate,
       // Include threshold params if provided (from placement test calibration)
       ...(anonymousData.thresholdParams && { thresholdParams: anonymousData.thresholdParams }),
+      ...(anonymousData.listenThresholdParams && {
+        listenThresholdParams: anonymousData.listenThresholdParams,
+      }),
+      ...(anonymousData.listenLevel !== undefined && { listenLevel: anonymousData.listenLevel }),
     };
 
     // Update user with merged stats
@@ -431,7 +496,28 @@ export const migrateAnonymousData = mutation({
             phonicsGroup: sw.phonicsGroup,
             consecutiveCorrect: sw.consecutiveCorrect,
             totalAttempts: 1,
+            listenMisses: sw.listenMisses,
+            seeMisses: sw.seeMisses,
             lastSeenAt: now,
+            createdAt: now,
+          });
+        }
+      }
+    }
+
+    // Same for words the voice mangled — skip any the account already knows
+    if (anonymousData.inaudibleWords?.length) {
+      const existingReports = await ctx.db
+        .query("inaudibleWordReports")
+        .withIndex("by_userId", (q) => q.eq("userId", user._id))
+        .collect();
+      const known = new Set(existingReports.map((r) => r.word));
+
+      for (const word of anonymousData.inaudibleWords) {
+        if (!known.has(word)) {
+          await ctx.db.insert("inaudibleWordReports", {
+            userId: user._id,
+            word,
             createdAt: now,
           });
         }

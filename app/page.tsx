@@ -7,6 +7,7 @@ import { PracticeSession } from "./practice/PracticeSession";
 import { MergeDialog } from "@/components/MergeDialog";
 import { ProgressView } from "@/components/ProgressView";
 import { OnboardingTour } from "@/components/OnboardingTour";
+import { WhatIsThis, SEEN_INTRO_KEY } from "@/components/WhatIsThis";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { usePostHogPageView } from "@/hooks/usePostHog";
 
@@ -33,6 +34,14 @@ function HomeContent() {
   } = useUserProgress();
   const [hasCompletedPlacementTest, setHasCompletedPlacementTest] = useState(false);
   const [skippedPlacementTest, setSkippedPlacementTest] = useState(false);
+  // First-ever visitors get told what the app is before the typing box. Read
+  // during render (a pure localStorage read, no write — render purity is
+  // load-bearing here, React Compiler is on); WhatIsThis marks itself seen
+  // when it renders.
+  const [showWhatIsThis, setShowWhatIsThis] = useState(
+    () =>
+      typeof window !== "undefined" && !localStorage.getItem(SEEN_INTRO_KEY),
+  );
 
   // Check if anonymous user has completed placement test
   useEffect(() => {
@@ -109,6 +118,9 @@ function HomeContent() {
   return (
     <>
       <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto">
+        {showWhatIsThis && (
+          <WhatIsThis onDismiss={() => setShowWhatIsThis(false)} />
+        )}
         {/* Subtle placement test banner for anonymous users who haven't taken it */}
         {isAnonymous && !hasCompletedPlacementTest && (
           <div className="w-full mb-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

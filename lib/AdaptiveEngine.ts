@@ -6,6 +6,7 @@
  */
 
 import { Word, UserProgress, PhonicsGroup, StruggleWord } from "./types";
+import { wordMatchesPrefixes } from "./phonicsPatterns";
 import { posthog } from "@/components/PostHogProvider";
 
 /**
@@ -31,14 +32,30 @@ export interface SessionOptions {
   newPercent?: number;
   confidencePercent?: number;
   startingBoosters?: number;
+  /**
+   * Optional session focus:
+   * - "review": fill the whole session from the struggle bucket (topped up
+   *   with level-appropriate words when the bucket runs short)
+   * - "pattern": restrict the word pool to the given phonicsGroup prefixes
+   */
+  focus?: { type: "review" } | { type: "pattern"; prefixes: string[] };
+  /**
+   * Words to keep out of this session entirely. Used for words the user
+   * reported as inaudible — a word the voice mangles is the app's fault, and
+   * re-serving it in dictation just teaches them to distrust the audio.
+   */
+  excludeWords?: string[];
 }
 
 export class AdaptiveSessionGenerator {
   private allWords: Word[];
+  /** Active pool for the current generateSession call (may be pattern-filtered) */
+  private pool: Word[];
   private userStruggleWords: StruggleWord[];
 
   constructor(allWords: Word[], userStruggleWords: StruggleWord[] = []) {
     this.allWords = allWords;
+    this.pool = allWords;
     this.userStruggleWords = userStruggleWords;
   }
 
@@ -59,26 +76,67 @@ export class AdaptiveSessionGenerator {
     } = SESSION_CONFIG;
 
     const SIZE = options.wordCount ?? DEFAULT_SIZE;
-    const STRUGGLE_PERCENT = (options.strugglePercent ?? DEFAULT_STRUGGLE_PERCENT * 100) / 100;
-    const NEW_PERCENT = (options.newPercent ?? DEFAULT_NEW_PERCENT * 100) / 100;
-    const STARTING_BOOSTERS = options.startingBoosters ?? DEFAULT_STARTING_BOOSTERS;
+    let STRUGGLE_PERCENT = (options.strugglePercent ?? DEFAULT_STRUGGLE_PERCENT * 100) / 100;
+    let NEW_PERCENT = (options.newPercent ?? DEFAULT_NEW_PERCENT * 100) / 100;
+    let STARTING_BOOSTERS = options.startingBoosters ?? DEFAULT_STARTING_BOOSTERS;
+
+    // Apply session focus
+    const focus = options.focus;
+    if (focus?.type === "pattern") {
+      const filtered = this.allWords.filter((w) =>
+        wordMatchesPrefixes(w.phonicsGroup, focus.prefixes),
+      );
+      // Fall back to the full pool if the pattern has no words (shouldn't
+      // happen via the UI, but never generate an empty session)
+      this.pool = filtered.length > 0 ? filtered : this.allWords;
+    } else {
+      this.pool = this.allWords;
+    }
+    if (focus?.type === "review") {
+      // Whole session from the struggle bucket; filler logic below tops up
+      // with level-appropriate words when the bucket is smaller than SIZE.
+      STRUGGLE_PERCENT = 1;
+      NEW_PERCENT = 0;
+      STARTING_BOOSTERS = 0;
+    }
 
     const maxAvailableDifficulty = Math.max(
-      ...this.allWords.map((w) => w.difficulty),
+      ...this.pool.map((w) => w.difficulty),
     );
 
-    // Track error if user level exceeds available words
-    if (user.currentLevel > maxAvailableDifficulty) {
-      console.error(
-        `[AdaptiveEngine] Insufficient words for user level. User level: ${user.currentLevel}, Max available: ${maxAvailableDifficulty}`,
-      );
-      posthog.capture("insufficient_words_for_level", {
+    // Track pool exhaustion. Only PATTERN sessions are exempt — their pools
+    // legitimately cap below higher user levels. Review sessions run against
+    // the full pool, so the alarm still means what it says there. Deferred to
+    // a task so generateSession stays pure when called from a useState
+    // initializer (React Compiler assumes render-path purity).
+    if (focus?.type !== "pattern" && user.currentLevel > maxAvailableDifficulty) {
+      const payload = {
         userLevel: user.currentLevel,
         maxAvailableDifficulty,
         levelGap: user.currentLevel - maxAvailableDifficulty,
         userId: user.userId,
         totalWordsInPool: this.allWords.length,
-      });
+      };
+      setTimeout(() => {
+        console.error(
+          `[AdaptiveEngine] Insufficient words for user level. User level: ${payload.userLevel}, Max available: ${payload.maxAvailableDifficulty}`,
+        );
+        posthog.capture("insufficient_words_for_level", payload);
+      }, 0);
+    }
+
+    // Drop excluded words AFTER the pool-exhaustion alarm above, so the alarm
+    // keeps meaning "the word pool can't reach this user's level" and doesn't
+    // start firing because someone flagged a few words as inaudible.
+    // getStruggleWords/getNewWords/getConfidenceBoosters all select from
+    // this.pool, so one filter covers every path.
+    if (options.excludeWords?.length) {
+      const excluded = new Set(
+        options.excludeWords.map((w) => w.toLowerCase()),
+      );
+      const kept = this.pool.filter((w) => !excluded.has(w.text.toLowerCase()));
+      // Never generate an empty session, however much has been excluded
+      if (kept.length > 0) this.pool = kept;
     }
 
     // Bucket sizes (targets - may not be fully filled)
@@ -156,9 +214,10 @@ export class AdaptiveSessionGenerator {
         text = text + mark;
       }
 
-      // Return new word object if modified
+      // Return new word object if modified, keeping the original text so the
+      // review bucket stores "cat" rather than "Cat."
       if (text !== word.text) {
-        return { ...word, text };
+        return { ...word, text, baseText: word.text };
       }
       return word;
     });
@@ -206,7 +265,7 @@ export class AdaptiveSessionGenerator {
 
     // Priority 1: Words from the struggle bucket (these are real struggles)
     const bucketWordTexts = new Set(this.userStruggleWords.map((sw) => sw.word));
-    const bucketWords = this.allWords.filter(
+    const bucketWords = this.pool.filter(
       (w) => bucketWordTexts.has(w.text) && !usedWords.has(w.text)
     );
 
@@ -224,7 +283,7 @@ export class AdaptiveSessionGenerator {
     // Priority 2: If we need more, get words from struggle phonics groups
     // These are NOT marked as isStruggle since they're just from struggle categories
     if (result.length < count && user.struggleGroups.length > 0) {
-      const groupWords = this.allWords.filter(
+      const groupWords = this.pool.filter(
         (w) =>
           !usedWords.has(w.text) &&
           !result.some((r) => r.id === w.id) &&
@@ -249,14 +308,14 @@ export class AdaptiveSessionGenerator {
   ): Word[] {
     // Find the max difficulty available in the word pool
     const maxAvailableDifficulty = Math.max(
-      ...this.allWords.map((w) => w.difficulty),
+      ...this.pool.map((w) => w.difficulty),
     );
 
     // Cap user level at max available difficulty for filtering
     const effectiveLevel = Math.min(user.currentLevel, maxAvailableDifficulty);
 
     // Get words at current level that aren't already used
-    const pool = this.allWords.filter((w) => {
+    const pool = this.pool.filter((w) => {
       if (usedWords.has(w.text)) return false;
       const diffGap = Math.abs(w.difficulty - effectiveLevel);
       return diffGap <= 1; // Allow words within +/- 1 level
@@ -267,7 +326,7 @@ export class AdaptiveSessionGenerator {
 
     // If not enough words at level, widen the range
     if (shuffled.length < count) {
-      const fallbackPool = this.allWords.filter((w) => {
+      const fallbackPool = this.pool.filter((w) => {
         if (usedWords.has(w.text)) return false;
         if (shuffled.some((s) => s.id === w.id)) return false;
         const diffGap = Math.abs(w.difficulty - effectiveLevel);
@@ -289,7 +348,7 @@ export class AdaptiveSessionGenerator {
   ): Word[] {
     // Find the max difficulty available in the word pool
     const maxAvailableDifficulty = Math.max(
-      ...this.allWords.map((w) => w.difficulty),
+      ...this.pool.map((w) => w.difficulty),
     );
 
     // Cap user level at max available difficulty
@@ -298,7 +357,7 @@ export class AdaptiveSessionGenerator {
     // Get easy words (below user level) that aren't struggle words
     const struggleWordTexts = new Set(this.userStruggleWords.map((sw) => sw.word));
 
-    const pool = this.allWords.filter((w) => {
+    const pool = this.pool.filter((w) => {
       if (usedWords.has(w.text)) return false;
       if (struggleWordTexts.has(w.text)) return false; // Don't use struggle words as boosters
       return w.difficulty < effectiveLevel || w.difficulty <= 2;
