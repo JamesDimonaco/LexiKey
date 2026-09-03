@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { requireUser } from "./authHelpers";
 
 /**
  * Forgiving Daily Streak System
@@ -81,10 +82,7 @@ export const recordSessionCompleted = mutation({
   },
   returns: streakResultValidator,
   handler: async (ctx, { userId, timezoneOffsetMinutes }) => {
-    const user = await ctx.db.get(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
+    const user = await requireUser(ctx, userId);
 
     const stats = user.stats;
     const today = localDateString(
@@ -181,8 +179,14 @@ export const getStreak = query({
     v.null(),
   ),
   handler: async (ctx, { userId }) => {
+    // Returns null rather than throwing for an unknown or unowned user: the
+    // returns validator allows null, ProgressView branches on it, and a stale
+    // id in an open tab should quietly hide the streak, not error the render.
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
     const user = await ctx.db.get(userId);
-    if (!user) return null;
+    if (!user || user.clerkId !== identity.subject) return null;
 
     return {
       currentStreak: user.stats.currentStreak,

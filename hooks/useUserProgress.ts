@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAnonymousUser } from "./useAnonymousUser";
 import { StruggleWord, AnonymousUserData } from "@/lib/types";
@@ -14,6 +14,9 @@ import { ThresholdParams } from "@/lib/thresholdCalculator";
  */
 export function useUserProgress() {
   const { user, isLoaded: isClerkLoaded } = useUser();
+  // Convex functions verify the caller, so queries must wait for Convex's own
+  // auth token — Clerk knowing who you are is a step ahead of Convex knowing.
+  const { isAuthenticated: isConvexAuthed } = useConvexAuth();
 
   // Anonymous user support
   const {
@@ -30,7 +33,7 @@ export function useUserProgress() {
   // Authenticated user queries (skip if not signed in)
   const currentUser = useQuery(
     api.users.getCurrentUser,
-    user?.id ? { clerkId: user.id } : "skip",
+    isConvexAuthed && user?.id ? { clerkId: user.id } : "skip",
   );
   const createUser = useMutation(api.users.createUser);
   const migrateAnonymousData = useMutation(api.users.migrateAnonymousData);

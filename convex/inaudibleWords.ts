@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { requireUser } from "./authHelpers";
 
 /**
  * Inaudible Word Reports
@@ -25,6 +26,8 @@ export const getUserInaudibleWords = query({
   args: { userId: v.id("users") },
   returns: v.array(v.string()),
   handler: async (ctx, { userId }) => {
+    await requireUser(ctx, userId);
+
     const reports = await ctx.db
       .query("inaudibleWordReports")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -51,6 +54,8 @@ export const reportInaudible = mutation({
   },
   returns: v.null(),
   handler: async (ctx, { userId, word }) => {
+    await requireUser(ctx, userId);
+
     const existing = await ctx.db
       .query("inaudibleWordReports")
       .withIndex("by_userId_word", (q) =>

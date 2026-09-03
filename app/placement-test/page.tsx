@@ -6,7 +6,7 @@ import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { Word, PhonicsGroup, PlacementTestResult } from "@/lib/types";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useConvexAuth } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useSyncPlacementData } from "@/hooks/useSyncPlacementData";
 import {
@@ -254,9 +254,12 @@ export default function PlacementTest() {
   const autoSubmittedWordIdRef = useRef<string | null>(null);
 
   // Convex hooks
+  // Convex verifies the caller, so wait for its own auth token rather than
+  // Clerk's — Clerk resolves first and the query would be rejected.
+  const { isAuthenticated: isConvexAuthed } = useConvexAuth();
   const currentUser = useQuery(
     api.users.getCurrentUser,
-    user?.id ? { clerkId: user.id } : "skip",
+    isConvexAuthed && user?.id ? { clerkId: user.id } : "skip",
   );
   const updateUserStats = useMutation(api.users.updateUserStats);
   const updateThresholdParams = useMutation(api.users.updateThresholdParams);
