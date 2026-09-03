@@ -184,6 +184,9 @@ export function trackWordStruggle(data: {
   word: string;
   phonicsGroup: string;
   reason: "hesitation" | "backspaces" | "error";
+  /** true = the word was spoken, not shown. Listening misses are a different
+   *  skill from spelling misses and must be segmentable apart. */
+  dictationMode: boolean;
 }) {
   trackEvent("word_struggle", data);
 }

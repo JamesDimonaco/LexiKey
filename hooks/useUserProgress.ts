@@ -24,6 +24,7 @@ export function useUserProgress() {
     clearData: clearAnonymousData,
     setThresholdParams: setAnonymousThreshold,
     updateThreshold: updateAnonymousThreshold,
+    reportInaudible: reportAnonymousInaudible,
   } = useAnonymousUser();
 
   // Authenticated user queries (skip if not signed in)
@@ -36,10 +37,16 @@ export function useUserProgress() {
   const updateUserStats = useMutation(api.users.updateUserStats);
   const updateThresholdParams = useMutation(api.users.updateThresholdParams);
   const batchProcessWordResults = useMutation(api.struggleWords.batchProcessWordResults);
+  const reportInaudibleWord = useMutation(api.inaudibleWords.reportInaudible);
 
   // Fetch struggle words from DB (only for authenticated users)
   const userStruggleWords = useQuery(
     api.struggleWords.getUserStruggleWords,
+    currentUser?._id ? { userId: currentUser._id } : "skip",
+  );
+
+  const userInaudibleWords = useQuery(
+    api.inaudibleWords.getUserInaudibleWords,
     currentUser?._id ? { userId: currentUser._id } : "skip",
   );
 
@@ -55,6 +62,13 @@ export function useUserProgress() {
     ? (anonymousUser?.currentLevel ?? 5)
     : (currentUser?.stats.currentLevel ?? 5);
 
+  // Listening is scored separately. Someone who has never done a dictation
+  // session starts from their reading level rather than from scratch — the
+  // adaptive engine pulls it down fast enough if listening is harder for them.
+  const effectiveListenLevel = isAnonymous
+    ? (anonymousUser?.listenLevel ?? effectiveLevel)
+    : (currentUser?.stats.listenLevel ?? effectiveLevel);
+
   const effectiveStruggleWords: StruggleWord[] = isAnonymous
     ? (anonymousUser?.struggleWords ?? [])
     : (userStruggleWords ?? []).map((sw) => ({
@@ -63,10 +77,20 @@ export function useUserProgress() {
         consecutiveCorrect: sw.consecutiveCorrect,
       }));
 
+  const effectiveInaudibleWords: string[] = isAnonymous
+    ? (anonymousUser?.inaudibleWords ?? [])
+    : (userInaudibleWords ?? []);
+
   // Get effective threshold params (from DB or localStorage, undefined if not set)
   const effectiveThresholdParams: ThresholdParams | undefined = isAnonymous
     ? anonymousUser?.thresholdParams
     : currentUser?.stats.thresholdParams;
+
+  // Listening has its own calibration — undefined falls back to the listening
+  // defaults, never to the reading ones, which are far too tight for dictation.
+  const effectiveListenThresholdParams: ThresholdParams | undefined = isAnonymous
+    ? anonymousUser?.listenThresholdParams
+    : currentUser?.stats.listenThresholdParams;
 
   // Simple effect: show merge dialog when conditions are met
   // Don't reset pendingMigration once set - user must take action
@@ -93,11 +117,14 @@ export function useUserProgress() {
         clerkId: user.id,
         anonymousData: {
           currentLevel: anonData.currentLevel,
+          listenLevel: anonData.listenLevel,
           totalWords: anonData.totalWords,
           totalSessions: anonData.totalSessions,
           struggleWords: anonData.struggleWords,
           lastPracticeDate: anonData.lastPracticeDate,
           thresholdParams: anonData.thresholdParams,
+          listenThresholdParams: anonData.listenThresholdParams,
+          inaudibleWords: anonData.inaudibleWords,
         },
       }).then(() => {
         clearAnonymousData();
@@ -122,10 +149,14 @@ export function useUserProgress() {
       role: "student",
       anonymousData: hasData ? {
         currentLevel: anonData.currentLevel,
+        listenLevel: anonData.listenLevel,
         totalWords: anonData.totalWords,
         totalSessions: anonData.totalSessions,
         struggleWords: anonData.struggleWords,
         lastPracticeDate: anonData.lastPracticeDate,
+        thresholdParams: anonData.thresholdParams,
+        listenThresholdParams: anonData.listenThresholdParams,
+        inaudibleWords: anonData.inaudibleWords,
       } : undefined,
     }).then(() => {
       if (hasData) clearAnonymousData();
@@ -149,11 +180,14 @@ export function useUserProgress() {
         clerkId: user.id,
         anonymousData: {
           currentLevel: levelToUse,
+          listenLevel: pendingMigration.listenLevel,
           totalWords: pendingMigration.totalWords,
           totalSessions: pendingMigration.totalSessions,
           struggleWords: pendingMigration.struggleWords,
           lastPracticeDate: pendingMigration.lastPracticeDate,
           thresholdParams: pendingMigration.thresholdParams,
+          listenThresholdParams: pendingMigration.listenThresholdParams,
+          inaudibleWords: pendingMigration.inaudibleWords,
         },
       });
       clearAnonymousData();
@@ -178,14 +212,19 @@ export function useUserProgress() {
       ? isAnonymousLoading
       : pendingMigration
         ? false // Have enough data to show merge dialog
-        : (!currentUser || userStruggleWords === undefined);
+        : (!currentUser ||
+           userStruggleWords === undefined ||
+           userInaudibleWords === undefined);
 
   return {
     isAnonymous,
     isLoading,
     effectiveLevel,
+    effectiveListenLevel,
     effectiveStruggleWords,
+    effectiveInaudibleWords,
     effectiveThresholdParams,
+    effectiveListenThresholdParams,
     currentUser,
     anonymousUser,
     // For saving results
@@ -195,6 +234,9 @@ export function useUserProgress() {
     // For threshold adjustment
     updateAnonymousThreshold,
     updateThresholdParams,
+    // For inaudible reports
+    reportAnonymousInaudible,
+    reportInaudibleWord,
     // For merge dialog
     pendingMigration,
     handleMerge,

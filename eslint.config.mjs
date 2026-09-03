@@ -7,6 +7,7 @@ export default defineConfig([
   globalIgnores([
     "node_modules/**",
     ".next/**",
+    ".claude/**",
     "out/**",
     "convex/_generated/**",
     "next-env.d.ts",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
@@ -249,6 +249,9 @@ export default function PlacementTest() {
     useState<PlacementTestResult | null>(null);
   const [usedWordIds, setUsedWordIds] = useState<Set<string>>(new Set());
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
+  const [isFocused, setIsFocused] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const autoSubmittedWordIdRef = useRef<string | null>(null);
 
   // Convex hooks
   const currentUser = useQuery(
@@ -495,9 +498,12 @@ export default function PlacementTest() {
         },
       });
 
+      // The placement test always shows the word, so it calibrates reading.
+      // Listening keeps its own defaults until a dictation session adjusts them.
       await updateThresholdParams({
         userId: currentUser._id,
         thresholdParams,
+        inputMode: "see",
       });
 
       console.log("✅ Placement test results saved to Convex");
@@ -512,6 +518,20 @@ export default function PlacementTest() {
   const handleStartPractice = () => {
     router.push("/");
   };
+
+  // Auto-advance once the word is typed correctly — no spacebar needed.
+  // Space/Enter still submits a word the user believes is done (typos and
+  // all), which is what the adaptive difficulty needs to see.
+  useEffect(() => {
+    if (!currentWord || isComplete) return;
+    if (userInput.trim().toLowerCase() !== currentWord.text.toLowerCase())
+      return;
+    if (autoSubmittedWordIdRef.current === currentWord.id) return;
+    autoSubmittedWordIdRef.current = currentWord.id;
+    handleSubmitWord();
+    // handleSubmitWord is recreated every render; the word-id ref guards re-fires
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInput, currentWord, isComplete]);
 
   if (isComplete && calculatedResult) {
     return (
@@ -629,12 +649,9 @@ export default function PlacementTest() {
           {/* Progress */}
           <div className="mb-8">
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <span>Finding your level</span>
               <span>
-                Word {currentWordIndex + 1} of {TOTAL_PLACEMENT_WORDS}
-              </span>
-              <span>
-                {Math.round((currentWordIndex / TOTAL_PLACEMENT_WORDS) * 100)}%
-                Complete
+                {currentWordIndex + 1} / {TOTAL_PLACEMENT_WORDS}
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -647,44 +664,104 @@ export default function PlacementTest() {
             </div>
           </div>
 
-          {/* Main Card */}
-          <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md border border-gray-200 dark:border-gray-800">
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold mb-2 text-black dark:text-white">
-                Placement Test
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Type the word you see below
-              </p>
-            </div>
+          {/* Typing Card */}
+          <div
+            className={`relative bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border transition-all cursor-text ${
+              isFocused
+                ? "border-gray-200 dark:border-gray-800"
+                : "border-gray-300 dark:border-gray-700"
+            }`}
+            onClick={() => inputRef.current?.focus()}
+          >
+            {/* Unfocused overlay */}
+            {!isFocused && (
+              <div className="absolute inset-0 bg-gray-500/10 dark:bg-gray-900/50 rounded-lg flex items-center justify-center z-10 cursor-pointer">
+                <div className="bg-white dark:bg-gray-800 px-6 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                  <p className="text-gray-700 dark:text-gray-300 font-medium">
+                    Click to continue typing
+                  </p>
+                </div>
+              </div>
+            )}
 
-            {/* Word Display */}
-            <div className="mb-8 p-8 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700">
-              <div className="text-6xl font-bold text-center text-black dark:text-white tracking-wider">
-                {currentWord?.text || "Loading..."}
+            <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
+              {currentWordIndex === 0
+                ? "Type each word as best you can — there's no rush and no wrong answers."
+                : "Type the word below"}
+            </p>
+
+            {/* Word Display with typed letters overlaid (neutral colors —
+                this is measurement, not teaching) */}
+            <div
+              key={currentWord?.id}
+              className="mb-8 p-8 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700 animate-in fade-in duration-200 motion-reduce:animate-none"
+            >
+              <div className="text-6xl font-bold text-center tracking-wider font-mono">
+                {currentWord ? (
+                  <>
+                    {currentWord.text.split("").map((char, charIdx) => {
+                      const typed = userInput[charIdx] !== undefined;
+                      const isNext = charIdx === userInput.length;
+                      return (
+                        <span
+                          key={charIdx}
+                          className={`relative ${
+                            typed
+                              ? "text-blue-500 dark:text-blue-400"
+                              : "text-gray-800 dark:text-gray-200"
+                          }`}
+                        >
+                          {char}
+                          {isNext && isFocused && (
+                            <span
+                              className="absolute left-0 right-0 -bottom-1 h-1 bg-blue-500 rounded-full animate-pulse motion-reduce:animate-none"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </span>
+                      );
+                    })}
+                    {/* Extra characters beyond the word length */}
+                    {userInput.length > currentWord.text.length &&
+                      userInput
+                        .slice(currentWord.text.length)
+                        .split("")
+                        .map((char, idx) => (
+                          <span
+                            key={`overflow-${idx}`}
+                            className="text-blue-400/60 dark:text-blue-300/50"
+                          >
+                            {char}
+                          </span>
+                        ))}
+                  </>
+                ) : (
+                  <span className="text-gray-400">…</span>
+                )}
               </div>
             </div>
 
-            {/* Input */}
-            <div className="mb-6">
-              <input
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type the word here..."
-                autoFocus
-                className="w-full px-6 py-4 text-2xl text-center border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            {/* Hidden input captures the typing */}
+            <input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              autoFocus
+              autoCapitalize="off"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
+              aria-label="Type the word shown above"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-text"
+            />
 
-            <button
-              onClick={handleSubmitWord}
-              disabled={userInput.length === 0}
-              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              Next Word
-            </button>
+            <p className="text-center text-sm text-gray-500 dark:text-gray-500">
+              Words move on by themselves — or press Space if you&apos;re done
+            </p>
           </div>
         </div>
       </main>

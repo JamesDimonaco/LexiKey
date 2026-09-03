@@ -17,30 +17,28 @@ type TourStep = {
   position: "top" | "bottom" | "left" | "right";
 };
 
+// The tour runs on the session setup screen (the app's front door)
 const TOUR_STEPS: TourStep[] = [
   {
-    target: "typing-area",
-    title: "Type to Spell",
-    content: "Type the highlighted word, then press Space to continue to the next word.",
+    target: "focus-picker",
+    title: "Choose Your Focus",
+    content:
+      "Practice a smart mix at your level, retry your own tricky words, or drill one spelling pattern.",
+    position: "bottom",
+  },
+  {
+    target: "typing-mode",
+    title: "See It or Hear It",
+    content:
+      "Type words you see on screen, or hide them and spell from audio - great for testing yourself!",
     position: "top",
   },
   {
-    target: "dictation-toggle",
-    title: "Listen Mode",
-    content: "Hide the words and spell from audio - great for testing yourself!",
-    position: "bottom",
-  },
-  {
-    target: "mode-toggle",
-    title: "Word or Sentence",
-    content: "Switch between single words or see them in sentence context.",
-    position: "bottom",
-  },
-  {
-    target: "level-display",
-    title: "Your Level",
-    content: "Your level adjusts based on accuracy. Higher accuracy = harder words!",
-    position: "bottom",
+    target: "start-button",
+    title: "Start Typing",
+    content:
+      "Type each word - it moves on by itself when you get it right. Your level adapts as you go - no timers, no pressure.",
+    position: "top",
   },
   {
     target: "settings-button",
@@ -284,24 +282,44 @@ function getTooltipPosition(
 ): React.CSSProperties {
   const margin = 16;
   const tooltipWidth = 320;
-  const tooltipHeight = 180; // Approximate
+  const tooltipHeight = 280; // Approximate
+
+  // The tooltip lives in a fixed overlay, so an off-viewport position can
+  // never be scrolled into view — flip to the other side of the target when
+  // there's no room, and clamp to the viewport as a last resort.
+  const centeredLeft = Math.max(16, Math.min(
+    targetRect.left + targetRect.width / 2 - tooltipWidth / 2,
+    window.innerWidth - tooltipWidth - 16
+  ));
+  const fitsBelow =
+    targetRect.bottom + margin + tooltipHeight <= window.innerHeight - 16;
+  const fitsAbove = targetRect.top - margin - tooltipHeight >= 16;
 
   switch (position) {
     case "top":
+      if (!fitsAbove && fitsBelow) {
+        return { left: centeredLeft, top: targetRect.bottom + margin };
+      }
       return {
-        left: Math.max(16, Math.min(
-          targetRect.left + targetRect.width / 2 - tooltipWidth / 2,
-          window.innerWidth - tooltipWidth - 16
-        )),
-        bottom: window.innerHeight - targetRect.top + margin,
+        left: centeredLeft,
+        bottom: Math.min(
+          window.innerHeight - targetRect.top + margin,
+          window.innerHeight - tooltipHeight - 16
+        ),
       };
     case "bottom":
+      if (!fitsBelow && fitsAbove) {
+        return {
+          left: centeredLeft,
+          bottom: window.innerHeight - targetRect.top + margin,
+        };
+      }
       return {
-        left: Math.max(16, Math.min(
-          targetRect.left + targetRect.width / 2 - tooltipWidth / 2,
-          window.innerWidth - tooltipWidth - 16
-        )),
-        top: targetRect.bottom + margin,
+        left: centeredLeft,
+        top: Math.min(
+          targetRect.bottom + margin,
+          window.innerHeight - tooltipHeight - 16
+        ),
       };
     case "left":
       return {

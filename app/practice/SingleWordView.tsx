@@ -14,7 +14,6 @@ type SingleWordViewProps = {
   inputRef: React.RefObject<HTMLInputElement | null>;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  onSubmit: () => void;
   // Accessibility props
   blindMode?: boolean;
   showHints?: boolean;
@@ -32,7 +31,6 @@ export function SingleWordView({
   inputRef,
   onInputChange,
   onKeyDown,
-  onSubmit,
   blindMode = false,
   showHints = false,
   dictationMode = false,
@@ -64,8 +62,9 @@ export function SingleWordView({
       onClick={handleContainerClick}
       data-tour="typing-area"
     >
-      {/* Unfocused overlay */}
-      {!isFocused && (
+      {/* Unfocused overlay — suppressed while the word is revealed in
+          dictation mode (the input is disabled then, and the user is reading) */}
+      {!isFocused && !(dictationMode && reveal.isRevealed) && (
         <div className="absolute inset-0 bg-gray-500/10 dark:bg-gray-900/50 rounded-lg flex items-center justify-center z-10 cursor-pointer">
           <div className="bg-white dark:bg-gray-800 px-6 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
             <p className="text-gray-700 dark:text-gray-300 font-medium">
@@ -74,14 +73,12 @@ export function SingleWordView({
           </div>
         </div>
       )}
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold mb-2 text-black dark:text-white">
-          Practice Session
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Type the word you see below
+
+      {dictationMode && (
+        <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
+          Listen, then type what you hear
         </p>
-      </div>
+      )}
 
       {/* Word Display with live letter coloring */}
       <div
@@ -139,11 +136,20 @@ export function SingleWordView({
               state?.wasEverWrong &&
               typedChar?.toLowerCase() === char.toLowerCase();
 
+            const showCaret =
+              charIdx === userInput.length && isFocused && !showFeedback;
+
             return (
               <span key={charIdx} className={`relative ${colorClass}`}>
                 {displayChar}
                 {showCorrectionDot && (
                   <span className="absolute -top-2 -right-1 w-2 h-2 bg-yellow-500 rounded-full" />
+                )}
+                {showCaret && (
+                  <span
+                    className="absolute left-0 right-0 -bottom-1 h-1 bg-blue-500 rounded-full animate-pulse motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
                 )}
               </span>
             );
@@ -197,42 +203,36 @@ export function SingleWordView({
         </div>
       )}
 
-      {/* Input */}
-      <div className="mb-6">
-        <input
-          ref={inputRef}
-          type="text"
-          value={userInput}
-          onChange={onInputChange}
-          onKeyDown={onKeyDown}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          placeholder={dictationMode ? "Type what you hear..." : "Type the word here..."}
-          autoFocus
-          disabled={dictationMode && reveal.isRevealed}
-          className={`w-full px-6 py-4 text-2xl text-center border-2 rounded-lg bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono ${
-            dictationMode && reveal.isRevealed
-              ? "border-gray-200 dark:border-gray-800 opacity-50 cursor-not-allowed"
-              : "border-gray-300 dark:border-gray-700"
-          }`}
-        />
-        <p className="text-center text-sm text-gray-500 dark:text-gray-500 mt-2">
-          {dictationMode
-            ? reveal.isRevealed
-              ? "Hide the word to continue typing"
-              : "Listen and type • Press Space or Enter to continue"
-            : "Press Space or Enter to continue"
-          }
-        </p>
-      </div>
+      {/* Hidden input captures the typing — the word display above IS the
+          typing surface */}
+      <input
+        ref={inputRef}
+        type="text"
+        value={userInput}
+        onChange={onInputChange}
+        onKeyDown={onKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        autoFocus
+        autoCapitalize="off"
+        autoCorrect="off"
+        autoComplete="off"
+        spellCheck={false}
+        disabled={dictationMode && reveal.isRevealed}
+        aria-label={
+          dictationMode ? "Type the word you hear" : "Type the word shown above"
+        }
+        className="absolute inset-0 w-full h-full opacity-0 cursor-text"
+      />
 
-      <button
-        onClick={onSubmit}
-        disabled={userInput.length === 0}
-        className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
-        Next Word
-      </button>
+      <p className="text-center text-sm text-gray-500 dark:text-gray-500">
+        {dictationMode && reveal.isRevealed
+          ? "Hide the word to continue typing"
+          : userInput.length >= currentWord.text.length &&
+              userInput.toLowerCase() !== currentWord.text.toLowerCase()
+            ? "Press Space to move on"
+            : "Words move on automatically when you get them right"}
+      </p>
     </div>
   );
 }
