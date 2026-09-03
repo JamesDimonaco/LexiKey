@@ -8,8 +8,8 @@
  * @module
  */
 
+import type * as authHelpers from "../authHelpers.js";
 import type * as inaudibleWords from "../inaudibleWords.js";
-import type * as practiceSessions from "../practiceSessions.js";
 import type * as streaks from "../streaks.js";
 import type * as struggleWords from "../struggleWords.js";
 import type * as users from "../users.js";
@@ -21,8 +21,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  authHelpers: typeof authHelpers;
   inaudibleWords: typeof inaudibleWords;
-  practiceSessions: typeof practiceSessions;
   streaks: typeof streaks;
   struggleWords: typeof struggleWords;
   users: typeof users;

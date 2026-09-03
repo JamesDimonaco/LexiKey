@@ -28,7 +28,6 @@
     "posthog-js": "^1.318.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "svix": "^1.84.1",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

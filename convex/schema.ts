@@ -116,6 +116,11 @@ export default defineSchema({
   // PRACTICE SESSIONS
   // ====================
 
+  // UNUSED. No function reads or writes this table — session summaries have
+  // never been persisted, and every function that referenced it was dead code
+  // (removed 2026-09-03). Kept only because dropping a table is a decision
+  // about whether server-side session history is ever wanted; nothing depends
+  // on it today.
   practiceSessions: defineTable({
     userId: v.id("users"),
 

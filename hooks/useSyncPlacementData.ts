@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useConvexAuth } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 /**
@@ -18,9 +18,12 @@ import { api } from "@/convex/_generated/api";
  */
 export function useSyncPlacementData() {
   const { user, isLoaded } = useUser();
+  // Convex verifies the caller, so wait for its own auth token rather than
+  // Clerk's — Clerk resolves first and the query would be rejected.
+  const { isAuthenticated: isConvexAuthed } = useConvexAuth();
   const currentUser = useQuery(
     api.users.getCurrentUser,
-    user?.id ? { clerkId: user.id } : "skip",
+    isConvexAuthed && user?.id ? { clerkId: user.id } : "skip",
   );
   const createUser = useMutation(api.users.createUser);
   const updateUserStats = useMutation(api.users.updateUserStats);
