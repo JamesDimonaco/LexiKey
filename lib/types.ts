@@ -67,6 +67,10 @@ export interface AnonymousUserData {
   listenThresholdParams?: ThresholdParams;
   // Words the voice mangled — kept out of this device's listening sessions
   inaudibleWords?: string[];
+  // Placement outcome, so signing up doesn't send the user back through the
+  // test they already took. Absent for anyone who skipped it.
+  hasCompletedPlacementTest?: boolean;
+  struggleGroups?: string[];
 }
 
 // Adaptive Learning Types

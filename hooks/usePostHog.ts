@@ -12,10 +12,8 @@ export function usePostHogPageView() {
   const hasIdentifiedRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !posthog || !(posthog as any).__loaded) return;
+    if (typeof window === "undefined" || !posthog || !posthog.__loaded) return;
 
-    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-    
     posthog.capture("$pageview", {
       $current_url: window.location.href,
       path: pathname,
@@ -25,7 +23,7 @@ export function usePostHogPageView() {
   // Identify user when they sign in (only once per session)
   useEffect(() => {
     if (!isLoaded || !user?.id || hasIdentifiedRef.current) return;
-    if (typeof window === "undefined" || !posthog || !(posthog as any).__loaded) return;
+    if (typeof window === "undefined" || !posthog || !posthog.__loaded) return;
 
     // Check if this is a new sign-in by checking if user was just created
     // We'll track sign-in completion when user is identified
@@ -47,11 +45,11 @@ export function usePostHogPageView() {
   }, [user, isLoaded]);
 }
 
-export function trackEvent(eventName: string, properties?: Record<string, any>) {
+export function trackEvent(eventName: string, properties?: Record<string, unknown>) {
   if (typeof window === "undefined" || !posthog) return;
 
   // Wait for PostHog to load if not ready
-  if (!(posthog as any).__loaded) {
+  if (!posthog.__loaded) {
     // Queue the event to be sent once PostHog loads
     setTimeout(() => trackEvent(eventName, properties), 100);
     return;
@@ -70,7 +68,7 @@ export function trackError(
     component?: string;
     action?: string;
     userId?: string;
-    extra?: Record<string, any>;
+    extra?: Record<string, unknown>;
   }
 ) {
   if (typeof window === "undefined" || !posthog) return;
@@ -78,7 +76,7 @@ export function trackError(
   const errorObj = typeof error === "string" ? new Error(error) : error;
 
   // Wait for PostHog to load if not ready
-  if (!(posthog as any).__loaded) {
+  if (!posthog.__loaded) {
     setTimeout(() => trackError(error, context), 100);
     return;
   }
@@ -98,50 +96,6 @@ export function trackError(
   if (process.env.NODE_ENV === "development") {
     console.error("[PostHog Error]", errorObj, context);
   }
-}
-
-/**
- * Track a warning (non-fatal issue)
- */
-export function trackWarning(
-  message: string,
-  context?: Record<string, any>
-) {
-  if (typeof window === "undefined" || !posthog) return;
-
-  if (!(posthog as any).__loaded) {
-    setTimeout(() => trackWarning(message, context), 100);
-    return;
-  }
-
-  posthog.capture("warning", {
-    message,
-    ...context,
-  });
-}
-
-/**
- * Track API/fetch errors
- */
-export function trackApiError(
-  endpoint: string,
-  status: number,
-  message: string,
-  context?: Record<string, any>
-) {
-  if (typeof window === "undefined" || !posthog) return;
-
-  if (!(posthog as any).__loaded) {
-    setTimeout(() => trackApiError(endpoint, status, message, context), 100);
-    return;
-  }
-
-  posthog.capture("api_error", {
-    endpoint,
-    status,
-    message,
-    ...context,
-  });
 }
 
 // ============================================
@@ -172,7 +126,9 @@ export function trackSessionCompleted(data: {
 export function trackWordMastered(data: {
   word: string;
   phonicsGroup: string;
-  attemptsToMaster: number;
+  /** Attempts within THIS session only. Graduation counts consecutive clean
+   *  attempts across sessions, and the client cannot see the earlier ones. */
+  attemptsThisSession: number;
 }) {
   trackEvent("word_mastered", data);
 }
@@ -199,6 +155,8 @@ export function trackPlacementTestCompleted(data: {
   accuracy: number;
   wordsAttempted: number;
   durationSeconds: number;
+  struggleGroups: string[];
+  isAnonymous: boolean;
 }) {
   trackEvent("placement_test_completed", data);
 }
@@ -233,7 +191,7 @@ export function updateUserProperties(properties: {
 }) {
   if (typeof window === "undefined" || !posthog) return;
 
-  if (!(posthog as any).__loaded) {
+  if (!posthog.__loaded) {
     setTimeout(() => updateUserProperties(properties), 100);
     return;
   }
@@ -252,7 +210,7 @@ export function incrementUserProperty(
 ) {
   if (typeof window === "undefined" || !posthog) return;
 
-  if (!(posthog as any).__loaded) {
+  if (!posthog.__loaded) {
     setTimeout(() => incrementUserProperty(property, value), 100);
     return;
   }
@@ -265,43 +223,6 @@ export function incrementUserProperty(
 }
 
 // ============================================
-// FEATURE FLAGS
-// ============================================
-
-/**
- * Check if a feature flag is enabled
- */
-export function isFeatureEnabled(flagKey: string): boolean {
-  if (typeof window === "undefined" || !posthog) return false;
-
-  if (!(posthog as any).__loaded) return false;
-
-  return posthog.isFeatureEnabled(flagKey) ?? false;
-}
-
-/**
- * Get feature flag value (for multivariate flags)
- */
-export function getFeatureFlag(flagKey: string): string | boolean | undefined {
-  if (typeof window === "undefined" || !posthog) return undefined;
-
-  if (!(posthog as any).__loaded) return undefined;
-
-  return posthog.getFeatureFlag(flagKey);
-}
-
-/**
- * Hook for using feature flags in React components
- */
-export function useFeatureFlag(flagKey: string): boolean {
-  if (typeof window === "undefined" || !posthog) return false;
-
-  // Note: PostHog also provides useFeatureFlagEnabled from posthog-js/react
-  // This is a simple version - for reactive updates use the official hook
-  return isFeatureEnabled(flagKey);
-}
-
-// ============================================
 // FUNNEL TRACKING
 // ============================================
 
@@ -311,7 +232,7 @@ export function useFeatureFlag(flagKey: string): boolean {
 export function trackFunnelStep(
   funnel: "onboarding" | "signup" | "practice",
   step: string,
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 ) {
   trackEvent(`funnel_${funnel}_${step}`, {
     funnel,
@@ -330,7 +251,7 @@ export function trackFunnelStep(
  */
 export function triggerSurveyEligibility(
   surveyTrigger: "after_5_sessions" | "after_first_week" | "after_word_mastered" | "nps",
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 ) {
   trackEvent("survey_eligible", {
     surveyTrigger,
@@ -338,18 +259,3 @@ export function triggerSurveyEligibility(
   });
 }
 
-/**
- * Manually show a survey by ID (configure in PostHog dashboard)
- */
-export function showSurvey(surveyId: string) {
-  if (typeof window === "undefined" || !posthog) return;
-
-  if (!(posthog as any).__loaded) {
-    setTimeout(() => showSurvey(surveyId), 100);
-    return;
-  }
-
-  // PostHog surveys are typically shown automatically based on conditions
-  // This captures an event that can trigger a survey
-  posthog.capture("$survey_shown", { $survey_id: surveyId });
-}

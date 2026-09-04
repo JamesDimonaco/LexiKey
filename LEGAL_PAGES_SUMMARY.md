@@ -61,12 +61,13 @@ Before going live, update:
 
 ```
 /app
-  /privacy
-    page.tsx - Privacy Policy page
-  /terms
-    page.tsx - Terms of Service page
+  /(content)          - route group (shared layout, no URL segment)
+    /privacy
+      page.tsx         - served at /privacy
+    /terms
+      page.tsx         - served at /terms
 /components
-  Footer.tsx - Footer component with legal links
+  Footer.tsx           - footer component with legal links
 ```
 
 ## Testing

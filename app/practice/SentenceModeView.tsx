@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Word, WordResult } from "@/lib/types";
 import { LetterState } from "./types";
 import { RevealButton } from "./RevealButton";
@@ -52,6 +52,28 @@ export function SentenceModeView({
     }
   }, [dictationMode, reveal.isRevealed]);
 
+  // Announce word-level outcomes only (never per-letter — that would be
+  // unusable noise, especially with the word hidden in dictation mode).
+  // Sentence mode has no showFeedback prop, so the signal is the index
+  // advancing: the just-finished word's result sits at the index it left.
+  // Written straight to the live-region node rather than through React
+  // state: it's synchronizing with the screen reader (an external system),
+  // not deriving anything the render needs.
+  const announcementRef = useRef<HTMLSpanElement>(null);
+  const prevWordIndexRef = useRef(currentWordIndex);
+  useEffect(() => {
+    const prevIndex = prevWordIndexRef.current;
+    if (currentWordIndex !== prevIndex) {
+      const finished = results[prevIndex];
+      if (finished && announcementRef.current) {
+        announcementRef.current.textContent = finished.correct
+          ? "Correct. Next word."
+          : "Not quite. Next word.";
+      }
+      prevWordIndexRef.current = currentWordIndex;
+    }
+  }, [currentWordIndex, results]);
+
   return (
     <div
       className={`
@@ -64,6 +86,13 @@ export function SentenceModeView({
       onClick={handleContainerClick}
       data-tour="typing-area"
     >
+      <span
+        ref={announcementRef}
+        role="status"
+        aria-live="polite"
+        className="sr-only"
+      />
+
       {/* Unfocused overlay */}
       {!isFocused && (
         <div className="absolute inset-0 bg-gray-500/10 dark:bg-gray-900/50 rounded-lg flex items-center justify-center z-10">
@@ -211,7 +240,13 @@ function CurrentWordDisplay({
         }
 
         // Determine color
-        let colorClass = "text-gray-400 dark:text-gray-600"; // Default for "?" untyped
+        let colorClass = "text-gray-500 dark:text-gray-400"; // Default for "?" untyped
+
+        // Correct/incorrect is otherwise colour-only (WCAG 1.4.1) — pair it
+        // with an underline style so it reads without colour perception.
+        // Not shown in blind/dictation mode: those colour every typed letter
+        // neutral blue on purpose, so there's no correct/incorrect signal to back up.
+        let underlineClass = "";
 
         if (typedChar !== undefined) {
           if (blindMode || (dictationMode && !wordRevealed)) {
@@ -222,8 +257,11 @@ function CurrentWordDisplay({
             colorClass = "text-blue-500 dark:text-blue-400";
           } else if (typedChar.toLowerCase() === char.toLowerCase()) {
             colorClass = "text-green-600 dark:text-green-400";
+            underlineClass = "underline decoration-2 underline-offset-4";
           } else {
             colorClass = "text-red-500 dark:text-red-400";
+            underlineClass =
+              "underline decoration-2 underline-offset-4 decoration-dotted";
           }
         } else if (!dictationMode || wordRevealed) {
           // Untyped characters in normal mode or revealed dictation
@@ -238,7 +276,10 @@ function CurrentWordDisplay({
           typedChar?.toLowerCase() === char.toLowerCase();
 
         return (
-          <span key={charIdx} className={`relative ${colorClass}`}>
+          <span
+            key={charIdx}
+            className={`relative ${colorClass} ${underlineClass}`}
+          >
             {displayChar}
             {showCorrectionDot && (
               <span className="absolute -top-1 -right-0.5 w-1.5 h-1.5 bg-yellow-500 rounded-full" />
@@ -252,7 +293,7 @@ function CurrentWordDisplay({
           {userInput.slice(word.text.length).split("").map((char, idx) => (
             <span
               key={`overflow-${idx}`}
-              className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30 rounded px-0.5 animate-pulse"
+              className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30 rounded px-0.5 underline decoration-2 underline-offset-4 decoration-dotted animate-pulse motion-reduce:animate-none"
             >
               {char}
             </span>

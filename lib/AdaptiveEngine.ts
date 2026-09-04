@@ -299,6 +299,28 @@ export class AdaptiveSessionGenerator {
   }
 
   /**
+   * User level clamped into the active pool's difficulty range.
+   *
+   * A pattern session's pool can sit entirely above or below the user's
+   * level (e.g. "compound" is 30 words, all difficulty 8). Clamping only
+   * downward left effectiveLevel stuck at the user's level with nothing in
+   * the pool nearby, so diffGap filters matched zero words and
+   * generateSession returned []. Clamping both ways means a pattern pool
+   * above/below the user's level still yields its own words — a pattern
+   * session is a deliberate choice to drill that pattern, so the user's
+   * level should shift the selection *within* it, not empty it.
+   */
+  private getEffectiveLevel(user: UserProgress): number {
+    const difficulties = this.pool.map((w) => w.difficulty);
+    const minAvailableDifficulty = Math.min(...difficulties);
+    const maxAvailableDifficulty = Math.max(...difficulties);
+    return Math.min(
+      Math.max(user.currentLevel, minAvailableDifficulty),
+      maxAvailableDifficulty,
+    );
+  }
+
+  /**
    * Find words at user's current level (variety each session)
    */
   private getNewWords(
@@ -306,13 +328,7 @@ export class AdaptiveSessionGenerator {
     count: number,
     usedWords: Set<string>,
   ): Word[] {
-    // Find the max difficulty available in the word pool
-    const maxAvailableDifficulty = Math.max(
-      ...this.pool.map((w) => w.difficulty),
-    );
-
-    // Cap user level at max available difficulty for filtering
-    const effectiveLevel = Math.min(user.currentLevel, maxAvailableDifficulty);
+    const effectiveLevel = this.getEffectiveLevel(user);
 
     // Get words at current level that aren't already used
     const pool = this.pool.filter((w) => {
@@ -346,13 +362,7 @@ export class AdaptiveSessionGenerator {
     count: number,
     usedWords: Set<string>,
   ): Word[] {
-    // Find the max difficulty available in the word pool
-    const maxAvailableDifficulty = Math.max(
-      ...this.pool.map((w) => w.difficulty),
-    );
-
-    // Cap user level at max available difficulty
-    const effectiveLevel = Math.min(user.currentLevel, maxAvailableDifficulty);
+    const effectiveLevel = this.getEffectiveLevel(user);
 
     // Get easy words (below user level) that aren't struggle words
     const struggleWordTexts = new Set(this.userStruggleWords.map((sw) => sw.word));

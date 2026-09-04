@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -61,6 +61,14 @@ export function OnboardingTour({ userId, hasCompletedTourInDb, onComplete }: Onb
   const [mounted, setMounted] = useState(false);
 
   const updateUserStats = useMutation(api.users.updateUserStats);
+
+  // True only once the dialog actually has something to render — the same
+  // condition the render's early-return below uses, kept as one place so
+  // the focus-management effects agree with it.
+  const isDialogOpen = mounted && isActive && targetRect !== null;
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   // Check if tour should show (check both localStorage and DB)
   useEffect(() => {
@@ -146,7 +154,8 @@ export function OnboardingTour({ userId, hasCompletedTourInDb, onComplete }: Onb
     }
   }, [currentStep]);
 
-  // Handle keyboard navigation
+  // Handle keyboard navigation, including trapping Tab inside the dialog —
+  // without it Tab walks straight into the page behind the spotlight.
   useEffect(() => {
     if (!isActive) return;
 
@@ -154,15 +163,86 @@ export function OnboardingTour({ userId, hasCompletedTourInDb, onComplete }: Onb
       if (e.key === "Escape") {
         skipTour();
       } else if (e.key === "ArrowRight" || e.key === "Enter") {
+        // Enter on a focused button is that button's own activation. Before
+        // the panel was keyboard-reachable this could never collide; now it
+        // would fire the button AND advance, skipping a step.
+        const active = document.activeElement;
+        if (
+          e.key === "Enter" &&
+          active instanceof HTMLElement &&
+          panelRef.current?.contains(active) &&
+          active.closest("button")
+        ) {
+          return;
+        }
         nextStep();
       } else if (e.key === "ArrowLeft") {
         prevStep();
+      } else if (e.key === "Tab") {
+        const panel = panelRef.current;
+        if (!panel) return;
+        const focusable = Array.from(
+          panel.querySelectorAll<HTMLElement>(
+            'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((el) => !el.hasAttribute("disabled"));
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+
+        if (e.shiftKey) {
+          if (active === first || !panel.contains(active)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else if (active === last || !panel.contains(active)) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isActive, nextStep, prevStep, skipTour]);
+
+  // Move focus into the dialog on open (and back in if a step change removes
+  // whatever was focused, e.g. "Back" disappearing on step 0), then restore
+  // the caller's focus when the tour closes.
+  useEffect(() => {
+    if (isDialogOpen) {
+      if (previouslyFocusedRef.current === null) {
+        previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+      }
+      if (!panelRef.current?.contains(document.activeElement)) {
+        panelRef.current?.focus();
+      }
+    } else if (previouslyFocusedRef.current) {
+      previouslyFocusedRef.current.focus();
+      previouslyFocusedRef.current = null;
+    }
+  }, [isDialogOpen, currentStep]);
+
+  // Hide the rest of the page from assistive tech while the dialog is open —
+  // otherwise a screen reader can still read/navigate the app behind it.
+  useEffect(() => {
+    if (!isDialogOpen) return;
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+
+    const hidden: Element[] = [];
+    Array.from(document.body.children).forEach((el) => {
+      if (el === overlay || el.hasAttribute("aria-hidden")) return;
+      el.setAttribute("aria-hidden", "true");
+      hidden.push(el);
+    });
+
+    return () => {
+      hidden.forEach((el) => el.removeAttribute("aria-hidden"));
+    };
+  }, [isDialogOpen]);
 
   if (!mounted || !isActive || !targetRect) return null;
 
@@ -173,7 +253,14 @@ export function OnboardingTour({ userId, hasCompletedTourInDb, onComplete }: Onb
   const tooltipStyle = getTooltipPosition(targetRect, step.position);
 
   return createPortal(
-    <div className="fixed inset-0 z-[100]" aria-modal="true" role="dialog">
+    <div
+      ref={overlayRef}
+      className="fixed inset-0 z-[100]"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="tour-step-heading"
+      aria-describedby="tour-step-content"
+    >
       {/* Backdrop with spotlight cutout */}
       <div className="absolute inset-0">
         <svg className="w-full h-full">
@@ -212,17 +299,22 @@ export function OnboardingTour({ userId, hasCompletedTourInDb, onComplete }: Onb
 
       {/* Tooltip */}
       <div
-        className="absolute bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-5 max-w-sm border border-gray-200 dark:border-gray-700"
+        ref={panelRef}
+        tabIndex={-1}
+        className="absolute bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-5 max-w-sm border border-gray-200 dark:border-gray-700 outline-none"
         style={tooltipStyle}
       >
         {/* Arrow */}
         <TooltipArrow position={step.position} targetRect={targetRect} />
 
         {/* Content */}
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+        <h3
+          id="tour-step-heading"
+          className="text-lg font-bold text-gray-900 dark:text-white mb-2"
+        >
           {step.title}
         </h3>
-        <p className="text-gray-600 dark:text-gray-300 mb-4">
+        <p id="tour-step-content" className="text-gray-600 dark:text-gray-300 mb-4">
           {step.content}
         </p>
 

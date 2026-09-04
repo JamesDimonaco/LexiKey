@@ -25,7 +25,6 @@ export function useUserProgress() {
     updateStats: updateAnonymousStats,
     getDataForMigration,
     clearData: clearAnonymousData,
-    setThresholdParams: setAnonymousThreshold,
     updateThreshold: updateAnonymousThreshold,
     reportInaudible: reportAnonymousInaudible,
   } = useAnonymousUser();
@@ -128,6 +127,8 @@ export function useUserProgress() {
           thresholdParams: anonData.thresholdParams,
           listenThresholdParams: anonData.listenThresholdParams,
           inaudibleWords: anonData.inaudibleWords,
+          hasCompletedPlacementTest: anonData.hasCompletedPlacementTest,
+          struggleGroups: anonData.struggleGroups,
         },
       }).then(() => {
         clearAnonymousData();
@@ -160,6 +161,8 @@ export function useUserProgress() {
         thresholdParams: anonData.thresholdParams,
         listenThresholdParams: anonData.listenThresholdParams,
         inaudibleWords: anonData.inaudibleWords,
+        hasCompletedPlacementTest: anonData.hasCompletedPlacementTest,
+        struggleGroups: anonData.struggleGroups,
       } : undefined,
     }).then(() => {
       if (hasData) clearAnonymousData();
@@ -191,6 +194,8 @@ export function useUserProgress() {
           thresholdParams: pendingMigration.thresholdParams,
           listenThresholdParams: pendingMigration.listenThresholdParams,
           inaudibleWords: pendingMigration.inaudibleWords,
+          hasCompletedPlacementTest: pendingMigration.hasCompletedPlacementTest,
+          struggleGroups: pendingMigration.struggleGroups,
         },
       });
       clearAnonymousData();

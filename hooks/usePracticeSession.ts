@@ -336,23 +336,25 @@ export function usePracticeSession({
           }),
         );
       } else {
-        const newCharIndex = newLength - 1;
-        const newChar = newValue[newCharIndex];
+        // A paste can add more than one character at once — update every
+        // newly-added index, not just the last, or the earlier pasted
+        // letters keep their stale (null) colour hint.
+        const startIndex = oldLength;
+        const endIndex = Math.min(newLength, letterStates.length) - 1;
 
-        if (newCharIndex < letterStates.length) {
+        if (endIndex >= startIndex) {
           setLetterStates((prev) =>
             prev.map((state, i) => {
-              if (i === newCharIndex) {
-                const isCorrect = newChar.toLowerCase() === state.expected;
-                return {
-                  ...state,
-                  typed: newChar,
-                  wasCorrectFirstTry:
-                    state.typed === null ? isCorrect : state.wasCorrectFirstTry,
-                  wasEverWrong: state.wasEverWrong || !isCorrect,
-                };
-              }
-              return state;
+              if (i < startIndex || i > endIndex) return state;
+              const newChar = newValue[i];
+              const isCorrect = newChar.toLowerCase() === state.expected;
+              return {
+                ...state,
+                typed: newChar,
+                wasCorrectFirstTry:
+                  state.typed === null ? isCorrect : state.wasCorrectFirstTry,
+                wasEverWrong: state.wasEverWrong || !isCorrect,
+              };
             }),
           );
         }
@@ -635,7 +637,14 @@ export function usePracticeSession({
     inputRef.current?.focus();
   }, []);
 
-  const isLoading = isUserLoading || sessionWords.length === 0;
+  // sessionWords is built synchronously in the useState lazy initializer, so
+  // an empty result here is never "still loading" — it's the generator
+  // genuinely having nothing to offer (e.g. every candidate word already
+  // excluded). Keeping it folded into isLoading is what left the UI on a
+  // spinner that could never resolve; isEmpty lets a caller show something
+  // actionable (e.g. send the user back to setup) instead.
+  const isLoading = isUserLoading;
+  const isEmpty = !isUserLoading && sessionWords.length === 0;
 
   return {
     // State
@@ -647,6 +656,7 @@ export function usePracticeSession({
     results,
     isComplete,
     isLoading,
+    isEmpty,
     sentenceMode,
     letterStates,
     showFeedback,

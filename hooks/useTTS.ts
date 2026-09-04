@@ -39,6 +39,10 @@ export function useTTS(voiceSpeed: number = 1.0, enabled: boolean = true) {
     return () => {
       if (synthRef.current) {
         synthRef.current.onvoiceschanged = null;
+        // Stop speech outliving the component — otherwise a word spoken in a
+        // dictation session keeps playing over whatever screen comes next.
+        synthRef.current.cancel();
+        speakingRef.current = false;
       }
     };
   }, []);

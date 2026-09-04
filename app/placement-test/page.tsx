@@ -242,7 +242,10 @@ export default function PlacementTest() {
   const [results, setResults] = useState<PlacementTestResult["wordResults"]>(
     [],
   );
-  const [startTime, setStartTime] = useState(Date.now());
+  // Timer starts on the first keystroke, not when the word appears — matches
+  // usePracticeSession, and keeps reading time out of the 2000ms speed check
+  // that picks the next word's difficulty.
+  const [startTime, setStartTime] = useState<number | null>(null);
   const [backspaceCount, setBackspaceCount] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [calculatedResult, setCalculatedResult] =
@@ -252,6 +255,11 @@ export default function PlacementTest() {
   const [isFocused, setIsFocused] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const autoSubmittedWordIdRef = useRef<string | null>(null);
+  // Wall clock for the whole test. Per-word timeSpent now measures only
+  // first-keystroke-to-submit, so summing it would silently redefine
+  // durationSeconds mid-series in PostHog. Stamped in an effect, not at
+  // render: React Compiler is on and Date.now() during render is impure.
+  const testStartedAtRef = useRef<number | null>(null);
 
   // Convex hooks
   // Convex verifies the caller, so wait for its own auth token rather than
@@ -266,6 +274,7 @@ export default function PlacementTest() {
 
   // Initialize first word on mount
   useEffect(() => {
+    testStartedAtRef.current = Date.now();
     const firstWord = selectNextWord([], new Set());
     if (firstWord) {
       setCurrentWord(firstWord);
@@ -274,7 +283,7 @@ export default function PlacementTest() {
   }, []);
 
   useEffect(() => {
-    setStartTime(Date.now());
+    setStartTime(null); // Timer starts on first keystroke, not when the word appears
     setBackspaceCount(0);
   }, [currentWordIndex]);
 
@@ -293,7 +302,7 @@ export default function PlacementTest() {
   const handleSubmitWord = () => {
     if (!currentWord) return;
 
-    const timeSpent = Date.now() - startTime;
+    const timeSpent = startTime ? Date.now() - startTime : 0;
     const correct =
       userInput.trim().toLowerCase() === currentWord.text.toLowerCase();
 
@@ -407,9 +416,10 @@ export default function PlacementTest() {
     const accuracy = Math.round(
       (result.wordResults.filter((r) => r.correct).length / result.wordResults.length) * 100
     );
-    const totalTime = Math.round(
-      result.wordResults.reduce((sum, r) => sum + r.timeSpent, 0) / 1000
-    );
+    const startedAt = testStartedAtRef.current;
+    const totalTime = startedAt
+      ? Math.round((Date.now() - startedAt) / 1000)
+      : 0;
 
     // Use the new tracking utility
     trackPlacementTestCompleted({
@@ -417,6 +427,8 @@ export default function PlacementTest() {
       accuracy,
       wordsAttempted: result.wordResults.length,
       durationSeconds: totalTime,
+      struggleGroups: result.identifiedStruggleGroups,
+      isAnonymous: !currentUser,
     });
 
     // Update user properties for segmentation
@@ -431,14 +443,6 @@ export default function PlacementTest() {
       accuracy,
     });
 
-    // Legacy event for backwards compatibility
-    trackEvent("placement_test_completed", {
-      determinedLevel: result.determinedLevel,
-      accuracy,
-      totalWords: result.wordResults.length,
-      struggleGroups: result.identifiedStruggleGroups,
-      isAnonymous: !currentUser,
-    });
 
     // Save to Convex
     console.log("Placement Test Result:", result);
@@ -475,6 +479,10 @@ export default function PlacementTest() {
             const anonUser = JSON.parse(anonUserData);
             anonUser.currentLevel = result.determinedLevel;
             anonUser.thresholdParams = thresholdParams;
+            // Recorded here too, not only in lexikey_placement_result: this is
+            // the store that survives into the Convex account at sign-up.
+            anonUser.hasCompletedPlacementTest = true;
+            anonUser.struggleGroups = result.identifiedStruggleGroups;
             localStorage.setItem("lexikey-anonymous-user", JSON.stringify(anonUser));
             console.log("✅ Anonymous user level updated to:", result.determinedLevel);
             console.log("✅ Anonymous user threshold params set");
@@ -749,7 +757,13 @@ export default function PlacementTest() {
               ref={inputRef}
               type="text"
               value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                if (userInput.length === 0 && newValue.length > 0 && startTime === null) {
+                  setStartTime(Date.now());
+                }
+                setUserInput(newValue);
+              }}
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}

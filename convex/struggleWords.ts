@@ -5,7 +5,12 @@ import { requireUser } from "./authHelpers";
 /**
  * Struggle Words (Simple Bucket System)
  *
- * Words are added when user struggles (hesitation >1.5s OR backspaces >3)
+ * Words are added when user struggles (hesitation past their adaptive
+ * threshold OR backspaces >3). The threshold isn't a flat 1.5s: it's computed
+ * per word by getHesitationThreshold (lib/thresholdCalculator.ts) from the
+ * user's own typing speed, calibrated separately for reading vs listening —
+ * listening thresholds add a quadratic length term, since holding a heard
+ * word in memory costs more per extra letter than reading one does.
  * Words graduate (get removed) after 3 consecutive correct attempts
  * Any mistake resets the consecutive counter to 0
  *

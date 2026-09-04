@@ -7,13 +7,12 @@ import { WordResult, StreakResult, StruggleWord } from "@/lib/types";
 import {
   trackEvent,
   trackSessionCompleted,
+  trackWordMastered,
   updateUserProperties,
   incrementUserProperty,
   triggerSurveyEligibility,
 } from "@/hooks/usePostHog";
-
-// Thresholds for determining struggle words (match practice page)
-const BACKSPACE_THRESHOLD = 4;
+import { BACKSPACE_THRESHOLD } from "@/hooks/usePracticeSession";
 
 type SessionCompleteProps = {
   results: WordResult[];
@@ -81,7 +80,7 @@ export function SessionComplete({
   // Words that graduated out of the review bucket this session. Mirrors the
   // server's rule exactly: 3 consecutive clean attempts deletes the word, a
   // struggle resets the counter (and re-adds it if it had just graduated).
-  const masteredWords = useMemo(() => {
+  const masteredWordDetails = useMemo(() => {
     if (!struggleWordsAtStart?.length) return [];
 
     const counters = new Map(
@@ -90,11 +89,17 @@ export function SessionComplete({
         w.consecutiveCorrect,
       ]),
     );
-    const mastered = new Set<string>();
+    const attempts = new Map<string, number>();
+    const mastered = new Map<
+      string,
+      { phonicsGroup: string; attemptsThisSession: number }
+    >();
 
     for (const r of results) {
       const key = r.word.toLowerCase();
       if (!counters.has(key)) continue;
+
+      attempts.set(key, (attempts.get(key) ?? 0) + 1);
 
       const wasStruggle =
         !r.correct ||
@@ -107,24 +112,50 @@ export function SessionComplete({
       } else {
         const next = (counters.get(key) ?? 0) + 1;
         counters.set(key, next);
-        if (next >= 3) mastered.add(key);
+        if (next >= 3) {
+          mastered.set(key, {
+            phonicsGroup: r.phonicsGroup,
+            attemptsThisSession: attempts.get(key) ?? next,
+          });
+        }
       }
     }
 
     // Return in original-casing, session order
     return results
-      .filter((r, i, arr) => arr.findIndex((x) => x.word === r.word) === i)
-      .map((r) => r.word)
-      .filter((word) => mastered.has(word.toLowerCase()));
+      .filter(
+        (r, i, arr) =>
+          arr.findIndex(
+            (x) => x.word.toLowerCase() === r.word.toLowerCase(),
+          ) === i,
+      )
+      .filter((r) => mastered.has(r.word.toLowerCase()))
+      .map((r) => ({ word: r.word, ...mastered.get(r.word.toLowerCase())! }));
   }, [results, struggleWordsAtStart]);
 
-  // Handle Enter key to restart
+  const masteredWords = useMemo(
+    () => masteredWordDetails.map((m) => m.word),
+    [masteredWordDetails],
+  );
+
+  // Handle Enter key to restart — but only when focus isn't already inside
+  // an interactive control (a button, a Clerk sign-up modal's form field,
+  // etc). Otherwise this fires on top of whatever Enter was supposed to do
+  // there, e.g. restarting the session instead of activating "Create Free
+  // Account".
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        onRestart();
+      if (e.key !== "Enter") return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target?.closest(
+          'button, a, input, textarea, select, [role="button"], [contenteditable="true"]',
+        )
+      ) {
+        return;
       }
+      e.preventDefault();
+      onRestart();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -172,6 +203,15 @@ export function SessionComplete({
       accuracy,
       currentLevel,
     });
+
+    // One event per word that graduated out of the review bucket this session
+    for (const m of masteredWordDetails) {
+      trackWordMastered({
+        word: m.word,
+        phonicsGroup: m.phonicsGroup,
+        attemptsThisSession: m.attemptsThisSession,
+      });
+    }
     // Analytics must fire exactly once when the completion screen mounts,
     // not again on re-renders — the values are frozen for this session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -181,9 +221,13 @@ export function SessionComplete({
     <div
       ref={containerRef}
       tabIndex={-1}
+      aria-labelledby="session-complete-heading"
       className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-gray-800 outline-none animate-in fade-in duration-300 motion-reduce:animate-none"
     >
-      <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
+      <h1
+        id="session-complete-heading"
+        className="text-3xl font-bold mb-6 text-center text-black dark:text-white"
+      >
         Session Complete!
       </h1>
 

@@ -163,7 +163,7 @@ export function adjustThresholdFromSession(
   // negative and get dropped; don't subtract and it gets counted twice. The
   // listening defaults are fitted from measured data and generous; personalise
   // them only once there is enough listening data to fit the curve properly.
-  if (current.secondsPerCharSquared) {
+  if (current.secondsPerCharSquared !== undefined) {
     return current;
   }
 

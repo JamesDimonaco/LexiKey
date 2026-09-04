@@ -57,10 +57,12 @@ You have several verification options:
 1. Go to "URL Inspection" tool
 2. Enter your homepage URL: `https://lexikey.org`
 3. Click "Request Indexing"
-4. Repeat for important pages:
-   - `/practice`
+4. Repeat for important pages (the same set listed in `app/sitemap.ts` —
+   `/settings` is deliberately excluded, it's user-specific):
    - `/placement-test`
-   - `/settings`
+   - `/for-parents`
+   - `/for-teachers`
+   - `/how-it-works`
 
 ## Step 5: Monitor Performance
 

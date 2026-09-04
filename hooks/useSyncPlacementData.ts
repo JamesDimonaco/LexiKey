@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery, useConvexAuth } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useAnonymousUser } from "./useAnonymousUser";
 
 /**
  * Hook to sync localStorage placement test data to Convex when user signs in
@@ -15,6 +16,13 @@ import { api } from "@/convex/_generated/api";
  * - Check if user already has placement test completed in Convex
  * - If localStorage has data but Convex doesn't, sync it
  * - Clear localStorage after successful sync
+ *
+ * The `lexikey_placement_result` snapshot is written once, at the end of the
+ * test, and never updated again — so it goes stale the moment a practice
+ * session moves the level. `lexikey-anonymous-user` (the anon progress store)
+ * is kept current by every session, so it's the source of truth for level and
+ * struggle words; the placement snapshot only supplies what that store never
+ * tracked — the completed flag and the struggle-group list.
  */
 export function useSyncPlacementData() {
   const { user, isLoaded } = useUser();
@@ -27,9 +35,15 @@ export function useSyncPlacementData() {
   );
   const createUser = useMutation(api.users.createUser);
   const updateUserStats = useMutation(api.users.updateUserStats);
+  const {
+    isLoading: isAnonymousLoading,
+    getDataForMigration,
+    clearData: clearAnonymousData,
+  } = useAnonymousUser();
 
   useEffect(() => {
     if (!isLoaded || !user) return;
+    if (isAnonymousLoading) return; // Wait for the anon store to load before reading it
 
     // Don't proceed if query hasn't finished loading yet
     // When query is skipped (user?.id is falsy), currentUser is undefined
@@ -46,6 +60,15 @@ export function useSyncPlacementData() {
 
       try {
         const placementResult = JSON.parse(localData);
+        // Read the anon store straight from localStorage rather than context
+        // state: the placement page writes the new level with a raw
+        // setItem, so the React state is still the pre-test value here.
+        const anonData = getDataForMigration();
+        // Prefer the live store's level (moved by any practice sessions since
+        // the test) — fall back to the frozen snapshot if the store is gone.
+        const currentLevel =
+          anonData?.currentLevel ?? placementResult.determinedLevel;
+        const struggleGroups = placementResult.identifiedStruggleGroups;
 
         // If user doesn't exist in Convex yet, create them first
         // Now we can safely check for null (query finished, no user found)
@@ -57,13 +80,28 @@ export function useSyncPlacementData() {
               name: user.fullName || user.firstName || "User",
               email: user.primaryEmailAddress?.emailAddress,
               role: "student",
+              anonymousData: {
+                currentLevel,
+                totalWords: anonData?.totalWords ?? 0,
+                totalSessions: anonData?.totalSessions ?? 0,
+                struggleWords: anonData?.struggleWords ?? [],
+                lastPracticeDate: anonData?.lastPracticeDate ?? null,
+                listenLevel: anonData?.listenLevel,
+                inaudibleWords: anonData?.inaudibleWords,
+                thresholdParams: anonData?.thresholdParams,
+                listenThresholdParams: anonData?.listenThresholdParams,
+                hasCompletedPlacementTest: true,
+                struggleGroups,
+              },
             });
             console.log("✅ User created");
-            // Don't sync placement data here - it will happen on next render when currentUser exists
+            clearAnonymousData();
+            localStorage.removeItem("lexikey_placement_result");
             return;
-          } catch (error: any) {
+          } catch (error) {
             // User might already exist (webhook created it)
-            if (!error.message?.includes("already exists")) {
+            const message = error instanceof Error ? error.message : String(error);
+            if (!message.includes("already exists")) {
               console.error("Failed to create user:", error);
               return;
             }
@@ -87,13 +125,18 @@ export function useSyncPlacementData() {
           await updateUserStats({
             userId: currentUser._id,
             stats: {
-              currentLevel: placementResult.determinedLevel,
+              currentLevel,
               hasCompletedPlacementTest: true,
-              struggleGroups: placementResult.identifiedStruggleGroups,
+              struggleGroups,
             },
           });
 
           console.log("✅ Placement test synced successfully!");
+          // Deliberately NOT clearing the anon store here: this path only
+          // wrote the level, the flag and the struggle groups. Words,
+          // sessions, the struggle bucket and threshold calibration are still
+          // only in localStorage, and useUserProgress migrates them on the
+          // next visit. Clearing now would destroy them.
           localStorage.removeItem("lexikey_placement_result");
         }
       } catch (error) {
@@ -102,5 +145,14 @@ export function useSyncPlacementData() {
     };
 
     syncData();
-  }, [isLoaded, user, currentUser, createUser, updateUserStats]);
+  }, [
+    isLoaded,
+    user,
+    currentUser,
+    createUser,
+    updateUserStats,
+    getDataForMigration,
+    isAnonymousLoading,
+    clearAnonymousData,
+  ]);
 }
