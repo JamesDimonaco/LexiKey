@@ -236,7 +236,7 @@ export default function PlacementTest() {
   useSyncPlacementData();
 
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [results, setResults] = useState<PlacementTestResult["wordResults"]>(
@@ -428,7 +428,9 @@ export default function PlacementTest() {
       wordsAttempted: result.wordResults.length,
       durationSeconds: totalTime,
       struggleGroups: result.identifiedStruggleGroups,
-      isAnonymous: !currentUser,
+      // From Clerk, not from currentUser: the Convex query is undefined while
+      // it loads, which recorded signed-in users as anonymous.
+      isAnonymous: !isSignedIn,
     });
 
     // Update user properties for segmentation

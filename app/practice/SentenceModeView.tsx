@@ -240,7 +240,7 @@ function CurrentWordDisplay({
         }
 
         // Determine color
-        let colorClass = "text-gray-500 dark:text-gray-400"; // Default for "?" untyped
+        let colorClass = "text-gray-600 dark:text-gray-400"; // Default for "?" untyped
 
         // Correct/incorrect is otherwise colour-only (WCAG 1.4.1) — pair it
         // with an underline style so it reads without colour perception.

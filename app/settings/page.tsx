@@ -758,7 +758,7 @@ function InfoTooltip({ text }: { text: string }) {
         onBlur={() => setOpen(false)}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
       >
         ?
       </button>

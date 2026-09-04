@@ -221,6 +221,7 @@ export function SessionComplete({
     <div
       ref={containerRef}
       tabIndex={-1}
+      role="region"
       aria-labelledby="session-complete-heading"
       className="max-w-2xl w-full bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-gray-800 outline-none animate-in fade-in duration-300 motion-reduce:animate-none"
     >
