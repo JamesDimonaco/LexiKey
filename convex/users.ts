@@ -40,6 +40,7 @@ export const getCurrentUser = query({
  * Optionally accepts anonymous user data for migration
  */
 export const createUser = mutation({
+  returns: v.id("users"),
   args: {
     clerkId: v.string(),
     name: v.string(),
@@ -188,14 +189,11 @@ export const createUser = mutation({
 export const updateUserStats = mutation({
   args: {
     userId: v.id("users"),
+    // Only the fields something actually writes. The streak fields and the
+    // running totals used to be here and were never sent by any caller —
+    // accepting them let a signed-in user rewrite their own streak, which
+    // streaks.recordSessionCompleted owns.
     stats: v.object({
-      totalWords: v.optional(v.number()),
-      totalSessions: v.optional(v.number()),
-      currentStreak: v.optional(v.number()),
-      longestStreak: v.optional(v.number()),
-      lastPracticeDate: v.optional(v.string()),
-      totalMinutesPracticed: v.optional(v.number()),
-      averageAccuracy: v.optional(v.number()),
       currentLevel: v.optional(v.number()),
       listenLevel: v.optional(v.number()),
       hasCompletedPlacementTest: v.optional(v.boolean()),
@@ -334,12 +332,20 @@ export const migrateAnonymousData = mutation({
         listenThresholdParams: anonymousData.listenThresholdParams,
       }),
       ...(anonymousData.listenLevel !== undefined && { listenLevel: anonymousData.listenLevel }),
-      // Only present when the anonymous data came from a completed placement
-      // test — absent (not false) callers must not reset an existing user's flag.
-      ...(anonymousData.hasCompletedPlacementTest !== undefined && {
-        hasCompletedPlacementTest: anonymousData.hasCompletedPlacementTest,
-      }),
-      ...(anonymousData.struggleGroups && { struggleGroups: anonymousData.struggleGroups }),
+      // Monotonic: a placement test already taken on the account stays taken,
+      // whatever the anonymous side claims.
+      hasCompletedPlacementTest:
+        user.stats.hasCompletedPlacementTest ||
+        (anonymousData.hasCompletedPlacementTest ?? false),
+      // Union, not replace. An empty array is truthy, so assigning it would
+      // have wiped the account's existing targets and left AdaptiveEngine
+      // with nothing to aim at.
+      struggleGroups: Array.from(
+        new Set([
+          ...user.stats.struggleGroups,
+          ...(anonymousData.struggleGroups ?? []),
+        ]),
+      ),
     };
 
     // Update user with merged stats

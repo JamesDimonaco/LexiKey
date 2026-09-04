@@ -336,10 +336,18 @@ export function usePracticeSession({
           }),
         );
       } else {
-        // A paste can add more than one character at once — update every
-        // newly-added index, not just the last, or the earlier pasted
-        // letters keep their stale (null) colour hint.
-        const startIndex = oldLength;
+        // A paste can add several characters at once, and can also replace a
+        // selection without changing the length — so start from the first
+        // index that actually differs, not from the old length, or replaced
+        // letters keep their stale colour hint.
+        let startIndex = 0;
+        while (
+          startIndex < oldLength &&
+          startIndex < newLength &&
+          userInput[startIndex] === newValue[startIndex]
+        ) {
+          startIndex++;
+        }
         const endIndex = Math.min(newLength, letterStates.length) - 1;
 
         if (endIndex >= startIndex) {
@@ -362,7 +370,7 @@ export function usePracticeSession({
 
       setUserInput(newValue);
     },
-    [userInput.length, letterStates.length, startTime],
+    [userInput, letterStates.length, startTime],
   );
 
   // Advance to next word

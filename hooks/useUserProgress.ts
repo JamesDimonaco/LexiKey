@@ -56,6 +56,18 @@ export function useUserProgress() {
   // This prevents flash of anonymous content while auth is loading
   const isAnonymous = isClerkLoaded ? !user?.id : false; // Assume authenticated until proven otherwise
 
+  // Practice words are not the only thing worth migrating: someone can finish
+  // the placement test and sign up without typing a single practice word, and
+  // their level, completion flag and struggle groups still have to survive.
+  const hasMigratableData = (
+    data: AnonymousUserData | null,
+  ): data is AnonymousUserData =>
+    !!data &&
+    (data.totalWords > 0 ||
+      data.hasCompletedPlacementTest === true ||
+      (data.struggleGroups?.length ?? 0) > 0 ||
+      data.struggleWords.length > 0);
+
   // Track pending migration for existing users (show dialog)
   const [pendingMigration, setPendingMigration] = useState<AnonymousUserData | null>(null);
 
@@ -107,7 +119,7 @@ export function useUserProgress() {
 
     // Check if there's anonymous data to migrate
     const anonData = getDataForMigration();
-    if (!anonData || anonData.totalWords === 0) return;
+    if (!hasMigratableData(anonData)) return;
 
     // Check if user exists and has data (existing user scenario)
     if (currentUser && currentUser.stats.totalWords > 0) {
@@ -144,7 +156,7 @@ export function useUserProgress() {
 
     // User doesn't exist in Convex - create them
     const anonData = getDataForMigration();
-    const hasData = anonData && anonData.totalWords > 0;
+    const hasData = hasMigratableData(anonData);
 
     createUser({
       clerkId: user.id,
