@@ -85,6 +85,10 @@ export const createUser = mutation({
           lastUpdated: v.string(),
         })
       ),
+      // Carried over so a user who placement-tested (and maybe practised
+      // further) anonymously isn't shown the placement prompt again on signup.
+      hasCompletedPlacementTest: v.optional(v.boolean()),
+      struggleGroups: v.optional(v.array(v.string())),
     })),
   },
   handler: async (ctx, { clerkId, name, email, role, anonymousData }) => {
@@ -113,8 +117,8 @@ export const createUser = mutation({
       averageAccuracy: 0,
       currentLevel: anonymousData?.currentLevel ?? 1,
       listenLevel: anonymousData?.listenLevel,
-      hasCompletedPlacementTest: false,
-      struggleGroups: [],
+      hasCompletedPlacementTest: anonymousData?.hasCompletedPlacementTest ?? false,
+      struggleGroups: anonymousData?.struggleGroups ?? [],
       thresholdParams: anonymousData?.thresholdParams,
       listenThresholdParams: anonymousData?.listenThresholdParams,
     };
@@ -292,6 +296,10 @@ export const migrateAnonymousData = mutation({
           lastUpdated: v.string(),
         })
       ),
+      // Carried over so a user who placement-tested (and maybe practised
+      // further) anonymously isn't shown the placement prompt again on signup.
+      hasCompletedPlacementTest: v.optional(v.boolean()),
+      struggleGroups: v.optional(v.array(v.string())),
     }),
   },
   returns: v.object({
@@ -326,6 +334,12 @@ export const migrateAnonymousData = mutation({
         listenThresholdParams: anonymousData.listenThresholdParams,
       }),
       ...(anonymousData.listenLevel !== undefined && { listenLevel: anonymousData.listenLevel }),
+      // Only present when the anonymous data came from a completed placement
+      // test — absent (not false) callers must not reset an existing user's flag.
+      ...(anonymousData.hasCompletedPlacementTest !== undefined && {
+        hasCompletedPlacementTest: anonymousData.hasCompletedPlacementTest,
+      }),
+      ...(anonymousData.struggleGroups && { struggleGroups: anonymousData.struggleGroups }),
     };
 
     // Update user with merged stats
@@ -334,7 +348,9 @@ export const migrateAnonymousData = mutation({
       updatedAt: now,
     });
 
-    // Migrate struggle words (only add ones that don't exist)
+    // Migrate struggle words — merge into existing rows rather than skipping
+    // them, keeping the more pessimistic state from either device. The point
+    // of the bucket is to keep practising words the learner has missed.
     if (anonymousData.struggleWords.length > 0) {
       // Get existing struggle words for this user
       const existingStruggleWords = await ctx.db
@@ -342,11 +358,19 @@ export const migrateAnonymousData = mutation({
         .withIndex("by_userId", (q) => q.eq("userId", user._id))
         .collect();
 
-      const existingWordSet = new Set(existingStruggleWords.map(sw => sw.word));
+      const existingByWord = new Map(existingStruggleWords.map((sw) => [sw.word, sw]));
 
-      // Insert only new struggle words
       for (const sw of anonymousData.struggleWords) {
-        if (!existingWordSet.has(sw.word)) {
+        const existing = existingByWord.get(sw.word);
+        if (existing) {
+          await ctx.db.patch(existing._id, {
+            // Lower consecutiveCorrect = further from graduating = more pessimistic.
+            consecutiveCorrect: Math.min(existing.consecutiveCorrect, sw.consecutiveCorrect),
+            listenMisses: Math.max(existing.listenMisses ?? 0, sw.listenMisses ?? 0),
+            seeMisses: Math.max(existing.seeMisses ?? 0, sw.seeMisses ?? 0),
+            lastSeenAt: now,
+          });
+        } else {
           await ctx.db.insert("userStruggleWords", {
             userId: user._id,
             word: sw.word,

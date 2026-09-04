@@ -56,9 +56,19 @@ type SessionSetupProps = {
   /** Words currently waiting in the user's review bucket */
   struggleWordCount: number;
   onStart: (config: SessionConfig) => void;
+  /**
+   * The setup screen is where a session that came up empty sends the user
+   * back to (see usePracticeSession's `isEmpty`) — this shows them why
+   * they're back here instead of leaving them to guess.
+   */
+  lastSessionWasEmpty?: boolean;
 };
 
-export function SessionSetup({ struggleWordCount, onStart }: SessionSetupProps) {
+export function SessionSetup({
+  struggleWordCount,
+  onStart,
+  lastSessionWasEmpty = false,
+}: SessionSetupProps) {
   const { settings, updateSettings } = useAccessibility();
   const [config, setConfig] = useState<SessionConfig>(() => {
     const last = loadLastConfig();
@@ -92,6 +102,16 @@ export function SessionSetup({ struggleWordCount, onStart }: SessionSetupProps) 
 
   return (
     <div className="w-full max-w-2xl mx-auto animate-in fade-in duration-300 motion-reduce:animate-none">
+      {lastSessionWasEmpty && (
+        <div
+          role="alert"
+          className="mb-6 p-4 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-sm text-amber-900 dark:text-amber-200"
+        >
+          That combination didn&apos;t turn up any words to practice. Try a
+          different pattern or focus below.
+        </div>
+      )}
+
       {/* Framing: dyslexia-first, but for everyone */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-black dark:text-white mb-2">

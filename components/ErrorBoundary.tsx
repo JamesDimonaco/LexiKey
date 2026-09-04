@@ -1,7 +1,7 @@
 "use client";
 
 import { Component, ReactNode } from "react";
-import { posthog } from "./PostHogProvider";
+import { trackError } from "@/hooks/usePostHog";
 
 interface Props {
   children: ReactNode;
@@ -24,18 +24,11 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Report to PostHog
-    if (typeof window !== "undefined" && posthog && (posthog as any).__loaded) {
-      posthog.capture("$exception", {
-        $exception_message: error.message,
-        $exception_stack: error.stack,
-        $exception_type: error.name || "ReactError",
-        componentStack: errorInfo.componentStack,
-        source: "ErrorBoundary",
-      });
-    }
+    trackError(error, {
+      component: "ErrorBoundary",
+      extra: { componentStack: errorInfo.componentStack },
+    });
 
-    // Log to console
     console.error("[ErrorBoundary]", error, errorInfo);
   }
 

@@ -18,7 +18,7 @@ LexiKey combines touch-typing practice with the Orton-Gillingham approach to tea
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 16, React, TypeScript, Tailwind CSS
 - **Backend**: Convex (database + serverless functions)
 - **Auth**: Clerk
 - **Analytics**: PostHog
@@ -39,9 +39,14 @@ pnpm dev
 Create a `.env.local` file:
 
 ```
+CONVEX_DEPLOYMENT=your_convex_deployment
 NEXT_PUBLIC_CONVEX_URL=your_convex_url
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
 CLERK_SECRET_KEY=your_clerk_secret
+CLERK_JWT_ISSUER_DOMAIN=your_clerk_issuer_domain
+CLERK_WEBHOOK_SECRET=your_clerk_webhook_secret
+NEXT_PUBLIC_POSTHOG_KEY=your_posthog_key
+NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 ```
 
 ## License

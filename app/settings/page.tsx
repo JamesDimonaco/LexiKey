@@ -121,10 +121,14 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 {/* Session Word Count */}
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="slider-word-count"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Words per session: {tempSettings.sessionWordCount}
                   </Label>
                   <input
+                    id="slider-word-count"
                     type="range"
                     min="10"
                     max="50"
@@ -150,10 +154,12 @@ export default function SettingsPage() {
                   <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">
                     Randomly capitalize some words in practice
                   </p>
-                  <div className="flex gap-2">
+                  <div role="group" aria-label="Capital Letters" className="flex gap-2">
                     {(["never", "sometimes", "often"] as const).map((freq) => (
                       <button
                         key={freq}
+                        type="button"
+                        aria-pressed={tempSettings.capitalFrequency === freq}
                         onClick={() => updateTempSettings({ capitalFrequency: freq })}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                           tempSettings.capitalFrequency === freq
@@ -175,10 +181,12 @@ export default function SettingsPage() {
                   <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">
                     Add periods, commas, or other punctuation
                   </p>
-                  <div className="flex gap-2">
+                  <div role="group" aria-label="Punctuation" className="flex gap-2">
                     {(["never", "sometimes", "often"] as const).map((freq) => (
                       <button
                         key={freq}
+                        type="button"
+                        aria-pressed={tempSettings.punctuationFrequency === freq}
                         onClick={() => updateTempSettings({ punctuationFrequency: freq })}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                           tempSettings.punctuationFrequency === freq
@@ -252,13 +260,22 @@ export default function SettingsPage() {
                   {/* Struggle Words */}
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                      <span
+                        id="label-struggle-name"
+                        className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5"
+                      >
                         Targeted Practice
                         <InfoTooltip text="Words you've struggled with before. These need extra attention and will appear more frequently until mastered." />
                       </span>
-                      <span className="font-medium text-gray-900 dark:text-white">{tempSettings.strugglePercent}%</span>
+                      <span
+                        id="label-struggle-value"
+                        className="font-medium text-gray-900 dark:text-white"
+                      >
+                        {tempSettings.strugglePercent}%
+                      </span>
                     </div>
                     <input
+                      aria-labelledby="label-struggle-name label-struggle-value"
                       type="range"
                       min="0"
                       max="100"
@@ -281,13 +298,22 @@ export default function SettingsPage() {
                   {/* New Concepts */}
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                      <span
+                        id="label-new-name"
+                        className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5"
+                      >
                         New Words
                         <InfoTooltip text="Fresh words at your current skill level. Learning new words helps expand your vocabulary and typing fluency." />
                       </span>
-                      <span className="font-medium text-gray-900 dark:text-white">{tempSettings.newPercent}%</span>
+                      <span
+                        id="label-new-value"
+                        className="font-medium text-gray-900 dark:text-white"
+                      >
+                        {tempSettings.newPercent}%
+                      </span>
                     </div>
                     <input
+                      aria-labelledby="label-new-name label-new-value"
                       type="range"
                       min="0"
                       max="100"
@@ -310,13 +336,22 @@ export default function SettingsPage() {
                   {/* Easy Practice */}
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                      <span
+                        id="label-confidence-name"
+                        className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5"
+                      >
                         Easy Practice
                         <InfoTooltip text="Simpler words you already know well. These help build rhythm, maintain confidence, and reinforce muscle memory." />
                       </span>
-                      <span className="font-medium text-gray-900 dark:text-white">{tempSettings.confidencePercent}%</span>
+                      <span
+                        id="label-confidence-value"
+                        className="font-medium text-gray-900 dark:text-white"
+                      >
+                        {tempSettings.confidencePercent}%
+                      </span>
                     </div>
                     <input
+                      aria-labelledby="label-confidence-name label-confidence-value"
                       type="range"
                       min="0"
                       max="100"
@@ -355,13 +390,22 @@ export default function SettingsPage() {
                   {/* Warm-up Words */}
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                      <span
+                        id="label-boosters-name"
+                        className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5"
+                      >
                         Warm-up Words
                         <InfoTooltip text="Number of easy words at the very start of each session. Helps you get into a good typing flow before tackling harder words." />
                       </span>
-                      <span className="font-medium text-gray-900 dark:text-white">{tempSettings.startingBoosters}</span>
+                      <span
+                        id="label-boosters-value"
+                        className="font-medium text-gray-900 dark:text-white"
+                      >
+                        {tempSettings.startingBoosters}
+                      </span>
                     </div>
                     <input
+                      aria-labelledby="label-boosters-name label-boosters-value"
                       type="range"
                       min="0"
                       max="5"
@@ -413,10 +457,14 @@ export default function SettingsPage() {
 
                 {/* Font Size */}
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="slider-font-size"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Font Size: {tempSettings.fontSize}px
                   </Label>
                   <input
+                    id="slider-font-size"
                     type="range"
                     min="16"
                     max="48"
@@ -430,10 +478,14 @@ export default function SettingsPage() {
 
                 {/* Letter Spacing */}
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="slider-letter-spacing"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Letter Spacing: {tempSettings.letterSpacing}px
                   </Label>
                   <input
+                    id="slider-letter-spacing"
                     type="range"
                     min="0"
                     max="8"
@@ -491,10 +543,14 @@ export default function SettingsPage() {
                 {/* Voice Speed */}
                 {tempSettings.ttsEnabled && (
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <Label
+                      htmlFor="slider-voice-speed"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
                       Voice Speed: {tempSettings.voiceSpeed.toFixed(1)}x
                     </Label>
                     <input
+                      id="slider-voice-speed"
                       type="range"
                       min="0.5"
                       max="2.0"
@@ -645,20 +701,26 @@ function SettingsSection({
   onToggle: () => void;
   children: React.ReactNode;
 }) {
+  const contentId = `settings-section-${title.toLowerCase().replace(/\s+/g, "-")}`;
+
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-none overflow-hidden">
       <button
+        type="button"
         onClick={onToggle}
+        aria-expanded={isExpanded}
+        aria-controls={contentId}
         className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{icon}</span>
+          <span className="text-2xl" aria-hidden="true">{icon}</span>
           <div className="text-left">
             <h3 className="font-semibold text-black dark:text-white">{title}</h3>
             <p className="text-xs text-gray-500 dark:text-gray-500">{description}</p>
           </div>
         </div>
         <span
+          aria-hidden="true"
           className={`text-gray-400 transition-transform duration-200 ${
             isExpanded ? "rotate-180" : ""
           }`}
@@ -667,7 +729,10 @@ function SettingsSection({
         </span>
       </button>
       {isExpanded && (
-        <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-800 pt-4">
+        <div
+          id={contentId}
+          className="px-4 pb-4 border-t border-gray-100 dark:border-gray-800 pt-4"
+        >
           {children}
         </div>
       )}
@@ -675,17 +740,37 @@ function SettingsSection({
   );
 }
 
-// Info tooltip component with hover behavior
+// Info tooltip trigger — a real button so keyboard users can focus and
+// activate it, with the explanation itself as its accessible name so a
+// screen reader gets it on focus whether or not the visual popup is shown.
 function InfoTooltip({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+
+  // No onClick: a tap or click fires mouseenter and focus first, so a toggle
+  // would open then immediately close it. Focus alone covers touch and
+  // keyboard; hover covers the mouse.
   return (
-    <span className="relative inline-block group">
-      <span className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs cursor-help">
+    <span className="relative inline-block">
+      <button
+        type="button"
+        aria-label={text}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
         ?
-      </span>
-      <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-56 text-center z-50 shadow-lg">
-        {text}
-        <span className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-gray-900 dark:border-t-gray-100" />
-      </span>
+      </button>
+      {open && (
+        <span
+          aria-hidden="true"
+          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded-lg w-56 text-center z-50 shadow-lg"
+        >
+          {text}
+          <span className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-gray-900 dark:border-t-gray-100" />
+        </span>
+      )}
     </span>
   );
 }

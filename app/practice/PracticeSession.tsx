@@ -77,6 +77,7 @@ export function PracticeSession() {
       key={sessionKey}
       config={config}
       userProgress={userProgress}
+      onStart={startSession}
       onChangeFocus={backToSetup}
     />
   );
@@ -98,10 +99,12 @@ function LoadingState() {
 function ActiveSession({
   config,
   userProgress,
+  onStart,
   onChangeFocus,
 }: {
   config: SessionConfig;
   userProgress: UserProgressData;
+  onStart: (config: SessionConfig) => void;
   onChangeFocus: () => void;
 }) {
   const { settings } = useAccessibility();
@@ -272,6 +275,7 @@ function ActiveSession({
     results,
     isComplete,
     isLoading: isSessionLoading,
+    isEmpty: isSessionEmpty,
     sentenceMode,
     letterStates,
     showFeedback,
@@ -298,6 +302,19 @@ function ActiveSession({
   // Loading state
   if (isUserLoading || isSessionLoading) {
     return <LoadingState />;
+  }
+
+  // A session with no words used to be indistinguishable from a loading one,
+  // which left the user on a spinner that never resolved. Send them back to
+  // setup with an explanation instead.
+  if (isSessionEmpty) {
+    return (
+      <SessionSetup
+        struggleWordCount={effectiveStruggleWords.length}
+        onStart={onStart}
+        lastSessionWasEmpty
+      />
+    );
   }
 
   // Session complete

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Word } from "@/lib/types";
 import { LetterState } from "./types";
 import { RevealButton } from "./RevealButton";
@@ -50,6 +50,29 @@ export function SingleWordView({
     }
   }, [dictationMode, reveal.isRevealed]);
 
+  // The word is deliberately hidden in dictation mode, so colour alone tells
+  // a screen-reader user nothing — announce only word-level outcomes
+  // (correct/incorrect, moving on), never per-letter, or every keystroke
+  // would talk over itself. Written straight to the live-region node rather
+  // than through React state: it's synchronizing with the screen reader
+  // (an external system), not deriving anything the render needs.
+  const announcementRef = useRef<HTMLSpanElement>(null);
+  const prevFeedbackRef = useRef(showFeedback);
+  useEffect(() => {
+    const prevFeedback = prevFeedbackRef.current;
+    if (showFeedback !== prevFeedback) {
+      if (announcementRef.current) {
+        if (showFeedback === "correct") {
+          announcementRef.current.textContent = "Correct. Next word.";
+        } else if (showFeedback === "incorrect") {
+          announcementRef.current.textContent =
+            "Not quite. Press space to move on.";
+        }
+      }
+      prevFeedbackRef.current = showFeedback;
+    }
+  }, [showFeedback]);
+
   return (
     <div
       className={`
@@ -62,6 +85,13 @@ export function SingleWordView({
       onClick={handleContainerClick}
       data-tour="typing-area"
     >
+      <span
+        ref={announcementRef}
+        role="status"
+        aria-live="polite"
+        className="sr-only"
+      />
+
       {/* Unfocused overlay — suppressed while the word is revealed in
           dictation mode (the input is disabled then, and the user is reading) */}
       {!isFocused && !(dictationMode && reveal.isRevealed) && (
@@ -111,7 +141,14 @@ export function SingleWordView({
             }
 
             // Determine color
-            let colorClass = "text-gray-400 dark:text-gray-600"; // Default for "?" untyped
+            let colorClass = "text-gray-500 dark:text-gray-400"; // Default for "?" untyped
+
+            // Correct/incorrect is otherwise colour-only (WCAG 1.4.1) — pair it
+            // with an underline style so it reads without colour perception.
+            // Not shown in blind/dictation mode: those colour every typed
+            // letter neutral blue on purpose (nothing to reveal), so there's
+            // no correct/incorrect signal there to back up.
+            let underlineClass = "";
 
             if (typedChar !== undefined) {
               if (blindMode || (dictationMode && !reveal.isRevealed)) {
@@ -122,8 +159,11 @@ export function SingleWordView({
                 colorClass = "text-blue-500 dark:text-blue-400";
               } else if (typedChar.toLowerCase() === char.toLowerCase()) {
                 colorClass = "text-green-600 dark:text-green-400";
+                underlineClass = "underline decoration-2 underline-offset-4";
               } else {
                 colorClass = "text-red-500 dark:text-red-400";
+                underlineClass =
+                  "underline decoration-2 underline-offset-4 decoration-dotted";
               }
             } else if (!dictationMode || reveal.isRevealed) {
               // Untyped characters in normal mode or revealed dictation
@@ -140,7 +180,10 @@ export function SingleWordView({
               charIdx === userInput.length && isFocused && !showFeedback;
 
             return (
-              <span key={charIdx} className={`relative ${colorClass}`}>
+              <span
+                key={charIdx}
+                className={`relative ${colorClass} ${underlineClass}`}
+              >
                 {displayChar}
                 {showCorrectionDot && (
                   <span className="absolute -top-2 -right-1 w-2 h-2 bg-yellow-500 rounded-full" />
@@ -160,7 +203,7 @@ export function SingleWordView({
               {userInput.slice(currentWord.text.length).split("").map((char, idx) => (
                 <span
                   key={`overflow-${idx}`}
-                  className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30 rounded px-0.5 animate-pulse"
+                  className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30 rounded px-0.5 underline decoration-2 underline-offset-4 decoration-dotted animate-pulse motion-reduce:animate-none"
                 >
                   {char}
                 </span>
