@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { AccessibilitySettings as SettingsType, TTSVoice } from "@/lib/types";
+import { AccessibilitySettings as SettingsType } from "@/lib/types";
 import { usePostHogPageView, trackEvent } from "@/hooks/usePostHog";
 import { useResetTour } from "@/components/OnboardingTour";
 
@@ -76,7 +76,6 @@ export default function SettingsPage() {
       highContrast: false,
       ttsEnabled: true,
       voiceSpeed: 1.0,
-      voice: "alice",
       dictationMode: false,
       showHints: false,
       showTimerPressure: false,
@@ -562,28 +561,6 @@ export default function SettingsPage() {
                       }
                       className="w-full mt-2 accent-blue-500"
                     />
-                  </div>
-                )}
-
-                {/* Voice */}
-                {tempSettings.ttsEnabled && (
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Voice
-                    </Label>
-                    <select
-                      value={tempSettings.voice}
-                      onChange={(e) =>
-                        updateTempSettings({ voice: e.target.value as TTSVoice })
-                      }
-                      className="w-full mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    >
-                      <option value="alice">Alice (British)</option>
-                      <option value="roger">Roger (American)</option>
-                    </select>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                      The two accents say some words differently, including bath, path and past.
-                    </p>
                   </div>
                 )}
 
