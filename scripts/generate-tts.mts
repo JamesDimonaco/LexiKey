@@ -11,7 +11,7 @@
  * Resumable: existing files are skipped, so a run killed halfway just picks up.
  */
 
-import { mkdir, writeFile, access } from "node:fs/promises";
+import { mkdir, writeFile, access, rename } from "node:fs/promises";
 import { join } from "node:path";
 import words from "../app/practice/words.json" with { type: "json" };
 
@@ -45,9 +45,19 @@ const exists = (p: string) => access(p).then(() => true, () => false);
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Exponential, capped at a minute, but a server-sent Retry-After always wins. */
-const backoff = (attempt: number, retryAfter?: string | null) =>
-  sleep(retryAfter ? Number(retryAfter) * 1000 : Math.min(2 ** attempt * 500, 60_000));
+/**
+ * Exponential, capped at a minute. A server-sent Retry-After wins when it is
+ * the delta-seconds form; the HTTP-date form parses to NaN, and setTimeout
+ * treats NaN as zero, which would burn every retry in a few milliseconds.
+ */
+const backoff = (attempt: number, retryAfter?: string | null) => {
+  const seconds = Number(retryAfter);
+  return sleep(
+    Number.isFinite(seconds) && seconds > 0
+      ? seconds * 1000
+      : Math.min(2 ** attempt * 500, 60_000),
+  );
+};
 
 async function synth(voiceId: string, text: string, attempt = 1): Promise<Buffer> {
   let res: Response;
@@ -95,7 +105,12 @@ for (const [name, voiceId] of Object.entries(VOICES)) {
         continue;
       }
       try {
-        await writeFile(file, await synth(voiceId, word));
+        // Write beside the target and rename, so an interrupted run cannot
+        // leave a truncated mp3 that the skip-if-exists check above would
+        // then treat as done forever.
+        const partial = `${file}.part`;
+        await writeFile(partial, await synth(voiceId, word));
+        await rename(partial, file);
       } catch (err) {
         // One unlucky word must not cost the other 2,000. The run is resumable,
         // so a rerun retries exactly the failures.

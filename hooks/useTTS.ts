@@ -4,10 +4,12 @@ import { useEffect, useRef, useCallback } from 'react';
 import { TTSVoice } from '@/lib/types';
 
 /**
- * Words with no generated file. Module scope because a missing file is a fact
- * about the build, not about one component, and re-checking it would cost a
- * failed request on every play. Only ever written from a playback callback,
- * never during render.
+ * "<voice>/<word>" for files that are genuinely absent. Module scope because a
+ * missing file is a fact about the build, not about one component, and
+ * re-checking it would cost a failed request on every play. Keyed by voice
+ * because generation continues past per-word failures, so the two voices can
+ * hold different words. Only ever written from a playback callback, never
+ * during render.
  */
 const missingAudio = new Set<string>();
 
@@ -60,7 +62,6 @@ export function useTTS(
       synthRef.current.onvoiceschanged = selectVoice;
     }
 
-    const audio = audioRef.current;
     return () => {
       if (synthRef.current) {
         synthRef.current.onvoiceschanged = null;
@@ -68,7 +69,9 @@ export function useTTS(
         // dictation session keeps playing over whatever screen comes next.
         synthRef.current.cancel();
       }
-      audio?.pause();
+      // Read through the ref, not a value captured at mount — this effect runs
+      // once, when audioRef.current is still null.
+      audioRef.current?.pause();
       speakingRef.current = false;
     };
   }, []);
@@ -118,10 +121,12 @@ export function useTTS(
 
     stop();
 
-    // Only single words are pre-rendered; sentences and anything carrying
-    // punctuation have no file to look for.
-    const word = text.toLowerCase();
-    if (!/^[a-z]+$/.test(word) || missingAudio.has(word)) {
+    // AdaptiveEngine appends "." "," "!" "?" to a share of words and
+    // capitalises others, so the text on screen is "Cat." where the file is
+    // "cat.mp3". Punctuation is inaudible in a single word either way.
+    const word = text.toLowerCase().replace(/[.,!?]+$/, "");
+    const key = `${voice}/${word}`;
+    if (!/^[a-z]+$/.test(word) || missingAudio.has(key)) {
       speakViaSynth(text);
       return;
     }
@@ -138,12 +143,24 @@ export function useTTS(
       speakingRef.current = false;
     };
 
+    // play() can resolve and the media fail afterwards. Without this the
+    // dedupe guard above sees a word still "speaking" and makes Repeat — the
+    // only recovery a learner has in dictation — a silent no-op.
+    audio.onerror = () => {
+      speakingRef.current = false;
+    };
+
     audio.play().catch((err: DOMException) => {
       speakingRef.current = false;
-      // An autoplay block says nothing about whether the file exists. Caching
-      // it as missing would lose the word for the rest of the session.
-      if (err.name !== "NotAllowedError") {
-        missingAudio.add(word);
+      // Only cache a file the browser actually looked for and did not find.
+      // An autoplay block, or a dropped connection on school wifi, says
+      // nothing about whether the file exists — caching either would serve the
+      // mangled synth voice for the rest of the session.
+      const absent =
+        audio.error?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED &&
+        navigator.onLine !== false;
+      if (err.name !== "NotAllowedError" && absent) {
+        missingAudio.add(key);
       }
       speakViaSynth(text);
     });
