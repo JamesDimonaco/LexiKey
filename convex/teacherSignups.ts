@@ -23,9 +23,20 @@ import { mutation } from "./_generated/server";
 /** RFC 5321 caps a forward path at 254 characters */
 const MAX_EMAIL_LENGTH = 254;
 
-/** Ceiling on new rows per window. Launch day will not come close. */
+/**
+ * Ceiling on new rows per window. Launch day will not come close.
+ *
+ * The quota is shared rather than per-caller, because a Convex mutation cannot
+ * see who is calling. That makes it possible to fill it and hold real signups
+ * out — so the window is deliberately short: a blocked teacher waits a minute,
+ * not an hour, and the message tells them so. Bounding the table is worth a
+ * self-healing delay; it would not be worth a lockout.
+ */
 const MAX_SIGNUPS_PER_WINDOW = 20;
 const WINDOW_MS = 60_000;
+
+/** Thrown when the window is full. The form matches on it to say the right thing. */
+export const RATE_LIMITED = "Too many signups in the last minute";
 
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -70,7 +81,7 @@ export const join = mutation({
       .take(MAX_SIGNUPS_PER_WINDOW);
 
     if (recent.length >= MAX_SIGNUPS_PER_WINDOW) {
-      throw new Error("Too many signups just now — try again in a minute");
+      throw new Error(RATE_LIMITED);
     }
 
     await ctx.db.insert("teacherSignups", {

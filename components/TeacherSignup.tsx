@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { RATE_LIMITED } from "@/convex/teacherSignups";
 import { trackEvent } from "@/hooks/usePostHog";
 
 type Props = {
@@ -20,9 +21,9 @@ type Props = {
 export function TeacherSignup({ source }: Props) {
   const join = useMutation(api.teacherSignups.join);
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">(
-    "idle",
-  );
+  const [status, setStatus] = useState<
+    "idle" | "sending" | "done" | "error" | "busy"
+  >("idle");
   // Bots fill every field they find. A human never sees this one.
   const [trap, setTrap] = useState("");
   const statusRef = useRef<HTMLParagraphElement>(null);
@@ -41,8 +42,11 @@ export function TeacherSignup({ source }: Props) {
       // The form unmounts on success, so focus would otherwise fall to <body>
       // and a screen reader would announce nothing at all.
       requestAnimationFrame(() => statusRef.current?.focus());
-    } catch {
-      setStatus("error");
+    } catch (err) {
+      // A full window is a wait, not a bad address. Telling someone to check
+      // their email when it was fine is how you lose them.
+      const message = err instanceof Error ? err.message : "";
+      setStatus(message.includes(RATE_LIMITED) ? "busy" : "error");
     }
   }
 
@@ -78,7 +82,7 @@ export function TeacherSignup({ source }: Props) {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            if (status === "error") setStatus("idle");
+            if (status !== "idle") setStatus("idle");
           }}
           placeholder="you@school.sch.uk"
           autoComplete="email"
@@ -107,9 +111,16 @@ export function TeacherSignup({ source }: Props) {
       <p
         role="status"
         aria-live="polite"
-        className="text-sm text-red-700 dark:text-red-400 empty:hidden"
+        className={
+          status === "busy"
+            ? "text-sm empty:hidden text-gray-700 dark:text-gray-300"
+            : "text-sm empty:hidden text-red-700 dark:text-red-400"
+        }
       >
-        {status === "error" && "That didn't go through. Check the address and try again."}
+        {status === "error" &&
+          "That didn't go through. Check the address and try again."}
+        {status === "busy" &&
+          "Busy right now — nothing was saved. Try again in a minute."}
       </p>
     </form>
   );
