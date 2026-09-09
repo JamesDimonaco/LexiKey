@@ -4,6 +4,11 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "LexiKey Terms of Service - Rules and guidelines for using our application",
+  // The root layout declares canonical "/" and child routes inherit it, which
+  // would tell Google this page is a duplicate of the homepage.
+  alternates: {
+    canonical: "/terms",
+  },
 };
 
 export default function TermsOfService() {

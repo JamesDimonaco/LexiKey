@@ -4,6 +4,11 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "LexiKey Privacy Policy - How we collect, use, and protect your data",
+  // The root layout declares canonical "/" and child routes inherit it, which
+  // would tell Google this page is a duplicate of the homepage.
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 export default function PrivacyPolicy() {

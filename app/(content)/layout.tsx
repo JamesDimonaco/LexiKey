@@ -2,7 +2,8 @@ import Link from "next/link";
 
 /**
  * Layout for static content pages (no auth needed)
- * Pages: /for-parents, /for-teachers, /how-it-works, /privacy, /terms
+ * Pages: /welcome, /spelling-tutor, /for-parents, /for-teachers, /how-it-works,
+ * /privacy, /terms
  */
 export default function ContentLayout({
   children,

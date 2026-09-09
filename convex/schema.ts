@@ -211,4 +211,18 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_userId_word", ["userId", "word"])
     .index("by_word", ["word"]),
+
+  // ====================
+  // TEACHER INTEREST LIST
+  // ====================
+
+  /**
+   * Addresses left on /for-teachers by people who want to hear about the
+   * classroom version. The only table in this schema written by a caller who
+   * is not signed in — convex/teacherSignups.ts covers what that costs.
+   */
+  teacherSignups: defineTable({
+    email: v.string(),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]),
 });

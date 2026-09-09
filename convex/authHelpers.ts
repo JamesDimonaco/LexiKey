@@ -10,7 +10,11 @@ import { Doc, Id } from "./_generated/dataModel";
  * visitor can read or modify any account's data by passing someone else's id.
  *
  * Anonymous practice never reaches Convex (it lives in localStorage), so every
- * function here can safely require a signed-in caller.
+ * function that touches a user's data can safely require a signed-in caller.
+ *
+ * One function deliberately does not: teacherSignups.join takes an address
+ * from a visitor with no account. It validates its own input instead — see the
+ * note there.
  */
 
 /** Assert the caller is signed in as `clerkId` */
