@@ -33,9 +33,11 @@ export function TeacherSignup({ source }: Props) {
 
     setStatus("sending");
     try {
-      await join({ email, website: trap });
+      const accepted = await join({ email, website: trap });
+      // The confirmation shows either way, so a bot learns nothing from the
+      // UI — but a tripped honeypot must not be counted as a signup.
       setStatus("done");
-      trackEvent("teacher_signup_completed", { source });
+      if (accepted) trackEvent("teacher_signup_completed", { source });
       // The form unmounts on success, so focus would otherwise fall to <body>
       // and a screen reader would announce nothing at all.
       requestAnimationFrame(() => statusRef.current?.focus());

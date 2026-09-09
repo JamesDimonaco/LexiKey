@@ -114,7 +114,8 @@ export default function SpellingTutor() {
               <strong className="text-black dark:text-white">
                 Teaches by rule, not by list.
               </strong>{" "}
-              Words are grouped into 108 phonics patterns following the same{" "}
+              1,114 words are grouped into 108 phonics patterns following the
+              same{" "}
               <Link
                 href="/how-it-works"
                 className="text-blue-600 dark:text-blue-400 hover:underline"
