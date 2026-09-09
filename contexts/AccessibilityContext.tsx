@@ -24,6 +24,7 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   // TTS
   ttsEnabled: true,
   voiceSpeed: 1.0,
+  voice: "alice",
   dictationMode: false,
   // UI
   showHints: false,

@@ -1,0 +1,14 @@
+{
+  "model": "eleven_multilingual_v2",
+  "voiceSettings": {
+    "stability": 0.75,
+    "similarity_boost": 0.75,
+    "style": 0
+  },
+  "voices": {
+    "alice": "Xb7hH8MSUJpSbSDYk0k2",
+    "roger": "CwhRBWXzGAHq8TQ4Fs17"
+  },
+  "words": 1114,
+  "generatedAt": "2026-09-09T08:16:47.060Z"
+}
