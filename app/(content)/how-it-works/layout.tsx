@@ -14,6 +14,11 @@ export const metadata: Metadata = {
     "structured literacy",
     "spelling intervention method",
   ],
+  // The root layout declares canonical "/" and child routes inherit it, which
+  // would tell Google this page is a duplicate of the homepage.
+  alternates: {
+    canonical: "/how-it-works",
+  },
   openGraph: {
     title: "How LexiKey Works | Multi-Sensory Spelling Practice",
     description: "Discover the science behind typing-based spelling practice. Orton-Gillingham method meets modern technology.",

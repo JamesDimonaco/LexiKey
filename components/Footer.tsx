@@ -27,10 +27,26 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
+                  href="/welcome"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  About LexiKey
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/for-parents"
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   For Parents
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/spelling-tutor"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  Spelling Tutors
                 </Link>
               </li>
               <li>

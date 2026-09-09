@@ -14,6 +14,11 @@ export const metadata: Metadata = {
     "phonics intervention",
     "multisensory spelling instruction",
   ],
+  // The root layout declares canonical "/" and child routes inherit it, which
+  // would tell Google this page is a duplicate of the homepage.
+  alternates: {
+    canonical: "/for-teachers",
+  },
   openGraph: {
     title: "Spelling Intervention Tool for Classrooms | LexiKey",
     description: "Orton-Gillingham based spelling practice through typing. Free tool for teachers supporting struggling readers and dyslexic students.",

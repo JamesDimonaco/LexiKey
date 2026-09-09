@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TeacherSignup } from "@/components/TeacherSignup";
 
 export default function ForTeachers() {
   return (
@@ -30,7 +31,6 @@ export default function ForTeachers() {
               Accessibility Built In
             </h2>
             <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-              <li>WCAG AAA compliant design</li>
               <li>Adjustable font sizes and letter spacing</li>
               <li>High contrast and dark mode options</li>
               <li>Text-to-speech for auditory reinforcement</li>
@@ -56,9 +56,10 @@ export default function ForTeachers() {
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
               Students can start practicing immediately. Create a free account to
-              save progress. School licenses coming soon for classroom management
-              and IEP reporting features.
+              save progress. School licenses are not built yet — classroom
+              management and IEP reporting are what I am working towards.
             </p>
+            <TeacherSignup source="for-teachers" />
           </section>
 
           <div className="flex flex-col sm:flex-row gap-4">
