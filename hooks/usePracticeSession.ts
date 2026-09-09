@@ -69,7 +69,7 @@ export function usePracticeSession({
   // Use personalized threshold or default
   const effectiveThreshold = thresholdParams ?? DEFAULT_THRESHOLD_PARAMS;
   const { settings } = useAccessibility();
-  const { speakWord } = useTTS(settings.voiceSpeed, settings.ttsEnabled);
+  const { speakWord } = useTTS(settings.voiceSpeed, settings.ttsEnabled, settings.voice);
 
   // Display flow is fixed per session (chosen at setup)
   const sentenceMode = config.flow === "sentence";

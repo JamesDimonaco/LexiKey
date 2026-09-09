@@ -1,4 +1,8 @@
 // Accessibility Settings Types
+/** Pre-rendered voices in public/audio. Accents differ, and so does how each
+ * one says bath, path and past — the pool contains all three. */
+export type TTSVoice = "alice" | "roger";
+
 export interface AccessibilitySettings {
   // Practice settings
   sessionWordCount: number; // 10-50
@@ -25,6 +29,7 @@ export interface AccessibilitySettings {
   // TTS settings
   ttsEnabled: boolean;
   voiceSpeed: number; // 0.5 to 2.0
+  voice: TTSVoice;
   dictationMode: boolean; // Hide word, speak it aloud for user to type
 
   // UI settings
