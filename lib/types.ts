@@ -124,7 +124,7 @@ export interface WordResult {
   hesitationDetected: boolean; // time exceeded per-character threshold
 }
 
-// Result of calling api.streaks.recordSessionCompleted (see convex/streaks.ts)
+// Result of calling api.practiceSessions.finishSession (see convex/streaks.ts)
 export interface StreakResult {
   status: "already_counted" | "started" | "incremented" | "freeze_used" | "reset";
   currentStreak: number;

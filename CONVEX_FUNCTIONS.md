@@ -47,13 +47,13 @@ Not Convex functions themselves — caller checks used by every function below.
   inaudible-word reports, placement-test completion).
 - **`updateUserStats({ userId, stats })`** — merges the given fields into
   `stats`. Streak fields (`currentStreak`, `lastActiveDate`,
-  `freezesAvailable`, `freezeWeekStart`) are owned by
-  `streaks.recordSessionCompleted` — this mutation only patches what it's
+  `freezesAvailable`, `freezeWeekStart`) and running totals are owned by
+  `practiceSessions.finishSession` — this mutation only patches what it's
   given.
 - **`updateThresholdParams({ userId, thresholdParams, inputMode? })`** —
   writes `thresholdParams` (reading, default) or `listenThresholdParams`
   (`inputMode: "listen"`). Called after the placement test (initial
-  calibration) and after practice sessions (gradual adjustment).
+  calibration); after practice sessions `finishSession` adjusts it.
 - **`migrateAnonymousData({ clerkId, anonymousData })`** — merges anonymous
   progress into an already-existing account, for the case where sign-up's
   webhook created the account before the client could migrate on `createUser`.
@@ -71,12 +71,12 @@ the current hesitation-threshold rule (it's adaptive, not a flat cutoff).
 - **`getUserStruggleWords({ userId })`** — all struggle-bucket rows for a
   user.
 
-### Mutations
+### Helpers
 
-- **`batchProcessWordResults({ userId, results })`** — processes a whole
-  session's word results in one call: adds/updates struggle rows, deletes a
-  word once it graduates (3 consecutive correct), and records which input
-  mode (`see`/`listen`) each miss happened in.
+- **`applyWordResultsToBucket(ctx, userId, results)`** — called inside
+  `finishSession`: adds/updates struggle rows, deletes a word once it
+  graduates (3 consecutive correct), and records which input mode
+  (`see`/`listen`) each miss happened in.
 
 ## `convex/inaudibleWords.ts`
 
@@ -96,15 +96,25 @@ exists.
   was a listening miss, the row is deleted; if it was also missed while
   reading, only the listening-miss count is cleared.
 
+## `convex/practiceSessions.ts`
+
+### Mutations
+
+- **`finishSession({ userId, mode, inputMode, displayMode, phonicsGroupFocus?,
+  durationSeconds, newLevel, thresholdParams, timezoneOffsetMinutes,
+  wordResults })`** — everything a finished session changes, atomically.
+  Returns the streak result (see `streaks.ts`).
+
 ## `convex/streaks.ts`
 
 Timezone-aware daily streak with one weekly freeze. See the file's header
 comment for the full rule set.
 
-### Mutations
+### Helpers
 
-- **`recordSessionCompleted({ userId, timezoneOffsetMinutes })`** — call once
-  per completed session; same-day calls are no-ops. Returns
+- **`applySessionToStreak(stats, timezoneOffsetMinutes, nowMs)`** — pure;
+  called inside `finishSession`. Same-day sessions change nothing. Returns the
+  streak fields to merge plus
   `{ status, currentStreak, longestStreak, freezesAvailable, milestone }`
   where `status` is one of `already_counted`, `started`, `incremented`,
   `freeze_used`, `reset`.
@@ -125,15 +135,12 @@ legacy `lastPracticeDate`. Read the schema directly for the exact shape
 rather than trusting a copy of it here — it's the source of truth and this
 doc will drift again otherwise.
 
-`practiceSessions` is defined but **unused** — no function reads or writes
-it. Session summaries have never actually been persisted server-side;
-per-session data lives only in the client until it's folded into `stats`,
-`userStruggleWords` and the streak fields above. The table is kept only
-because dropping it is a decision (is server-side session history ever
-wanted?), not an oversight.
+`practiceSessions` holds one summary row per signed-in session (written by
+`finishSession` since 2026-11-01; nothing before that date was saved).
+Anonymous sessions never reach Convex.
 
 ## Write discipline
 
-Never write individual keystrokes. Batch a session's results into a single
-mutation call (`batchProcessWordResults`, `updateUserStats`,
-`recordSessionCompleted`) rather than one call per word.
+Never write individual keystrokes. A finished session is one
+`practiceSessions.finishSession` call: history row, review bucket, level,
+threshold, totals and streak in a single transaction.

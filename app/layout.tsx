@@ -145,7 +145,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 dark:bg-black text-gray-900 dark:text-white flex flex-col min-h-screen`}
       >
         <PostHogProvider>
-          <ClerkProvider dynamic>
+          <ClerkProvider dynamic afterSignOutUrl="/">
             <ConvexClientProvider>
               <ThemeProvider
                 attribute="class"

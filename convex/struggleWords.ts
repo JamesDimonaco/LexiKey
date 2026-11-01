@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { query, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { requireUser } from "./authHelpers";
 
 /**
@@ -53,74 +54,69 @@ export const getUserStruggleWords = query({
 });
 
 // ====================
-// MUTATIONS
+// SESSION RESULTS
 // ====================
 
 /**
- * Batch process multiple word results at end of session
+ * Apply a finished session's word results to the review bucket.
+ * Called from practiceSessions.finishSession, inside its transaction.
  */
-export const batchProcessWordResults = mutation({
-  args: {
-    userId: v.id("users"),
-    results: v.array(v.object({
-      word: v.string(),
-      phonicsGroup: v.string(),
-      wasStruggle: v.boolean(),
-      inputMode: v.optional(v.union(v.literal("see"), v.literal("listen"))),
-    })),
-  },
-  handler: async (ctx, { userId, results }) => {
-    await requireUser(ctx, userId);
+export async function applyWordResultsToBucket(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  results: Array<{
+    word: string;
+    phonicsGroup: string;
+    wasStruggle: boolean;
+    inputMode: "see" | "listen";
+  }>,
+) {
+  const now = Date.now();
 
-    const now = Date.now();
+  for (const { word, phonicsGroup, wasStruggle, inputMode } of results) {
+    // Check if word already in bucket
+    const existing = await ctx.db
+      .query("userStruggleWords")
+      .withIndex("by_userId_word", (q) =>
+        q.eq("userId", userId).eq("word", word)
+      )
+      .first();
 
-    for (const result of results) {
-      const { word, phonicsGroup, wasStruggle, inputMode = "see" } = result;
-
-      // Check if word already in bucket
-      const existing = await ctx.db
-        .query("userStruggleWords")
-        .withIndex("by_userId_word", (q) =>
-          q.eq("userId", userId).eq("word", word)
-        )
-        .first();
-
-      if (wasStruggle) {
-        if (existing) {
-          await ctx.db.patch(existing._id, {
-            consecutiveCorrect: 0,
-            totalAttempts: existing.totalAttempts + 1,
-            ...missCounter(existing, inputMode),
-            lastSeenAt: now,
-          });
-        } else {
-          await ctx.db.insert("userStruggleWords", {
-            userId,
-            word,
-            phonicsGroup,
-            consecutiveCorrect: 0,
-            totalAttempts: 1,
-            ...missCounter(null, inputMode),
-            lastSeenAt: now,
-            createdAt: now,
-          });
-        }
+    if (wasStruggle) {
+      if (existing) {
+        await ctx.db.patch(existing._id, {
+          consecutiveCorrect: 0,
+          totalAttempts: existing.totalAttempts + 1,
+          ...missCounter(existing, inputMode),
+          lastSeenAt: now,
+        });
       } else {
-        if (existing) {
-          const newConsecutive = existing.consecutiveCorrect + 1;
+        await ctx.db.insert("userStruggleWords", {
+          userId,
+          word,
+          phonicsGroup,
+          consecutiveCorrect: 0,
+          totalAttempts: 1,
+          ...missCounter(null, inputMode),
+          lastSeenAt: now,
+          createdAt: now,
+        });
+      }
+    } else {
+      if (existing) {
+        const newConsecutive = existing.consecutiveCorrect + 1;
 
-          if (newConsecutive >= 3) {
-            await ctx.db.delete(existing._id);
-          } else {
-            await ctx.db.patch(existing._id, {
-              consecutiveCorrect: newConsecutive,
-              totalAttempts: existing.totalAttempts + 1,
-              lastSeenAt: now,
-            });
-          }
+        if (newConsecutive >= 3) {
+          await ctx.db.delete(existing._id);
+        } else {
+          await ctx.db.patch(existing._id, {
+            consecutiveCorrect: newConsecutive,
+            totalAttempts: existing.totalAttempts + 1,
+            lastSeenAt: now,
+          });
         }
       }
     }
-  },
-});
+  }
+}
 

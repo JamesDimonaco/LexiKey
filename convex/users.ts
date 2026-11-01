@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireClerkId, requireUser } from "./authHelpers";
+import { thresholdParamsValidator } from "./schema";
 
 /**
  * User Management Functions
@@ -192,7 +193,7 @@ export const updateUserStats = mutation({
     // Only the fields something actually writes. The streak fields and the
     // running totals used to be here and were never sent by any caller —
     // accepting them let a signed-in user rewrite their own streak, which
-    // streaks.recordSessionCompleted owns.
+    // practiceSessions.finishSession owns.
     stats: v.object({
       currentLevel: v.optional(v.number()),
       listenLevel: v.optional(v.number()),
@@ -204,7 +205,7 @@ export const updateUserStats = mutation({
   handler: async (ctx, { userId, stats }) => {
     const user = await requireUser(ctx, userId);
 
-    // NOTE: streaks are owned by streaks.recordSessionCompleted (timezone-aware,
+    // NOTE: streaks are owned by practiceSessions.finishSession (timezone-aware,
     // freeze-forgiving) — this mutation only merges the fields it's given.
     await ctx.db.patch(userId, {
       stats: { ...user.stats, ...stats },
@@ -216,26 +217,18 @@ export const updateUserStats = mutation({
 });
 
 /**
- * Update user's adaptive hesitation threshold parameters.
- * Called after placement test (initial calibration) and after practice sessions (gradual adjustment).
+ * Set the user's adaptive hesitation threshold after the placement test
+ * (initial calibration). After practice sessions, finishSession adjusts it.
  */
 export const updateThresholdParams = mutation({
   args: {
     userId: v.id("users"),
-    thresholdParams: v.object({
-      baseTime: v.number(),
-      secondsPerChar: v.number(),
-      secondsPerCharSquared: v.optional(v.number()),
-      safetyMultiplier: v.number(),
-      wordCount: v.number(),
-      lastUpdated: v.string(),
-    }),
-    /** Which mode the session ran in — each has its own calibration.
-     *  Optional for the same cross-deploy reason as struggleWords. */
-    inputMode: v.optional(v.union(v.literal("see"), v.literal("listen"))),
+    thresholdParams: thresholdParamsValidator,
+    /** Which mode was calibrated — each has its own threshold. */
+    inputMode: v.union(v.literal("see"), v.literal("listen")),
   },
   returns: v.id("users"),
-  handler: async (ctx, { userId, thresholdParams, inputMode = "see" }) => {
+  handler: async (ctx, { userId, thresholdParams, inputMode }) => {
     const user = await requireUser(ctx, userId);
 
     await ctx.db.patch(userId, {
