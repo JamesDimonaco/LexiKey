@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./authHelpers";
 
-// Well above any real session; stops one call writing an unbounded document.
+// Well above the 50-word settings maximum; rejects obviously bogus calls.
 const MAX_WORDS_PER_SESSION = 200;
 
 /**

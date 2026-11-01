@@ -184,6 +184,8 @@ function ActiveSession({
         updateAnonymousThreshold(adjustedThreshold, inputMode);
       } else if (currentUser) {
         await Promise.all([
+          // Best-effort like the streak: a failed history row must not stop
+          // the review bucket, level and streak from saving.
           recordSession({
             userId: currentUser._id,
             mode: config.focus.type === "review" ? "review" : "practice",
@@ -203,7 +205,9 @@ function ActiveSession({
               hesitationDetected: r.hesitationDetected,
               wasStruggle: wordResultsForBucket[i].wasStruggle,
             })),
-          }),
+          }).catch((error) =>
+            console.error("[Session] Failed to save session summary:", error),
+          ),
           batchProcessWordResults({
             userId: currentUser._id,
             results: wordResultsForBucket,

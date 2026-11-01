@@ -6,12 +6,12 @@ const FAQS: Faq[] = [
   {
     question: "Is LexiKey really free for schools?",
     answer:
-      "Yes. There is no license, no trial that expires and nothing to buy. The free version is the whole tool. Classroom management and progress reports for teachers are being built and may be paid for later; the practice itself is free now.",
+      "Yes. There is no license, no trial that expires and nothing to buy. The free version is the whole tool. A classroom version for teachers may come later, and may be paid for; the practice itself is free now.",
   },
   {
     question: "Is there a teacher dashboard?",
     answer:
-      "Not yet. Progress is stored in each student's own free account and shown on their results screen, including the words they hesitated on and accuracy by phonics pattern. A teacher sees it by looking at the student's screen.",
+      "Not yet. Progress is stored in each student's own free account and shown on their results screen, including their accuracy and the words they hesitated on. A teacher sees it by looking at the student's screen.",
   },
   {
     question: "What age range is it for?",
@@ -68,9 +68,8 @@ export default function FreeDyslexiaToolForSchools() {
             software install.
           </p>
           <p className="text-gray-700 dark:text-gray-300">
-            School features, meaning class lists and progress reports a
-            teacher can see across students, are what is being built next.
-            They do not exist today, and this page will not pretend they do.
+            There are no class lists or teacher dashboards today, and this
+            page will not pretend there are.
           </p>
         </section>
 
@@ -186,7 +185,7 @@ export default function FreeDyslexiaToolForSchools() {
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             Try it on one student first. If it earns a place, leave an address
-            and I will tell you when class management and reports are ready.
+            and I will tell you if a classroom version is ready to try.
           </p>
           <TeacherSignup source="free-dyslexia-tool-for-schools" />
         </section>

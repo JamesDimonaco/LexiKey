@@ -11,7 +11,13 @@ const CLERK_PROXY_PATH = "/__clerk";
 // in the Clerk dashboard and NEXT_PUBLIC_CLERK_PROXY_URL is set.
 function proxyClerkFrontendApi(req: NextRequest) {
   const headers = new Headers(req.headers);
-  headers.set("Clerk-Proxy-Url", `${req.nextUrl.origin}${CLERK_PROXY_PATH}`);
+  // Falls back to this origin so Clerk's dashboard check passes before the
+  // env var exists; afterwards every host reports the one registered URL.
+  headers.set(
+    "Clerk-Proxy-Url",
+    process.env.NEXT_PUBLIC_CLERK_PROXY_URL ||
+      `${req.nextUrl.origin}${CLERK_PROXY_PATH}`,
+  );
   headers.set("Clerk-Secret-Key", process.env.CLERK_SECRET_KEY ?? "");
 
   const target = new URL(req.url);
