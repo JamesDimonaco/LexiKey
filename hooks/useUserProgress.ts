@@ -36,9 +36,6 @@ export function useUserProgress() {
   );
   const createUser = useMutation(api.users.createUser);
   const migrateAnonymousData = useMutation(api.users.migrateAnonymousData);
-  const updateUserStats = useMutation(api.users.updateUserStats);
-  const updateThresholdParams = useMutation(api.users.updateThresholdParams);
-  const batchProcessWordResults = useMutation(api.struggleWords.batchProcessWordResults);
   const reportInaudibleWord = useMutation(api.inaudibleWords.reportInaudible);
 
   // Fetch struggle words from DB (only for authenticated users)
@@ -249,11 +246,8 @@ export function useUserProgress() {
     anonymousUser,
     // For saving results
     updateAnonymousStats,
-    updateUserStats,
-    batchProcessWordResults,
     // For threshold adjustment
     updateAnonymousThreshold,
-    updateThresholdParams,
     // For inaudible reports
     reportAnonymousInaudible,
     reportInaudibleWord,

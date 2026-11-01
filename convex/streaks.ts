@@ -1,6 +1,6 @@
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import { requireUser } from "./authHelpers";
+import { v, type Infer } from "convex/values";
+import { query } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
 
 /**
  * Forgiving Daily Streak System
@@ -49,7 +49,7 @@ function clampTzOffset(minutes: number): number {
   return Math.max(-840, Math.min(840, Math.round(minutes)));
 }
 
-const streakResultValidator = v.object({
+export const streakResultValidator = v.object({
   // What happened to the streak, so the client can celebrate / track it:
   // - already_counted: user already practiced today, nothing changed
   // - started: first ever active day (streak = 1)
@@ -70,98 +70,85 @@ const streakResultValidator = v.object({
   milestone: v.union(v.number(), v.null()),
 });
 
+export type StreakResult = Infer<typeof streakResultValidator>;
+
 /**
- * Record that the user completed a practice session today.
- * Call once after every completed session; same-day calls are no-ops.
+ * Count a completed practice session towards the streak.
+ * Same-day calls change nothing. Returns the streak fields to merge into the
+ * user's stats, and what happened, for the client to celebrate or track.
  */
-export const recordSessionCompleted = mutation({
-  args: {
-    userId: v.id("users"),
-    // From the client: new Date().getTimezoneOffset()
-    timezoneOffsetMinutes: v.number(),
-  },
-  returns: streakResultValidator,
-  handler: async (ctx, { userId, timezoneOffsetMinutes }) => {
-    const user = await requireUser(ctx, userId);
+export function applySessionToStreak(
+  stats: Doc<"users">["stats"],
+  timezoneOffsetMinutes: number,
+  nowMs: number,
+): { stats: Partial<Doc<"users">["stats"]>; result: StreakResult } {
+  const today = localDateString(nowMs, clampTzOffset(timezoneOffsetMinutes));
+  const lastActive = stats.lastActiveDate;
 
-    const stats = user.stats;
-    const today = localDateString(
-      Date.now(),
-      clampTzOffset(timezoneOffsetMinutes),
-    );
-    const lastActive = stats.lastActiveDate;
-
-    // Same day (or clock moved backwards after travel): already counted.
-    if (lastActive && dayNumber(today) <= dayNumber(lastActive)) {
-      return {
-        status: "already_counted" as const,
+  // Same day (or clock moved backwards after travel): already counted.
+  if (lastActive && dayNumber(today) <= dayNumber(lastActive)) {
+    return {
+      stats: {},
+      result: {
+        status: "already_counted",
         currentStreak: stats.currentStreak,
         longestStreak: stats.longestStreak,
         freezesAvailable: stats.freezesAvailable ?? MAX_FREEZES,
         milestone: null,
-      };
-    }
-
-    // Weekly freeze refill — before evaluating the gap, so a fresh week's
-    // freeze can forgive the first missed day of that week.
-    let freezesAvailable = stats.freezesAvailable ?? MAX_FREEZES;
-    let freezeWeekStart = stats.freezeWeekStart;
-    const thisWeek = mondayOf(today);
-    if (!freezeWeekStart || dayNumber(thisWeek) > dayNumber(freezeWeekStart)) {
-      freezesAvailable = MAX_FREEZES;
-      freezeWeekStart = thisWeek;
-    }
-
-    let currentStreak: number;
-    let status: "started" | "incremented" | "freeze_used" | "reset";
-
-    if (!lastActive) {
-      currentStreak = 1;
-      status = "started";
-    } else {
-      const gap = dayNumber(today) - dayNumber(lastActive);
-      if (gap === 1) {
-        currentStreak = stats.currentStreak + 1;
-        status = "incremented";
-      } else if (gap === 2 && freezesAvailable > 0) {
-        // Exactly one day skipped and a freeze is available: spend it,
-        // the streak survives and today still counts.
-        freezesAvailable -= 1;
-        currentStreak = stats.currentStreak + 1;
-        status = "freeze_used";
-      } else {
-        currentStreak = 1;
-        status = "reset";
-      }
-    }
-
-    const longestStreak = Math.max(stats.longestStreak, currentStreak);
-    const milestone = STREAK_MILESTONES.includes(currentStreak)
-      ? currentStreak
-      : null;
-
-    await ctx.db.patch(userId, {
-      stats: {
-        ...stats,
-        currentStreak,
-        longestStreak,
-        lastActiveDate: today,
-        lastPracticeDate: today, // keep legacy field in sync
-        freezesAvailable,
-        freezeWeekStart,
       },
-      updatedAt: Date.now(),
-    });
+    };
+  }
 
-    return {
-      status,
+  // Weekly freeze refill — before evaluating the gap, so a fresh week's
+  // freeze can forgive the first missed day of that week.
+  let freezesAvailable = stats.freezesAvailable ?? MAX_FREEZES;
+  let freezeWeekStart = stats.freezeWeekStart;
+  const thisWeek = mondayOf(today);
+  if (!freezeWeekStart || dayNumber(thisWeek) > dayNumber(freezeWeekStart)) {
+    freezesAvailable = MAX_FREEZES;
+    freezeWeekStart = thisWeek;
+  }
+
+  let currentStreak: number;
+  let status: StreakResult["status"];
+
+  if (!lastActive) {
+    currentStreak = 1;
+    status = "started";
+  } else {
+    const gap = dayNumber(today) - dayNumber(lastActive);
+    if (gap === 1) {
+      currentStreak = stats.currentStreak + 1;
+      status = "incremented";
+    } else if (gap === 2 && freezesAvailable > 0) {
+      // Exactly one day skipped and a freeze is available: spend it,
+      // the streak survives and today still counts.
+      freezesAvailable -= 1;
+      currentStreak = stats.currentStreak + 1;
+      status = "freeze_used";
+    } else {
+      currentStreak = 1;
+      status = "reset";
+    }
+  }
+
+  const longestStreak = Math.max(stats.longestStreak, currentStreak);
+  const milestone = STREAK_MILESTONES.includes(currentStreak)
+    ? currentStreak
+    : null;
+
+  return {
+    stats: {
       currentStreak,
       longestStreak,
+      lastActiveDate: today,
+      lastPracticeDate: today, // keep legacy field in sync
       freezesAvailable,
-      milestone,
-    };
-  },
-});
+      freezeWeekStart,
+    },
+    result: { status, currentStreak, longestStreak, freezesAvailable, milestone },
+  };
+}
 
 /**
  * Normalized streak state for the UI (fills defaults for users created

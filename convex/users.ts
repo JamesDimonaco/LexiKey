@@ -192,7 +192,7 @@ export const updateUserStats = mutation({
     // Only the fields something actually writes. The streak fields and the
     // running totals used to be here and were never sent by any caller —
     // accepting them let a signed-in user rewrite their own streak, which
-    // streaks.recordSessionCompleted owns.
+    // practiceSessions.finishSession owns.
     stats: v.object({
       currentLevel: v.optional(v.number()),
       listenLevel: v.optional(v.number()),
@@ -204,7 +204,7 @@ export const updateUserStats = mutation({
   handler: async (ctx, { userId, stats }) => {
     const user = await requireUser(ctx, userId);
 
-    // NOTE: streaks are owned by streaks.recordSessionCompleted (timezone-aware,
+    // NOTE: streaks are owned by practiceSessions.finishSession (timezone-aware,
     // freeze-forgiving) — this mutation only merges the fields it's given.
     await ctx.db.patch(userId, {
       stats: { ...user.stats, ...stats },

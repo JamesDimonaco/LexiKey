@@ -121,18 +121,12 @@ function ActiveSession({
     currentUser,
     anonymousUser,
     updateAnonymousStats,
-    updateUserStats,
-    batchProcessWordResults,
     updateAnonymousThreshold,
-    updateThresholdParams,
     reportAnonymousInaudible,
     reportInaudibleWord,
   } = userProgress;
 
-  const recordSessionCompleted = useMutation(
-    api.streaks.recordSessionCompleted,
-  );
-  const recordSession = useMutation(api.practiceSessions.recordSession);
+  const finishSession = useMutation(api.practiceSessions.finishSession);
   const [streakResult, setStreakResult] = useState<StreakResult | null>(null);
 
   // The input mode is fixed for a whole session, so the level and the
@@ -148,7 +142,7 @@ function ActiveSession({
 
   // Handle finishing session - save results to appropriate storage
   const handleFinishSession = useCallback(
-    async (allResults: WordResult[], newLevel: number) => {
+    async (allResults: WordResult[], newLevel: number, durationSeconds: number) => {
       // Build word results with wasStruggle flag for bucket processing
       // A word is a struggle if: incorrect, took too long, or required many corrections
       const wordResultsForBucket = allResults.map((r) => ({
@@ -183,19 +177,18 @@ function ActiveSession({
         // Update threshold (gradual adjustment)
         updateAnonymousThreshold(adjustedThreshold, inputMode);
       } else if (currentUser) {
-        await Promise.all([
-          // Best-effort like the streak: a failed history row must not stop
-          // the review bucket, level and streak from saving.
-          recordSession({
+        try {
+          const result = await finishSession({
             userId: currentUser._id,
             mode: config.focus.type === "review" ? "review" : "practice",
-            inputMode: inputMode === "listen" ? "voice" : "visible",
+            inputMode,
             displayMode: config.flow,
             phonicsGroupFocus:
               config.focus.type === "pattern" ? config.focus.patternId : undefined,
-            durationSeconds: Math.round(
-              allResults.reduce((sum, r) => sum + r.timeSpent, 0),
-            ),
+            durationSeconds,
+            newLevel,
+            thresholdParams: adjustedThreshold,
+            timezoneOffsetMinutes: new Date().getTimezoneOffset(),
             wordResults: allResults.map((r, i) => ({
               word: r.word,
               phonicsGroup: r.phonicsGroup,
@@ -205,32 +198,6 @@ function ActiveSession({
               hesitationDetected: r.hesitationDetected,
               wasStruggle: wordResultsForBucket[i].wasStruggle,
             })),
-          }).catch((error) =>
-            console.error("[Session] Failed to save session summary:", error),
-          ),
-          batchProcessWordResults({
-            userId: currentUser._id,
-            results: wordResultsForBucket,
-          }),
-          updateUserStats({
-            userId: currentUser._id,
-            stats:
-              inputMode === "listen"
-                ? { listenLevel: newLevel }
-                : { currentLevel: newLevel },
-          }),
-          updateThresholdParams({
-            userId: currentUser._id,
-            thresholdParams: adjustedThreshold,
-            inputMode,
-          }),
-        ]);
-
-        // Streak tracking is best-effort - never let it block session saving.
-        try {
-          const result = await recordSessionCompleted({
-            userId: currentUser._id,
-            timezoneOffsetMinutes: new Date().getTimezoneOffset(),
           });
           setStreakResult(result);
 
@@ -254,7 +221,8 @@ function ActiveSession({
             });
           }
         } catch (error) {
-          console.error("[Streak] Failed to record session:", error);
+          // The results screen still shows; nothing from this session saved.
+          console.error("[Session] Failed to save session:", error);
         }
       }
     },
@@ -265,12 +233,8 @@ function ActiveSession({
       sessionThresholdParams,
       currentUser,
       updateAnonymousStats,
-      updateUserStats,
-      batchProcessWordResults,
       updateAnonymousThreshold,
-      updateThresholdParams,
-      recordSessionCompleted,
-      recordSession,
+      finishSession,
     ],
   );
 
