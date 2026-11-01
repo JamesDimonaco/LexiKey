@@ -132,6 +132,7 @@ function ActiveSession({
   const recordSessionCompleted = useMutation(
     api.streaks.recordSessionCompleted,
   );
+  const recordSession = useMutation(api.practiceSessions.recordSession);
   const [streakResult, setStreakResult] = useState<StreakResult | null>(null);
 
   // The input mode is fixed for a whole session, so the level and the
@@ -183,6 +184,26 @@ function ActiveSession({
         updateAnonymousThreshold(adjustedThreshold, inputMode);
       } else if (currentUser) {
         await Promise.all([
+          recordSession({
+            userId: currentUser._id,
+            mode: config.focus.type === "review" ? "review" : "practice",
+            inputMode: inputMode === "listen" ? "voice" : "visible",
+            displayMode: config.flow,
+            phonicsGroupFocus:
+              config.focus.type === "pattern" ? config.focus.patternId : undefined,
+            durationSeconds: Math.round(
+              allResults.reduce((sum, r) => sum + r.timeSpent, 0),
+            ),
+            wordResults: allResults.map((r, i) => ({
+              word: r.word,
+              phonicsGroup: r.phonicsGroup,
+              timeSpent: r.timeSpent,
+              backspaceCount: r.backspaceCount,
+              wasCorrect: r.correct,
+              hesitationDetected: r.hesitationDetected,
+              wasStruggle: wordResultsForBucket[i].wasStruggle,
+            })),
+          }),
           batchProcessWordResults({
             userId: currentUser._id,
             results: wordResultsForBucket,
@@ -236,6 +257,7 @@ function ActiveSession({
     [
       isAnonymous,
       inputMode,
+      config,
       sessionThresholdParams,
       currentUser,
       updateAnonymousStats,
@@ -244,6 +266,7 @@ function ActiveSession({
       updateAnonymousThreshold,
       updateThresholdParams,
       recordSessionCompleted,
+      recordSession,
     ],
   );
 
