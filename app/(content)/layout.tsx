@@ -3,7 +3,8 @@ import Link from "next/link";
 /**
  * Layout for static content pages (no auth needed)
  * Pages: /welcome, /spelling-tutor, /for-parents, /for-teachers, /how-it-works,
- * /privacy, /terms
+ * /typing-practice-for-dyslexic-students, /orton-gillingham-spelling-practice,
+ * /free-dyslexia-tool-for-schools, /privacy, /terms
  */
 export default function ContentLayout({
   children,

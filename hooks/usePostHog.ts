@@ -103,24 +103,6 @@ export function trackError(
 // ============================================
 
 /**
- * Track when a practice session is completed
- */
-export function trackSessionCompleted(data: {
-  wordsAttempted: number;
-  wordsCompleted: number;
-  accuracy: number;
-  durationSeconds: number;
-  phonicsGroup?: string;
-  struggleWordsAdded: number;
-  mode: "practice" | "review" | "lesson";
-}) {
-  trackEvent("practice_session_completed", {
-    ...data,
-    timestamp: new Date().toISOString(),
-  });
-}
-
-/**
  * Track when a word is mastered (graduated from review)
  */
 export function trackWordMastered(data: {

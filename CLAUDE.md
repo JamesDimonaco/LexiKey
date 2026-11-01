@@ -17,7 +17,7 @@ Words must stay categorised by phonics rules — quality over quantity; context 
 
 ## Field notes (2026-08)
 
-- PostHog project **252090**, personal org — the connected Dama MCP can't read it; use `phog personal "<HogQL>"`.
+- PostHog project **252090**, personal org — the connected Dama MCP can't read it; `phog personal` hits a different project (400245), so call `/api/projects/252090/query/` with `PH_PERSONAL_KEY` from `~/.config/posthog-accounts.env`.
 - **Traction root cause (found 2026-07-25):** 19 people reached the practice screen in 90 days but only James ever completed a word — `practice_word_completed` only fired on spacebar/enter and nobody discovered the spacebar. Zero session completions ever. Fix shipped 2026-07-25: auto-advance on correct words (single-word mode: every word; sentence mode: last word only — spacebar stays the mid-sentence rhythm), type-over-the-word UI on practice AND placement test (placement uses neutral blue, no red — measurement not teaching), and a "Words Mastered" results section (client replays the server's 3-consecutive graduation rule against a session-start snapshot, because Convex deletes graduated words reactively before results render). Funnel to watch: per-person `practice_word_completed`, and `practice_session_completed` (previously zero).
 - Ideas James has NOT greenlit (don't build unprompted): TTS-by-default, kid-first results screen (demote WPM), teacher-side IEP report.
 
