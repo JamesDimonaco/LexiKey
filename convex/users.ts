@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireClerkId, requireUser } from "./authHelpers";
+import { thresholdParamsValidator } from "./schema";
 
 /**
  * User Management Functions
@@ -216,26 +217,18 @@ export const updateUserStats = mutation({
 });
 
 /**
- * Update user's adaptive hesitation threshold parameters.
- * Called after placement test (initial calibration) and after practice sessions (gradual adjustment).
+ * Set the user's adaptive hesitation threshold after the placement test
+ * (initial calibration). After practice sessions, finishSession adjusts it.
  */
 export const updateThresholdParams = mutation({
   args: {
     userId: v.id("users"),
-    thresholdParams: v.object({
-      baseTime: v.number(),
-      secondsPerChar: v.number(),
-      secondsPerCharSquared: v.optional(v.number()),
-      safetyMultiplier: v.number(),
-      wordCount: v.number(),
-      lastUpdated: v.string(),
-    }),
-    /** Which mode the session ran in — each has its own calibration.
-     *  Optional for the same cross-deploy reason as struggleWords. */
-    inputMode: v.optional(v.union(v.literal("see"), v.literal("listen"))),
+    thresholdParams: thresholdParamsValidator,
+    /** Which mode was calibrated — each has its own threshold. */
+    inputMode: v.union(v.literal("see"), v.literal("listen")),
   },
   returns: v.id("users"),
-  handler: async (ctx, { userId, thresholdParams, inputMode = "see" }) => {
+  handler: async (ctx, { userId, thresholdParams, inputMode }) => {
     const user = await requireUser(ctx, userId);
 
     await ctx.db.patch(userId, {

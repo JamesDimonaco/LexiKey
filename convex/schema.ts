@@ -10,6 +10,15 @@ import { v } from "convex/values";
  * 3. PHONICS-FOCUSED: Words categorized by Orton-Gillingham principles
  */
 
+export const thresholdParamsValidator = v.object({
+  baseTime: v.number(), // Processing overhead in seconds
+  secondsPerChar: v.number(), // Typing speed per character
+  secondsPerCharSquared: v.optional(v.number()), // Length penalty (listening only)
+  safetyMultiplier: v.number(), // Buffer above normal (e.g., 1.3)
+  wordCount: v.number(), // Words used to calculate this
+  lastUpdated: v.string(), // ISO timestamp
+});
+
 export default defineSchema({
 
   // ====================
@@ -72,26 +81,8 @@ export default defineSchema({
       // Adaptive hesitation threshold (personalized to user's typing speed).
       // One set per input mode — a slow listening session must not drag the
       // reading threshold up, or vice versa.
-      thresholdParams: v.optional(
-        v.object({
-          baseTime: v.number(), // Processing overhead in seconds
-          secondsPerChar: v.number(), // Typing speed per character
-          secondsPerCharSquared: v.optional(v.number()), // Length penalty (listening only)
-          safetyMultiplier: v.number(), // Buffer above normal (e.g., 1.3)
-          wordCount: v.number(), // Words used to calculate this
-          lastUpdated: v.string(), // ISO timestamp
-        })
-      ),
-      listenThresholdParams: v.optional(
-        v.object({
-          baseTime: v.number(),
-          secondsPerChar: v.number(),
-          secondsPerCharSquared: v.optional(v.number()),
-          safetyMultiplier: v.number(),
-          wordCount: v.number(),
-          lastUpdated: v.string(),
-        })
-      ),
+      thresholdParams: v.optional(thresholdParamsValidator),
+      listenThresholdParams: v.optional(thresholdParamsValidator),
     }),
 
     // Subscription info (Premium)

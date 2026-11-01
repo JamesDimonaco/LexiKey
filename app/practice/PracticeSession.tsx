@@ -223,6 +223,10 @@ function ActiveSession({
         } catch (error) {
           // The results screen still shows; nothing from this session saved.
           console.error("[Session] Failed to save session:", error);
+          trackEvent("practice_session_save_failed", {
+            wordCount: allResults.length,
+            message: error instanceof Error ? error.message : String(error),
+          });
         }
       }
     },

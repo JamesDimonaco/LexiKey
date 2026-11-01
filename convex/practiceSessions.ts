@@ -1,11 +1,14 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { requireUser } from "./authHelpers";
+import { thresholdParamsValidator } from "./schema";
 import { applySessionToStreak, streakResultValidator } from "./streaks";
 import { applyWordResultsToBucket } from "./struggleWords";
 
 // Well above the 50-word settings maximum; rejects obviously bogus calls.
 const MAX_WORDS_PER_SESSION = 200;
+// A tab left open mid-session would otherwise count hours of idle time.
+const MAX_SESSION_SECONDS = 60 * 60;
 
 /**
  * Everything a finished session changes, in one transaction: the history row,
@@ -22,14 +25,7 @@ export const finishSession = mutation({
     phonicsGroupFocus: v.optional(v.string()),
     durationSeconds: v.number(),
     newLevel: v.number(),
-    thresholdParams: v.object({
-      baseTime: v.number(),
-      secondsPerChar: v.number(),
-      secondsPerCharSquared: v.optional(v.number()),
-      safetyMultiplier: v.number(),
-      wordCount: v.number(),
-      lastUpdated: v.string(),
-    }),
+    thresholdParams: thresholdParamsValidator,
     // From the client: new Date().getTimezoneOffset()
     timezoneOffsetMinutes: v.number(),
     wordResults: v.array(
@@ -62,7 +58,10 @@ export const finishSession = mutation({
       inputMode: inputMode === "listen" ? "voice" : "visible",
       displayMode: args.displayMode,
       phonicsGroupFocus: args.phonicsGroupFocus,
-      durationSeconds: args.durationSeconds,
+      durationSeconds: Math.min(
+        Math.max(0, Math.round(args.durationSeconds)),
+        MAX_SESSION_SECONDS,
+      ),
       wordsAttempted: wordResults.length,
       wordsCompleted,
       accuracy: Math.round((wordsCompleted / wordResults.length) * 100),

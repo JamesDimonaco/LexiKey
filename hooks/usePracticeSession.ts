@@ -175,9 +175,9 @@ export function usePracticeSession({
   // write). Keyed by index, not word id: the same word can appear twice in a
   // session and the second occurrence still needs its own submit.
   const submittedIndexRef = useRef<number | null>(null);
-  // Wall-clock from the session's first keystroke. Per-word timers start at
-  // each word's first keystroke, so their sum leaves out listening time and
-  // the gaps between words.
+  // Wall clock from the session's first keystroke. Per-word timers start at
+  // each word's first keystroke, so their sum leaves out the gaps between
+  // words, including listening to every word after the first.
   const sessionStartRef = useRef<number | null>(null);
 
   const currentWord = sessionWords[currentWordIndex];
@@ -304,11 +304,16 @@ export function usePracticeSession({
         (r) => !r.correct || r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD
       );
 
+      const durationSeconds = sessionStartRef.current
+        ? Math.round((Date.now() - sessionStartRef.current) / 1000)
+        : Math.round(totalTime);
+
       trackEvent("practice_session_completed", {
         wordCount: allResults.length,
         accuracy: Math.round(accuracy * 100),
         avgTimePerWord: Math.round(avgTimePerWord * 100) / 100,
         totalTime: Math.round(totalTime),
+        durationSeconds,
         oldLevel: effectiveLevel,
         newLevel,
         struggleWordsCount: struggleWords.length,
@@ -316,10 +321,6 @@ export function usePracticeSession({
         sentenceMode,
         dictationMode: settings.dictationMode,
       });
-
-      const durationSeconds = sessionStartRef.current
-        ? Math.round((Date.now() - sessionStartRef.current) / 1000)
-        : Math.round(totalTime);
 
       await onFinishSession(allResults, newLevel, durationSeconds);
     },

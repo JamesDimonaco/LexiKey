@@ -70,7 +70,7 @@ export const streakResultValidator = v.object({
   milestone: v.union(v.number(), v.null()),
 });
 
-export type StreakResult = Infer<typeof streakResultValidator>;
+type StreakResult = Infer<typeof streakResultValidator>;
 
 /**
  * Count a completed practice session towards the streak.
