@@ -6,7 +6,6 @@ import { Flame, Snowflake, Trophy, VolumeX } from "lucide-react";
 import { WordResult, StreakResult, StruggleWord } from "@/lib/types";
 import {
   trackEvent,
-  trackSessionCompleted,
   trackWordMastered,
   updateUserProperties,
   incrementUserProperty,
@@ -165,16 +164,6 @@ export function SessionComplete({
   // Focus container for keyboard events and track analytics
   useEffect(() => {
     containerRef.current?.focus();
-
-    // Track comprehensive session completion
-    trackSessionCompleted({
-      wordsAttempted: results.length,
-      wordsCompleted: results.filter((r) => r.correct).length,
-      accuracy,
-      durationSeconds: totalTime,
-      struggleWordsAdded: struggleWords.length,
-      mode: "practice",
-    });
 
     // Update user properties for segmentation
     updateUserProperties({
