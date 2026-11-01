@@ -5,37 +5,63 @@
 > the same words. Not a words-per-minute trainer.
 
 LexiKey is a web app at https://lexikey.org. It is free, needs no account to
-start, and has no timer, leaderboard or reward loop — deliberately, because
-those work against the learners it is for.
+start, and has no timer, leaderboard or reward loop, deliberately, because
+those work against the learners it is for. There is nothing to buy. A
+secondary school in Ireland uses it in class with its students.
 
 ## How it works
 
 - 1,114 words sorted into 108 phonics groups following the Orton-Gillingham
   approach, the method dyslexia specialists have used for eighty years. A
   session drills one spelling pattern, so learning "shine" transfers to "stripe".
-- Two modes: type the word shown on screen, or switch to listening and type
+  Patterns include short vowels, magic e, digraphs, blends, vowel teams,
+  r-controlled vowels, diphthongs, silent letters, double letters, compound
+  words, longer multisyllable words and a set of tricky rules.
+- Every word is spoken aloud by a recorded voice (British or American), not a
+  browser speech synthesiser. Speed is adjustable.
+- Two modes: type the word shown on screen, or switch to dictation and type
   what is spoken. They are levelled and scored separately because reading and
   hearing a word are different skills.
-- Hesitation is tracked, not just errors. A word typed correctly after a long
-  pause has not been learned; it returns in later sessions until it is right
-  three times running.
+- Hesitation is tracked, not just errors. A word typed correctly after a pause
+  of more than 1.5 seconds has not been learned; it returns in later sessions
+  until it is right three times running. Keystrokes are checked in the browser
+  and never sent to a server; only session summaries are stored.
 - A placement test finds the learner's level so practice starts at the gaps.
-- Adjustable font, size, letter spacing, high contrast, dark mode, text-to-speech.
+- Adjustable font, size and letter spacing, high contrast, dark mode.
+
+## Who it is for
+
+- Dyslexic students from upper primary through secondary school. The screen
+  is plain (a word, a sentence, nothing else), so teenagers do not find it
+  childish.
+- Parents of children who keep failing the same spellings.
+- Learning support and SEN teachers who need something free that runs in a
+  browser with nothing to install. There is no teacher dashboard yet;
+  progress lives in each student's own free account.
+- Orton-Gillingham tutors, as homework between lessons.
 
 ## What it does not do
 
 - It cannot diagnose dyslexia. That needs a qualified assessor.
-- It does not teach reading, comprehension or writing — only spelling.
+- It does not teach reading, comprehension or writing. Only spelling.
+- It does not teach touch typing or measure words per minute.
+- It does not explain phonics rules; it drills them. It is not aligned to any
+  named published Orton-Gillingham programme.
 - It does not replace a human tutor, who can read a child's mood and adjust.
   It is what fills the six days between tutoring sessions.
 
 ## Pages
 
 - https://lexikey.org/welcome: what LexiKey is and who it is for
+- https://lexikey.org/typing-practice-for-dyslexic-students: for dyslexic teenagers and secondary students
+- https://lexikey.org/orton-gillingham-spelling-practice: the practice half of Orton-Gillingham, online and free
+- https://lexikey.org/free-dyslexia-tool-for-schools: for learning support teachers and schools
 - https://lexikey.org/spelling-tutor: honest comparison with hiring a tutor
 - https://lexikey.org/how-it-works: the Orton-Gillingham method behind it
 - https://lexikey.org/for-parents: for parents of struggling spellers
 - https://lexikey.org/for-teachers: classroom use and what it tracks
+- https://lexikey.org/placement-test: find the learner's starting level
+- https://lexikey.org/privacy: what is stored
 - https://lexikey.org/: the practice app itself
 
 ## Who made it
