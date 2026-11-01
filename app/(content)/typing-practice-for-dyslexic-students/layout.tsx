@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Typing Practice for Dyslexic Teenagers and Secondary Students",
   description:
-    "Free typing practice for dyslexic students in secondary school. Words are grouped by spelling rule and spoken aloud, hesitations are tracked, and there is no timer or leaderboard. Used in class by a secondary school.",
+    "Free typing practice for dyslexic students in secondary school. Words are grouped by spelling rule and spoken aloud, hesitations are tracked, and there is no timer or leaderboard.",
   keywords: [
     "typing practice for dyslexic students",
     "typing for dyslexic teenagers",

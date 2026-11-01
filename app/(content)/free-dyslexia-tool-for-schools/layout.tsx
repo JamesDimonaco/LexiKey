@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Free Dyslexia Spelling Tool for Schools and Learning Support",
   description:
-    "A free spelling tool for dyslexic students that a school can use today: nothing to install, nothing to buy, no student account needed to start. Orton-Gillingham word groups, recorded voices, hesitation tracking. Used in class by a secondary school.",
+    "A free spelling tool for dyslexic students that a school can use today: nothing to install, nothing to buy, no student account needed to start. Orton-Gillingham word groups, recorded voices, hesitation tracking.",
   keywords: [
     "free dyslexia tool for schools",
     "dyslexia software for schools free",

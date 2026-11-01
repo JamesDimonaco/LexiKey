@@ -6,8 +6,7 @@
 
 LexiKey is a web app at https://lexikey.org. It is free, needs no account to
 start, and has no timer, leaderboard or reward loop, deliberately, because
-those work against the learners it is for. There is nothing to buy. A
-secondary school in Ireland uses it in class with its students.
+those work against the learners it is for. There is nothing to buy.
 
 ## How it works
 

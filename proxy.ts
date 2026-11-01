@@ -7,11 +7,11 @@ const CLERK_PROXY_PATH = "/__clerk";
 
 // Clerk's script loads from its own domain by default, which some school
 // filters and browser blockers stop, leaving Sign Up dead. Serving it from our
-// own origin avoids that. Inert until NEXT_PUBLIC_CLERK_PROXY_URL is set and
-// the proxy is enabled in the Clerk dashboard.
+// own origin avoids that. The browser only uses it once the proxy is enabled
+// in the Clerk dashboard and NEXT_PUBLIC_CLERK_PROXY_URL is set.
 function proxyClerkFrontendApi(req: NextRequest) {
   const headers = new Headers(req.headers);
-  headers.set("Clerk-Proxy-Url", process.env.NEXT_PUBLIC_CLERK_PROXY_URL ?? "");
+  headers.set("Clerk-Proxy-Url", `${req.nextUrl.origin}${CLERK_PROXY_PATH}`);
   headers.set("Clerk-Secret-Key", process.env.CLERK_SECRET_KEY ?? "");
 
   const target = new URL(req.url);

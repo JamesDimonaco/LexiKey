@@ -16,7 +16,7 @@ const FAQS: Faq[] = [
   {
     question: "What age range is it for?",
     answer:
-      "The words run from three-letter short-vowel words to multisyllable words like 'wonderful' and 'receive', so it covers upper primary through secondary. The screen is plain, with no cartoons, and a secondary school uses it in class.",
+      "The words run from three-letter short-vowel words to multisyllable words like 'wonderful' and 'receive', so it covers upper primary through secondary. The screen is plain, with no cartoons.",
   },
   {
     question: "Do students need accounts?",
@@ -54,8 +54,7 @@ export default function FreeDyslexiaToolForSchools() {
           Orton-Gillingham approach, every word is spoken aloud by a recorded
           voice, and words a student hesitates on come back until they are
           secure. It runs in a web browser, needs no installation and no
-          account to start, and there is nothing to buy. A secondary school in
-          Ireland uses it in class.
+          account to start, and there is nothing to buy.
         </p>
 
         <section className="mb-10">

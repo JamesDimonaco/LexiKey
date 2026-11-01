@@ -5,7 +5,7 @@ const FAQS: Faq[] = [
   {
     question: "Is LexiKey suitable for teenagers, or only young children?",
     answer:
-      "It is used in class by a secondary school. The screen shows a word, a sentence and nothing else: no cartoons, no mascot, no points. The word list runs from three-letter words up to words like 'receive' and 'wonderful', and the placement test skips what a student already knows.",
+      "The screen shows a word, a sentence and nothing else: no cartoons, no mascot, no points. The word list runs from three-letter words up to words like 'receive' and 'wonderful', and the placement test skips what a student already knows.",
   },
   {
     question: "Does LexiKey teach touch typing?",
@@ -50,7 +50,7 @@ export default function TypingPracticeForDyslexicStudents() {
           LexiKey is free typing practice where the typing teaches the
           spelling. Words are grouped by the phonics rule behind them, spoken
           aloud, and brought back when a student hesitates. There is no timer
-          and no leaderboard. A secondary school uses it in class.
+          and no leaderboard.
         </p>
 
         <section className="mb-10">
