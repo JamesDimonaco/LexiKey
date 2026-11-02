@@ -1,2 +1,5 @@
 ignoredBuiltDependencies:
   - '@clerk/shared'
+
+overrides:
+  minimatch@<11.0.1: '>=11.0.1'
