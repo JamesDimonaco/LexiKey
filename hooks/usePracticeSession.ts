@@ -51,7 +51,11 @@ interface UsePracticeSessionProps {
   anonymousUser: { deviceId: string } | null;
   /** Session configuration chosen on the setup screen */
   config: SessionConfig;
-  onFinishSession: (results: WordResult[], newLevel: number) => Promise<void>;
+  onFinishSession: (
+    results: WordResult[],
+    newLevel: number,
+    durationSeconds: number,
+  ) => Promise<void>;
 }
 
 export function usePracticeSession({
@@ -171,6 +175,10 @@ export function usePracticeSession({
   // write). Keyed by index, not word id: the same word can appear twice in a
   // session and the second occurrence still needs its own submit.
   const submittedIndexRef = useRef<number | null>(null);
+  // Wall clock from the session's first keystroke. Per-word timers start at
+  // each word's first keystroke, so their sum leaves out the gaps between
+  // words, including listening to every word after the first.
+  const sessionStartRef = useRef<number | null>(null);
 
   const currentWord = sessionWords[currentWordIndex];
 
@@ -296,11 +304,16 @@ export function usePracticeSession({
         (r) => !r.correct || r.hesitationDetected || r.backspaceCount > BACKSPACE_THRESHOLD
       );
 
+      const durationSeconds = sessionStartRef.current
+        ? Math.round((Date.now() - sessionStartRef.current) / 1000)
+        : Math.round(totalTime);
+
       trackEvent("practice_session_completed", {
         wordCount: allResults.length,
         accuracy: Math.round(accuracy * 100),
         avgTimePerWord: Math.round(avgTimePerWord * 100) / 100,
         totalTime: Math.round(totalTime),
+        durationSeconds,
         oldLevel: effectiveLevel,
         newLevel,
         struggleWordsCount: struggleWords.length,
@@ -309,7 +322,7 @@ export function usePracticeSession({
         dictationMode: settings.dictationMode,
       });
 
-      await onFinishSession(allResults, newLevel);
+      await onFinishSession(allResults, newLevel, durationSeconds);
     },
     [effectiveLevel, onFinishSession, isAnonymous, sentenceMode, settings.dictationMode],
   );
@@ -324,6 +337,7 @@ export function usePracticeSession({
       // Start timer on first keystroke (when going from 0 to 1 character)
       if (oldLength === 0 && newLength > 0 && startTime === null) {
         setStartTime(Date.now());
+        sessionStartRef.current ??= Date.now();
       }
 
       if (newLength < oldLength) {
@@ -594,6 +608,7 @@ export function usePracticeSession({
     setBackspaceCount(0);
     setShowFeedback(null);
     submittedIndexRef.current = null;
+    sessionStartRef.current = null;
     reveal.reset();
   }, [reveal]);
 

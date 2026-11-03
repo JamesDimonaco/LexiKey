@@ -113,7 +113,7 @@ export function AnonymousUserProvider({ children }: { children: ReactNode }) {
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Process all word results (same logic as Convex batchProcessWordResults)
+    // Process all word results (same logic as Convex applyWordResultsToBucket)
     const updatedStruggleWords = [...currentUser.struggleWords];
 
     for (const result of wordResults) {
