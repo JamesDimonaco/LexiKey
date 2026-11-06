@@ -1,2 +1,5 @@
-ignoredBuiltDependencies:
-  - '@clerk/shared'
+allowBuilds:
+  '@clerk/shared': false
+  core-js: false
+  esbuild: false
+  unrs-resolver: false
