@@ -1,34 +1,55 @@
-# CLAUDE.md - LexiKey
+# LexiKey
 
-LexiKey is a B2B literacy intervention tool disguised as a B2C typing app: typing practice
-organised by phonics rules (Orton-Gillingham) to reinforce spelling for dyslexic students,
-not a WPM trainer. Calm and educational, not gamified — B2B (teachers/schools) is the revenue,
-the free B2C tier is the funnel.
+Typing practice organised by phonics rules (Orton-Gillingham) to reinforce spelling for dyslexic
+students. Not a WPM trainer. Calm and educational, not gamified. Teachers and schools (B2B) are
+the revenue; the free B2C tier is the funnel.
 
-**Stack:** Next.js 16 (App Router, TypeScript), Convex, Clerk, Tailwind CSS 4,
-next-themes (dark default — always pair `dark:` classes), Web Speech API for TTS,
-PostHog, Vercel.
+## Stack and commands
 
-**The non-negotiable — local-first keystroke handling:** NEVER write individual keystrokes
-to Convex. Validate typing locally in the browser (zero latency), track hesitations
-(>1.5s → review bucket) locally, and only persist session summaries.
+- Next.js 16 (App Router, React Compiler on), Convex, Clerk, Tailwind CSS 4, PostHog. pnpm.
+- next-themes with dark as default: always pair `dark:` classes.
+- `pnpm dev` (Next + `convex dev` in parallel), `pnpm build`, `pnpm lint`. No test suite.
+- `npx next build` is the definitive React Compiler check.
+- TTS: pre-rendered ElevenLabs MP3s in `public/audio/<voice>/`, built by
+  `node --env-file=.env.local scripts/generate-tts.mts`. Web Speech API is the fallback.
 
-Words must stay categorised by phonics rules — quality over quantity; context sentences for TTS.
+## Rules
 
-## Field notes (2026-08)
+- Local-first keystrokes: NEVER write individual keystrokes to Convex. Validate typing in the
+  browser, track hesitations (>1.5s goes to the review bucket) locally, persist session summaries only.
+- Words stay categorised by phonics rules. Quality over quantity; context sentences for TTS.
+- Not greenlit, don't build unprompted: TTS by default, kid-first results screen, teacher IEP report.
 
-- PostHog project **252090**, personal org — the connected Dama MCP can't read it; `phog personal` hits a different project (400245), so call `/api/projects/252090/query/` with `PH_PERSONAL_KEY` from `~/.config/posthog-accounts.env`.
-- **Traction root cause (found 2026-07-25):** 19 people reached the practice screen in 90 days but only James ever completed a word — `practice_word_completed` only fired on spacebar/enter and nobody discovered the spacebar. Zero session completions ever. Fix shipped 2026-07-25: auto-advance on correct words (single-word mode: every word; sentence mode: last word only — spacebar stays the mid-sentence rhythm), type-over-the-word UI on practice AND placement test (placement uses neutral blue, no red — measurement not teaching), and a "Words Mastered" results section (client replays the server's 3-consecutive graduation rule against a session-start snapshot, because Convex deletes graduated words reactively before results render). Funnel to watch: per-person `practice_word_completed`, and `practice_session_completed` (previously zero).
-- Ideas James has NOT greenlit (don't build unprompted): TTS-by-default, kid-first results screen (demote WPM), teacher-side IEP report.
+## Where things live
 
-## Review checklist (repo-specific)
+- Identity lane: personal.
+- Vercel project `lexi-key` (lexikey.org). Production builds run `npx convex deploy` first
+  (`vercel.json`), so a push to `main` deploys Convex prod too.
+- Convex: dev `capable-hippopotamus-953`, prod `prestigious-snail-572`.
+- Auth: Clerk.
+- PostHog project 252090. Query with `phog personal 252090 "<HogQL>"`. Funnel to watch:
+  `practice_word_completed` per person and `practice_session_completed`.
+- Env: `.env.local`. `CONVEX_DEPLOYMENT`, `NEXT_PUBLIC_CONVEX_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`,
+  `CLERK_SECRET_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, `CLERK_WEBHOOK_SECRET`, `NEXT_PUBLIC_POSTHOG_KEY`,
+  `NEXT_PUBLIC_POSTHOG_HOST`, `ELEVENLABS_API_KEY` (TTS script only).
 
-- **React Compiler is ON** (`reactCompiler: true` in next.config.ts) — render purity is load-bearing. Watch side effects in lazy `useState` initializers and module-level cache mutation during render. `npx next build` is the definitive compiler check.
-- **AdaptiveEngine treats PostHog events as alarms** (`insufficient_words_for_level`) — changes to the word pool (focus filters etc.) can turn an alarm into routine noise; check alarm semantics on pool-math changes.
-- **Contrast baseline:** WCAG AAA is not met repo-wide — `text-gray-500/600` small text (~4.6:1) is the accepted convention. Don't re-raise the convention; DO flag anything below it (gray-400 on white ≈ 3.0:1 fails even AA).
-- Custom `role="radio"` buttons keep appearing without roving tabindex/arrow keys — recurring pattern to catch; native inputs in the same files do it right.
-- Lint baseline: 62 accepted pre-existing problems (as of 2026-07-06) — diff-only review; new files add zero.
-- SSR safety of client-only work (Math.random/localStorage in render) is usually guaranteed by the `userProgress.isLoading` gate — verify the gate still wraps it.
+## Review checklist
+
+- React Compiler makes render purity load-bearing. Watch side effects in lazy `useState`
+  initialisers and module-level cache mutation during render.
+- AdaptiveEngine treats some PostHog events as alarms (`insufficient_words_for_level`). Word-pool
+  changes can turn an alarm into routine noise; check alarm semantics on pool-math changes.
+- Contrast: `text-gray-500/600` small text (~4.6:1) is the accepted baseline. Don't re-raise it;
+  flag anything below it (gray-400 on white fails AA).
+- Custom `role="radio"` buttons keep appearing without roving tabindex and arrow keys. Catch them.
+- Lint has accepted pre-existing problems. Review the diff only; new files add zero.
+- Client-only work in render (Math.random, localStorage) relies on the `userProgress.isLoading`
+  gate for SSR safety. Check the gate still wraps it.
+
+## Gotchas
+
+- Convex deletes graduated words reactively before results render. The results screen replays the
+  3-in-a-row graduation rule against a session-start snapshot instead.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
